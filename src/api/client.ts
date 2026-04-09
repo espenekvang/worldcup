@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5062'
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5211'
 
 function getToken(): string | null {
   try {

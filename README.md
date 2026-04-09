@@ -21,7 +21,7 @@ A match prediction app for the FIFA World Cup 2026. Invite friends, predict full
 │  │  └────────────────┬────────────────────────┘  │  │
 │  └───────────────────┼───────────────────────────┘  │
 └──────────────────────┼──────────────────────────────┘
-                       │ HTTP :5173 → :5076
+                       │ HTTP :5173 → :5211
                        │
 ┌──────────────────────▼──────────────────────────────┐
 │              .NET 10 Web API                        │
@@ -91,7 +91,7 @@ dotnet ef database update
 dotnet run
 ```
 
-The API runs on `http://localhost:5076`.
+The API runs on `http://localhost:5211`.
 
 ### Frontend Setup
 
