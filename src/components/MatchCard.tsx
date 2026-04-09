@@ -1,10 +1,12 @@
 import type { Match, Team, Venue } from '../types'
 import { formatMatchDate, formatMatchTime } from '../utils/dateUtils'
+import { usePredictions } from '../context/PredictionsContext'
 
 interface MatchCardProps {
   match: Match
   teams: Record<string, Team>
   venues: Venue[]
+  onTipClick: (match: Match) => void
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -17,11 +19,12 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Final',
 }
 
-export default function MatchCard({ match, teams, venues }: MatchCardProps) {
+export default function MatchCard({ match, teams, venues, onTipClick }: MatchCardProps) {
+  const { predictions } = usePredictions()
+  const prediction = predictions.get(match.id)
   const venue = venues.find(v => v.id === match.venueId)
   const isGroupStage = match.stage === 'group'
 
-  // Team names or placeholders
   let homeDisplay: string
   let awayDisplay: string
   let homeFlag = ''
@@ -41,7 +44,6 @@ export default function MatchCard({ match, teams, venues }: MatchCardProps) {
 
   return (
     <div data-testid="match-card" className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      {/* Header: date/time + stage/group badge */}
       <div className="flex items-center justify-between text-sm text-gray-500">
         <div>
           <span>{formatMatchDate(match.date)}</span>
@@ -53,7 +55,6 @@ export default function MatchCard({ match, teams, venues }: MatchCardProps) {
         </span>
       </div>
 
-      {/* Teams */}
       <div className="mt-3 flex items-center justify-center gap-3 text-lg font-semibold text-gray-900">
         <span className="text-right">
           {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
@@ -64,12 +65,37 @@ export default function MatchCard({ match, teams, venues }: MatchCardProps) {
         </span>
       </div>
 
-      {/* Venue */}
       {venue ? (
         <p className="mt-2 text-center text-sm text-gray-500">
           {venue.name}, {venue.city}
         </p>
       ) : null}
+
+      <div className="mt-3 border-t border-gray-100 pt-3">
+        {prediction ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-green-600">Ditt tipp:</span>
+              <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
+                {prediction.homeScore} – {prediction.awayScore}
+              </span>
+            </div>
+            <button
+              onClick={() => onTipClick(match)}
+              className="rounded-md px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+            >
+              Endre
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => onTipClick(match)}
+            className="w-full rounded-md bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
+          >
+            Tipp resultat
+          </button>
+        )}
+      </div>
     </div>
   )
 }

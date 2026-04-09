@@ -6,21 +6,18 @@ interface MatchListProps {
   teams: Record<string, Team>
   venues: Venue[]
   activeStage: Stage
+  onTipClick: (match: Match) => void
 }
 
-export default function MatchList({ matches, teams, venues, activeStage }: MatchListProps) {
-  // Filter matches by active stage
-  // SPECIAL: "final" tab should show BOTH "third-place" and "final" stage matches
+export default function MatchList({ matches, teams, venues, activeStage, onTipClick }: MatchListProps) {
   const filtered = matches.filter(m => {
     if (activeStage === 'final') return m.stage === 'final' || m.stage === 'third-place'
     return m.stage === activeStage
   })
 
-  // Sort chronologically
   const sorted = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   if (activeStage === 'group') {
-    // Group stage: sub-group by group field with headers
     const groups = new Map<string, Match[]>()
     for (const match of sorted) {
       const group = match.group ?? '?'
@@ -28,7 +25,6 @@ export default function MatchList({ matches, teams, venues, activeStage }: Match
       groups.get(group)!.push(match)
     }
 
-    // Sort group keys alphabetically
     const sortedGroups = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b))
 
     return (
@@ -39,7 +35,7 @@ export default function MatchList({ matches, teams, venues, activeStage }: Match
             <h3 className="mb-3 text-lg font-semibold text-gray-800">Group {group}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {groupMatches.map(match => (
-                <MatchCard key={match.id} match={match} teams={teams} venues={venues} />
+                <MatchCard key={match.id} match={match} teams={teams} venues={venues} onTipClick={onTipClick} />
               ))}
             </div>
           </div>
@@ -48,13 +44,12 @@ export default function MatchList({ matches, teams, venues, activeStage }: Match
     )
   }
 
-  // Knockout stages: chronological list
   return (
     <div className="space-y-3 p-4">
       <p className="text-sm text-gray-500">{sorted.length} matches</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map(match => (
-          <MatchCard key={match.id} match={match} teams={teams} venues={venues} />
+          <MatchCard key={match.id} match={match} teams={teams} venues={venues} onTipClick={onTipClick} />
         ))}
       </div>
     </div>

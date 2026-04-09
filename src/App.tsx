@@ -1,24 +1,47 @@
 import { useState } from 'react'
-import type { Stage } from './types'
+import type { Stage, Match } from './types'
 import { matches, teams, venues } from './data'
 import Header from './components/Header'
 import Countdown from './components/Countdown'
 import TabNav from './components/TabNav'
 import MatchList from './components/MatchList'
+import PredictionModal from './components/PredictionModal'
+import AdminPanel from './components/AdminPanel'
+import { useAuth } from './context/AuthContext'
 
-function App() {
+export default function App() {
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<Stage>('group')
+  const [tippingMatch, setTippingMatch] = useState<Match | null>(null)
+  const [showAdmin, setShowAdmin] = useState(false)
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
+      <Header onAdminClick={user?.isAdmin ? () => setShowAdmin((v) => !v) : undefined} />
       <main className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+        {showAdmin && user?.isAdmin ? (
+          <div className="mb-6">
+            <AdminPanel />
+          </div>
+        ) : null}
         <Countdown matches={matches} teams={teams} venues={venues} />
         <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-        <MatchList matches={matches} teams={teams} venues={venues} activeStage={activeTab} />
+        <MatchList
+          matches={matches}
+          teams={teams}
+          venues={venues}
+          activeStage={activeTab}
+          onTipClick={setTippingMatch}
+        />
       </main>
+
+      {tippingMatch ? (
+        <PredictionModal
+          match={tippingMatch}
+          teams={teams}
+          onClose={() => setTippingMatch(null)}
+        />
+      ) : null}
     </div>
   )
 }
-
-export default App
