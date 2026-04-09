@@ -457,7 +457,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/Countdown.tsx`, `src/utils/dateUtils.ts`
   - Pre-commit: `npm run dev` renders countdown
 
-- [ ] 4. Match Card Component
+- [x] 4. Match Card Component
 
   **What to do**:
   - Create `src/components/MatchCard.tsx`:
