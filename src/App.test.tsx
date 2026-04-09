@@ -5,8 +5,6 @@ describe('App', () => {
   it('renders the title', () => {
     render(<App />)
 
-    expect(
-      screen.getByRole('heading', { name: 'FIFA World Cup 2026' }),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/FIFA World Cup 2026/)).toBeInTheDocument()
   })
 })

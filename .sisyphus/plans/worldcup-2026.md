@@ -536,7 +536,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/MatchCard.tsx`
   - Pre-commit: `npx tsc --noEmit`
 
-- [ ] 5. Tabbed Match List with Phase Filtering
+- [x] 5. Tabbed Match List with Phase Filtering
 
   **What to do**:
   - Create `src/components/TabNav.tsx`:

@@ -36,6 +36,15 @@
       "agent": "Sisyphus-Junior",
       "category": "visual-engineering",
       "updated_at": "2026-04-09T18:59:44.330Z"
+    },
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "Tabbed Match List with Phase Filtering",
+      "session_id": "ses_28c61b921ffenG5ufmmEFCeCFk",
+      "agent": "Sisyphus-Junior",
+      "category": "visual-engineering",
+      "updated_at": "2026-04-09T19:02:11.363Z"
     }
   }
 }
