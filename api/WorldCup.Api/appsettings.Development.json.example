@@ -1,0 +1,22 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=worldcup.db"
+  },
+  "Jwt": {
+    "Key": "<your-jwt-secret-key-min-32-chars>",
+    "Issuer": "WorldCup.Api",
+    "Audience": "WorldCup.Client"
+  },
+  "Google": {
+    "ClientId": "<your-google-oauth-client-id>"
+  },
+  "Admin": {
+    "Email": "<admin-email>"
+  }
+}
