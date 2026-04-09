@@ -264,7 +264,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: All scaffold files
   - Pre-commit: `npm run dev` starts, `npm test` runs, `npx tsc --noEmit` passes
 
-- [ ] 2. Match Data JSON + TypeScript Type Definitions
+- [x] 2. Match Data JSON + TypeScript Type Definitions
 
   **What to do**:
   - Create `src/types/index.ts` with TypeScript interfaces:
@@ -368,7 +368,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/types/index.ts`, `src/data/*.json`, `src/data/index.ts`
   - Pre-commit: `npx tsc --noEmit`
 
-- [ ] 3. Smart Countdown Component + Date Utilities
+- [x] 3. Smart Countdown Component + Date Utilities
 
   **What to do**:
   - Create `src/utils/dateUtils.ts` with utility functions:
