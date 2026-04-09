@@ -31,8 +31,8 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Until World Cup 2026 begins/)).toBeInTheDocument()
-    expect(screen.getByText('days')).toBeInTheDocument()
+    expect(screen.getByText(/Til VM 2026 starter/)).toBeInTheDocument()
+    expect(screen.getByText('dager')).toBeInTheDocument()
   })
 
   it('shows the next match context and venue after the opener', () => {
@@ -40,7 +40,7 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Until Mexico vs Czech Republic/)).toBeInTheDocument()
+    expect(screen.getByText(/Til Mexico mot Czech Republic/)).toBeInTheDocument()
     expect(screen.getByText(/Estadio Azteca, Mexico City/)).toBeInTheDocument()
   })
 })

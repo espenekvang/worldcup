@@ -6,12 +6,12 @@ interface TabNavProps {
 }
 
 const TABS: { stage: Stage; label: string }[] = [
-  { stage: 'group', label: 'Group Stage' },
-  { stage: 'round-of-32', label: 'Round of 32' },
-  { stage: 'round-of-16', label: 'Round of 16' },
-  { stage: 'quarter-final', label: 'Quarter-finals' },
-  { stage: 'semi-final', label: 'Semi-finals' },
-  { stage: 'final', label: 'Final' },
+  { stage: 'group', label: 'Gruppespill' },
+  { stage: 'round-of-32', label: '32-delsfinale' },
+  { stage: 'round-of-16', label: '8-delsfinale' },
+  { stage: 'quarter-final', label: 'Kvartfinale' },
+  { stage: 'semi-final', label: 'Semifinale' },
+  { stage: 'final', label: 'Finale' },
 ]
 
 export default function TabNav({ activeTab, onTabChange }: TabNavProps) {

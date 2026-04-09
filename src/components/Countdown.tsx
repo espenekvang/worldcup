@@ -43,15 +43,15 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
   let contextText: string
 
   if (isTournamentOver) {
-    contextText = 'World Cup 2026 has ended'
+    contextText = 'VM 2026 er avsluttet'
   } else if (!targetMatch) {
-    contextText = 'Until World Cup 2026 begins'
+    contextText = 'Til VM 2026 starter'
   } else if (targetMatch.homeTeam && targetMatch.awayTeam) {
     const home = teams[targetMatch.homeTeam]
     const away = teams[targetMatch.awayTeam]
-    contextText = `Until ${home?.name ?? targetMatch.homeTeam} vs ${away?.name ?? targetMatch.awayTeam}`
+    contextText = `Til ${home?.name ?? targetMatch.homeTeam} mot ${away?.name ?? targetMatch.awayTeam}`
   } else {
-    contextText = `Until ${targetMatch.homePlaceholder ?? 'TBD'} vs ${targetMatch.awayPlaceholder ?? 'TBD'}`
+    contextText = `Til ${targetMatch.homePlaceholder ?? 'Ikke avgjort'} mot ${targetMatch.awayPlaceholder ?? 'Ikke avgjort'}`
   }
 
   const venue = targetMatch ? venues.find(venueItem => venueItem.id === targetMatch.venueId) : null
@@ -69,12 +69,12 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
       <div className="flex items-center justify-center gap-4 text-4xl font-bold text-gray-900 sm:text-5xl">
         <div className="flex flex-col items-center">
           <span>{timeLeft.days}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">days</span>
+          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">dager</span>
         </div>
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">hours</span>
+          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">timer</span>
         </div>
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
@@ -84,13 +84,13 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">sec</span>
+          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">sek</span>
         </div>
       </div>
       <p className="mt-4 text-lg font-medium text-gray-700">{contextText}</p>
       {venue ? (
         <p className="mt-1 text-sm text-gray-500">
-          at {venue.name}, {venue.city}
+          {venue.name}, {venue.city}
         </p>
       ) : null}
     </div>

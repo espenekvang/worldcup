@@ -11,7 +11,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
     <header className="bg-gradient-to-r from-blue-900 to-blue-700 py-6 text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex-1 text-center">
-          <h1 className="text-3xl font-bold sm:text-4xl">⚽ FIFA World Cup 2026 🏆</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">⚽ FIFA VM 2026 🏆</h1>
           <p className="mt-2 text-blue-200">USA • Mexico • Canada</p>
         </div>
 

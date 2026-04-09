@@ -10,13 +10,13 @@ interface MatchCardProps {
 }
 
 const STAGE_LABELS: Record<string, string> = {
-  'group': 'Group Stage',
-  'round-of-32': 'Round of 32',
-  'round-of-16': 'Round of 16',
-  'quarter-final': 'Quarter-final',
-  'semi-final': 'Semi-final',
-  'third-place': 'Third Place',
-  'final': 'Final',
+  'group': 'Gruppespill',
+  'round-of-32': '32-delsfinale',
+  'round-of-16': '8-delsfinale',
+  'quarter-final': 'Kvartfinale',
+  'semi-final': 'Semifinale',
+  'third-place': 'Bronsefinale',
+  'final': 'Finale',
 }
 
 export default function MatchCard({ match, teams, venues, onTipClick }: MatchCardProps) {
@@ -38,8 +38,8 @@ export default function MatchCard({ match, teams, venues, onTipClick }: MatchCar
     homeFlag = home?.flag ?? ''
     awayFlag = away?.flag ?? ''
   } else {
-    homeDisplay = match.homePlaceholder ?? 'TBD'
-    awayDisplay = match.awayPlaceholder ?? 'TBD'
+    homeDisplay = match.homePlaceholder ?? 'Ikke avgjort'
+    awayDisplay = match.awayPlaceholder ?? 'Ikke avgjort'
   }
 
   return (
@@ -51,7 +51,7 @@ export default function MatchCard({ match, teams, venues, onTipClick }: MatchCar
           <span>{formatMatchTime(match.date)}</span>
         </div>
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-          {isGroupStage ? `Group ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage}
+          {isGroupStage ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage}
         </span>
       </div>
 
@@ -59,7 +59,7 @@ export default function MatchCard({ match, teams, venues, onTipClick }: MatchCar
         <span className="text-right">
           {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
         </span>
-        <span className="text-sm font-normal text-gray-400">vs</span>
+        <span className="text-sm font-normal text-gray-400">mot</span>
         <span className="text-left">
           {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
         </span>

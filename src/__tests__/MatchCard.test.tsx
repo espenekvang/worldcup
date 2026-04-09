@@ -50,6 +50,6 @@ describe('MatchCard', () => {
 
     expect(screen.getByText(/1st Group A/)).toBeInTheDocument()
     expect(screen.getByText(/2nd Group B/)).toBeInTheDocument()
-    expect(screen.getByText(/Round of 32/)).toBeInTheDocument()
+    expect(screen.getByText(/32-delsfinale/)).toBeInTheDocument()
   })
 })
