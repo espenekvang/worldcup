@@ -3,3 +3,12 @@ dist
 .vite
 *.tsbuildinfo
 coverage
+
+# .NET
+api/**/bin/
+api/**/obj/
+*.db
+
+# Environment
+.env
+api/**/appsettings.Development.json
