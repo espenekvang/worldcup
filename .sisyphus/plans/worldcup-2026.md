@@ -167,7 +167,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 ## TODOs
 
-- [ ] 1. Project Scaffold — Vite + React + TypeScript + Tailwind CSS v4 + Vitest
+- [x] 1. Project Scaffold — Vite + React + TypeScript + Tailwind CSS v4 + Vitest
 
   **What to do**:
   - Run `npm create vite@latest . -- --template react-ts` in the project directory (`.` = current dir, do NOT create a subdirectory)

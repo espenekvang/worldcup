@@ -1,0 +1,114 @@
+[
+  {
+    "id": "azteca",
+    "name": "Estadio Azteca",
+    "city": "Mexico City",
+    "country": "Mexico",
+    "timezone": "America/Mexico_City"
+  },
+  {
+    "id": "akron",
+    "name": "Estadio Akron",
+    "city": "Guadalajara",
+    "country": "Mexico",
+    "timezone": "America/Mexico_City"
+  },
+  {
+    "id": "bbva",
+    "name": "Estadio BBVA",
+    "city": "Monterrey",
+    "country": "Mexico",
+    "timezone": "America/Monterrey"
+  },
+  {
+    "id": "bmo",
+    "name": "BMO Field",
+    "city": "Toronto",
+    "country": "Canada",
+    "timezone": "America/Toronto"
+  },
+  {
+    "id": "bcplace",
+    "name": "BC Place",
+    "city": "Vancouver",
+    "country": "Canada",
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "metlife",
+    "name": "MetLife Stadium",
+    "city": "East Rutherford",
+    "country": "USA",
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "rosebowl",
+    "name": "Rose Bowl",
+    "city": "Pasadena",
+    "country": "USA",
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "att",
+    "name": "AT&T Stadium",
+    "city": "Arlington",
+    "country": "USA",
+    "timezone": "America/Chicago"
+  },
+  {
+    "id": "sofi",
+    "name": "SoFi Stadium",
+    "city": "Inglewood",
+    "country": "USA",
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "hardrock",
+    "name": "Hard Rock Stadium",
+    "city": "Miami Gardens",
+    "country": "USA",
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "lincoln",
+    "name": "Lincoln Financial Field",
+    "city": "Philadelphia",
+    "country": "USA",
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "lumen",
+    "name": "Lumen Field",
+    "city": "Seattle",
+    "country": "USA",
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "nrg",
+    "name": "NRG Stadium",
+    "city": "Houston",
+    "country": "USA",
+    "timezone": "America/Chicago"
+  },
+  {
+    "id": "mercedesbenz",
+    "name": "Mercedes-Benz Stadium",
+    "city": "Atlanta",
+    "country": "USA",
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "arrowhead",
+    "name": "Arrowhead Stadium",
+    "city": "Kansas City",
+    "country": "USA",
+    "timezone": "America/Chicago"
+  },
+  {
+    "id": "levis",
+    "name": "Levi's Stadium",
+    "city": "Santa Clara",
+    "country": "USA",
+    "timezone": "America/Los_Angeles"
+  }
+]
