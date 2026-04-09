@@ -5,7 +5,7 @@ import type { Match, Team, Venue } from '../types'
 
 const mockTeams: Record<string, Team> = {
   MEX: { code: 'MEX', name: 'Mexico', flag: '🇲🇽' },
-  CZE: { code: 'CZE', name: 'Czech Republic', flag: '🇨🇿' },
+  CZE: { code: 'CZE', name: 'Tsjekkia', flag: '🇨🇿' },
 }
 
 const mockVenues: Venue[] = [
@@ -40,7 +40,7 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Til Mexico mot Czech Republic/)).toBeInTheDocument()
+    expect(screen.getByText(/Til Mexico mot Tsjekkia/)).toBeInTheDocument()
     expect(screen.getByText(/Estadio Azteca, Mexico City/)).toBeInTheDocument()
   })
 })

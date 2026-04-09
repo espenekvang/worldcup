@@ -8,7 +8,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { MemoryRouter } from 'react-router-dom'
 
 const mockTeams: Record<string, Team> = {
-  BRA: { code: 'BRA', name: 'Brazil', flag: '🇧🇷' },
+  BRA: { code: 'BRA', name: 'Brasil', flag: '🇧🇷' },
   ARG: { code: 'ARG', name: 'Argentina', flag: '🇦🇷' },
 }
 
@@ -38,7 +38,7 @@ describe('MatchCard', () => {
 
     render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} onTipClick={onTipClick} />, { wrapper: Wrapper })
 
-    expect(screen.getByText(/Brazil/)).toBeInTheDocument()
+    expect(screen.getByText(/Brasil/)).toBeInTheDocument()
     expect(screen.getByText(/Argentina/)).toBeInTheDocument()
     expect(screen.getByText(/MetLife Stadium, East Rutherford/)).toBeInTheDocument()
   })
