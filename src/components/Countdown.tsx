@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Match, Team, Venue } from '../types'
 import { getNextMatch, getTimeUntil, isBeforeTournament } from '../utils/dateUtils'
 
@@ -8,23 +8,23 @@ interface CountdownProps {
   venues: Venue[]
 }
 
-const FIRST_MATCH_DATE = '2026-06-11T20:00:00Z'
-
 export default function Countdown({ matches, teams, venues }: CountdownProps) {
+  const firstMatchDate = useMemo(() => matches.map(match => match.date).sort()[0] ?? null, [matches])
+
   const [targetMatch, setTargetMatch] = useState<Match | null>(() => {
-    if (isBeforeTournament(FIRST_MATCH_DATE)) {
+    if (!firstMatchDate || isBeforeTournament(firstMatchDate)) {
       return null
     }
 
     return getNextMatch(matches)
   })
 
-  const targetDate = targetMatch ? targetMatch.date : FIRST_MATCH_DATE
-  const isTournamentOver = !isBeforeTournament(FIRST_MATCH_DATE) && !targetMatch
-  const [timeLeft, setTimeLeft] = useState(() => getTimeUntil(targetDate))
+  const targetDate = targetMatch?.date ?? firstMatchDate
+  const isTournamentOver = firstMatchDate !== null && !isBeforeTournament(firstMatchDate) && !targetMatch
+  const [timeLeft, setTimeLeft] = useState(() => getTimeUntil(targetDate ?? new Date().toISOString()))
 
   useEffect(() => {
-    if (isTournamentOver) {
+    if (isTournamentOver || !targetDate) {
       return undefined
     }
 
