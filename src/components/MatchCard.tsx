@@ -8,6 +8,7 @@ interface MatchCardProps {
   venues: Venue[]
   locked: boolean
   onTipClick: (match: Match) => void
+  onViewOthers: (match: Match) => void
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -20,7 +21,7 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
-export default function MatchCard({ match, teams, venues, locked, onTipClick }: MatchCardProps) {
+export default function MatchCard({ match, teams, venues, locked, onTipClick, onViewOthers }: MatchCardProps) {
   const { predictions } = usePredictions()
   const prediction = predictions.get(match.id)
   const venue = venues.find(v => v.id === match.venueId)
@@ -117,6 +118,13 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick }: 
           </button>
         )}
       </div>
+
+      <button
+        onClick={() => onViewOthers(match)}
+        className="mt-2 w-full text-center text-xs font-medium text-gray-400 hover:text-gray-600"
+      >
+        Se andres tipp
+      </button>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import Countdown from './components/Countdown'
 import TabNav from './components/TabNav'
 import MatchList from './components/MatchList'
 import PredictionModal from './components/PredictionModal'
+import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
 import { useAuth } from './context/AuthContext'
 
@@ -13,6 +14,7 @@ export default function App() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<Stage>('group')
   const [tippingMatch, setTippingMatch] = useState<Match | null>(null)
+  const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
 
   return (
@@ -32,6 +34,7 @@ export default function App() {
           venues={venues}
           activeStage={activeTab}
           onTipClick={setTippingMatch}
+          onViewOthers={setViewingOthersMatch}
         />
       </main>
 
@@ -40,6 +43,14 @@ export default function App() {
           match={tippingMatch}
           teams={teams}
           onClose={() => setTippingMatch(null)}
+        />
+      ) : null}
+
+      {viewingOthersMatch ? (
+        <OtherPredictionsModal
+          match={viewingOthersMatch}
+          teams={teams}
+          onClose={() => setViewingOthersMatch(null)}
         />
       ) : null}
     </div>

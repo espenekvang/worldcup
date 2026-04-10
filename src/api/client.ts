@@ -97,3 +97,14 @@ export function deleteInvitation(id: string): Promise<void> {
     method: 'DELETE',
   })
 }
+
+export interface MatchPredictionResponse {
+  name: string
+  picture: string | null
+  homeScore: number | null
+  awayScore: number | null
+}
+
+export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {
+  return request<MatchPredictionResponse[]>(`/api/predictions/match/${matchId}`)
+}

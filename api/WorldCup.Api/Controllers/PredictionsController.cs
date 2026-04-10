@@ -109,6 +109,33 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
         return isNewPrediction ? StatusCode(StatusCodes.Status201Created, response) : Ok(response);
     }
 
+    [HttpGet("match/{matchId:int}")]
+    public async Task<ActionResult<IEnumerable<MatchPredictionResponse>>> GetMatchPredictions(int matchId)
+    {
+        var matchEntry = matchSchedule.GetMatch(matchId);
+        if (matchEntry is null)
+        {
+            return NotFound("Match not found.");
+        }
+
+        var locked = matchSchedule.IsStageLocked(matchEntry.Stage);
+
+        var predictions = await dbContext.Predictions
+            .Where(p => p.MatchId == matchId)
+            .Select(p => new MatchPredictionResponse
+            {
+                Name = p.User.Name,
+                Picture = p.User.Picture,
+                HomeScore = locked ? p.HomeScore : null,
+                AwayScore = locked ? p.AwayScore : null,
+            })
+            .OrderBy(p => p.Name)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(predictions);
+    }
+
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
