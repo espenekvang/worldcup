@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { Match, Team } from '../types'
 import { usePredictions } from '../context/PredictionsContext'
+import { isStageLocked } from '../utils/dateUtils'
+import { matches as allMatches } from '../data'
 
 interface PredictionModalProps {
   match: Match
@@ -32,6 +34,11 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
 
     if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
       setError('Skriv inn gyldige resultater (0 eller høyere)')
+      return
+    }
+
+    if (isStageLocked(match.stage, allMatches)) {
+      setError('Tipping er stengt for denne runden')
       return
     }
 

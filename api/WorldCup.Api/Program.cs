@@ -3,11 +3,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WorldCup.Api.Data;
+using WorldCup.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+var matchesJsonPath = Path.Combine(builder.Environment.ContentRootPath, "..", "..", "src", "data", "matches.json");
+builder.Services.AddSingleton(MatchSchedule.LoadFromJson(matchesJsonPath));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using WorldCup.Api.Data;
 using WorldCup.Api.DTOs;
 using WorldCup.Api.Models;
+using WorldCup.Api.Services;
 
 namespace WorldCup.Api.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/predictions")]
-public class PredictionsController(AppDbContext dbContext) : ControllerBase
+public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSchedule) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PredictionResponse>>> GetPredictions()
@@ -54,6 +55,17 @@ public class PredictionsController(AppDbContext dbContext) : ControllerBase
         if (request.MatchId != matchId)
         {
             return BadRequest("Route matchId must match request MatchId.");
+        }
+
+        var matchEntry = matchSchedule.GetMatch(matchId);
+        if (matchEntry is null)
+        {
+            return NotFound("Match not found.");
+        }
+
+        if (matchSchedule.IsStageLocked(matchEntry.Stage))
+        {
+            return BadRequest("Tipping er stengt for denne runden.");
         }
 
         var prediction = await dbContext.Predictions

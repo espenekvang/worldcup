@@ -6,6 +6,7 @@ interface MatchCardProps {
   match: Match
   teams: Record<string, Team>
   venues: Venue[]
+  locked: boolean
   onTipClick: (match: Match) => void
 }
 
@@ -19,7 +20,7 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
-export default function MatchCard({ match, teams, venues, onTipClick }: MatchCardProps) {
+export default function MatchCard({ match, teams, venues, locked, onTipClick }: MatchCardProps) {
   const { predictions } = usePredictions()
   const prediction = predictions.get(match.id)
   const venue = venues.find(v => v.id === match.venueId)
@@ -72,7 +73,27 @@ export default function MatchCard({ match, teams, venues, onTipClick }: MatchCar
       ) : null}
 
       <div className="mt-3 border-t border-gray-100 pt-3">
-        {prediction ? (
+        {locked ? (
+          <div className="flex items-center justify-between">
+            {prediction ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-green-600">Ditt tipp:</span>
+                <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
+                  {prediction.homeScore} – {prediction.awayScore}
+                </span>
+              </div>
+            ) : (
+              <span className="text-xs text-gray-400">Ingen tipp registrert</span>
+            )}
+            <span className="flex items-center gap-1 text-xs text-gray-400" title="Tipping er stengt for denne runden">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
+              </svg>
+              Låst
+            </span>
+          </div>
+        ) : prediction ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-green-600">Ditt tipp:</span>

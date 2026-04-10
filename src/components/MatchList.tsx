@@ -1,4 +1,5 @@
 import type { Match, Team, Venue, Stage } from '../types'
+import { isStageLocked } from '../utils/dateUtils'
 import MatchCard from './MatchCard'
 
 interface MatchListProps {
@@ -16,6 +17,8 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
   })
 
   const sorted = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+  const isLocked = (match: Match) => isStageLocked(match.stage, matches)
 
   if (activeStage === 'group') {
     const groups = new Map<string, Match[]>()
@@ -35,7 +38,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
             <h3 className="mb-3 text-lg font-semibold text-gray-800">Gruppe {group}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {groupMatches.map(match => (
-                <MatchCard key={match.id} match={match} teams={teams} venues={venues} onTipClick={onTipClick} />
+                <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} />
               ))}
             </div>
           </div>
@@ -49,7 +52,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
       <p className="text-sm text-gray-500">{sorted.length} kamper</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map(match => (
-          <MatchCard key={match.id} match={match} teams={teams} venues={venues} onTipClick={onTipClick} />
+          <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} />
         ))}
       </div>
     </div>

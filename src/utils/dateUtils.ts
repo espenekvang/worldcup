@@ -1,4 +1,4 @@
-import type { Match } from '../types'
+import type { Match, Stage } from '../types'
 
 export function formatMatchDate(isoDate: string): string {
   return new Intl.DateTimeFormat(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(isoDate))
@@ -30,4 +30,23 @@ export function getNextMatch(matches: Match[]): Match | null {
 
 export function isBeforeTournament(firstMatchDate: string): boolean {
   return Date.now() < new Date(firstMatchDate).getTime()
+}
+
+export function getEarliestKickoffByStage(matches: Match[]): Map<Stage, number> {
+  const result = new Map<Stage, number>()
+  for (const match of matches) {
+    const t = new Date(match.date).getTime()
+    const prev = result.get(match.stage)
+    if (prev === undefined || t < prev) {
+      result.set(match.stage, t)
+    }
+  }
+  return result
+}
+
+export function isStageLocked(stage: Stage, matches: Match[], now: number = Date.now()): boolean {
+  const earliest = getEarliestKickoffByStage(matches)
+  const kickoff = earliest.get(stage)
+  if (kickoff === undefined) return false
+  return now >= kickoff
 }

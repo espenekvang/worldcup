@@ -36,7 +36,7 @@ describe('MatchCard', () => {
   it('renders team names and venue for a group stage match', () => {
     const match: Match = { id: 1, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
 
-    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} onTipClick={onTipClick} />, { wrapper: Wrapper })
+    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} />, { wrapper: Wrapper })
 
     expect(screen.getByText(/Brasil/)).toBeInTheDocument()
     expect(screen.getByText(/Argentina/)).toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('MatchCard', () => {
   it('renders knockout placeholders and stage label', () => {
     const match: Match = { id: 73, date: '2026-07-01T20:00:00Z', homeTeam: null, awayTeam: null, homePlaceholder: '1st Group A', awayPlaceholder: '2nd Group B', stage: 'round-of-32', venueId: 'metlife' }
 
-    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} onTipClick={onTipClick} />, { wrapper: Wrapper })
+    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} />, { wrapper: Wrapper })
 
     expect(screen.getByText(/1st Group A/)).toBeInTheDocument()
     expect(screen.getByText(/2nd Group B/)).toBeInTheDocument()
