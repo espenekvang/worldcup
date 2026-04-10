@@ -31,3 +31,28 @@
 - Countdown ticking recalculates from `Date.now()` on each interval to avoid timer drift
 - Pre-tournament mode keeps `targetMatch` null for the "Until World Cup 2026 begins" label while still counting down to the first kickoff date
 - Match context falls back to placeholder labels when knockout fixtures do not yet have concrete team codes
+
+## [2026-04-09] F1 Audit Remediation
+- Countdown opener date now derives from `matches` by sorting ISO date strings and taking the earliest kickoff instead of using a hardcoded constant
+- Enabling `strict: true` in both app and node tsconfig exposed JSON import widening; runtime parser/type-guard functions in `src/data/index.ts` preserve strong typing without `as` assertions
+- `npx tsc --noEmit`, `npm run build`, and `npm test` all pass after the strict-mode/data typing cleanup
+
+## F3 Real Manual QA — 2026-04-09
+
+### QA Execution Notes
+- Dev server: `npm run dev -- --port 5173` starts successfully
+- Playwright MCP (Chrome 146) has WebSocket connection issues on this machine — workaround: use `playwright` npm package via npx cache with explicit `executablePath` pointing to Playwright's own bundled Chromium at `~/.npm/_npx/.../playwright` + `~/.ms-playwright/chromium-1181`
+- Command: `NODE_PATH=... node script.cjs` with `executablePath: '/Users/eekvang/Library/Caches/ms-playwright/chromium-1181/chrome-mac/Chromium.app/Contents/MacOS/Chromium'`
+
+### App Behavior Verified
+- Countdown shows: `62 DAYS : 23 HOURS : 32 MIN : 33 SEC` — live updating
+- All 6 tabs render correctly with exact names: Group Stage, Round of 32, Round of 16, Quarter-finals, Semi-finals, Final
+- Group Stage: 14 real team names confirmed (Mexico, USA, Canada, Brazil, Argentina, Germany, France, Spain, England, Morocco, Portugal, Japan, Saudi Arabia, South Africa)
+- Knockout tabs show `Winner Group C vs Runner-up Group F` style bracket labels
+- Match cards show venue names (NRG Stadium, Houston, etc.), dates (Tuesday 30 June 2026), times (19:00)
+- Mobile responsive at 375px: docWidth === winWidth === 375, no overflow
+
+### Console Errors
+- Only 1 error: `favicon.ico 404` — non-critical, cosmetic only
+- No JavaScript runtime errors
+
