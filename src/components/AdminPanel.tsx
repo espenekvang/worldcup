@@ -54,23 +54,23 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
       <h2 className="text-lg font-semibold text-gray-900">Administrer invitasjoner</h2>
       <p className="mt-1 text-sm text-gray-500">Kun inviterte brukere kan logge inn og tippe.</p>
 
-      <form onSubmit={handleInvite} className="mt-4 flex gap-2">
+      <form onSubmit={handleInvite} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="navn@eksempel.no"
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:py-2"
           required
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 sm:py-2"
         >
           {isLoading ? 'Sender...' : 'Inviter'}
         </button>

@@ -32,7 +32,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
     const sortedGroups = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b))
 
     return (
-      <div className="space-y-6 p-4">
+      <div className="space-y-6 p-2 sm:p-4">
         <p className="text-sm text-gray-500">{sorted.length} kamper</p>
         {sortedGroups.map(([group, groupMatches]) => (
           <div key={group}>
@@ -49,7 +49,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
   }
 
   return (
-    <div className="space-y-3 p-4">
+    <div className="space-y-3 p-2 sm:p-4">
       <p className="text-sm text-gray-500">{sorted.length} kamper</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map(match => (

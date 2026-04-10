@@ -45,8 +45,8 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
   }
 
   return (
-    <div data-testid="match-card" className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between text-sm text-gray-500">
+    <div data-testid="match-card" className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+      <div className="flex items-center justify-between text-xs text-gray-500 sm:text-sm">
         <div>
           <span>{formatMatchDate(match.date)}</span>
           <span className="mx-1">·</span>
@@ -57,12 +57,12 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-3 text-lg font-semibold text-gray-900">
-        <span className="text-right">
+      <div className="mt-3 flex items-center justify-center gap-2 text-base font-semibold text-gray-900 sm:gap-3 sm:text-lg">
+        <span className="min-w-0 truncate text-right">
           {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
         </span>
-        <span className="text-sm font-normal text-gray-400">mot</span>
-        <span className="text-left">
+        <span className="shrink-0 text-sm font-normal text-gray-400">mot</span>
+        <span className="min-w-0 truncate text-left">
           {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
         </span>
       </div>

@@ -65,29 +65,29 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
   }
 
   return (
-    <div className="py-8 text-center">
-      <div className="flex items-center justify-center gap-4 text-4xl font-bold text-gray-900 sm:text-5xl">
+    <div className="py-6 text-center sm:py-8">
+      <div className="flex items-center justify-center gap-2 text-3xl font-bold text-gray-900 sm:gap-4 sm:text-5xl">
         <div className="flex flex-col items-center">
           <span>{timeLeft.days}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">dager</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">dager</span>
         </div>
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">timer</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">timer</span>
         </div>
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">min</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">min</span>
         </div>
         <span className="text-gray-300">:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-          <span className="text-xs font-normal uppercase tracking-wide text-gray-500">sek</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">sek</span>
         </div>
       </div>
-      <p className="mt-4 text-lg font-medium text-gray-700">{contextText}</p>
+      <p className="mt-3 text-base font-medium text-gray-700 sm:mt-4 sm:text-lg">{contextText}</p>
       {venue ? (
         <p className="mt-1 text-sm text-gray-500">
           {venue.name}, {venue.city}

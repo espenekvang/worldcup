@@ -16,12 +16,12 @@ const TABS: { stage: Stage; label: string }[] = [
 
 export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
   return (
-    <nav className="flex gap-1 overflow-x-auto border-b border-gray-200 px-4">
+    <nav className="-mx-4 flex gap-1 overflow-x-auto border-b border-gray-200 px-4 scrollbar-none sm:mx-0">
       {TABS.map(tab => (
         <button
           key={tab.stage}
           onClick={() => onTabChange(tab.stage)}
-          className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
+          className={`whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors sm:px-4 sm:py-2 ${
             activeTab === tab.stage
               ? 'border-b-2 border-blue-600 text-blue-600'
               : 'text-gray-500 hover:text-gray-700'
