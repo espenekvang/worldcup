@@ -45,6 +45,33 @@
       "agent": "Sisyphus-Junior",
       "category": "visual-engineering",
       "updated_at": "2026-04-09T19:02:11.363Z"
+    },
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "App Integration + Header + Responsive Layout",
+      "session_id": "ses_28c5f9a87ffeO8IKRjhAQ0Pdy6",
+      "agent": "Sisyphus-Junior",
+      "category": "visual-engineering",
+      "updated_at": "2026-04-09T19:05:13.418Z"
+    },
+    "todo:7": {
+      "task_key": "todo:7",
+      "task_label": "7",
+      "task_title": "Vitest Component Tests",
+      "session_id": "ses_28c5caefeffe90DpXvv6OhwF3y",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-04-09T19:08:26.951Z"
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "**Plan Compliance Audit** — `oracle`",
+      "session_id": "ses_28c4cdda9ffeJAf3QW4pMK0NnK",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-04-09T19:28:47.615Z"
     }
   }
 }

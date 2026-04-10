@@ -626,7 +626,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/TabNav.tsx`, `src/components/MatchList.tsx`
   - Pre-commit: `npm run dev` renders tabs and matches
 
-- [ ] 6. App Integration + Header + Responsive Layout
+- [x] 6. App Integration + Header + Responsive Layout
 
   **What to do**:
   - Create `src/components/Header.tsx`:
@@ -741,7 +741,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/App.tsx`, `src/index.css`, `src/components/Header.tsx`
   - Pre-commit: `npm run build` succeeds
 
-- [ ] 7. Vitest Component Tests
+- [x] 7. Vitest Component Tests
 
   **What to do**:
   - Create `src/__tests__/dateUtils.test.ts`:
@@ -828,19 +828,19 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, open browser, run command). For each "Must NOT Have": search codebase for forbidden patterns (React Router, Redux, Zustand, Framer Motion, i18next imports). Check evidence files exist in `.sisyphus/evidence/`. Compare deliverables against plan.
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   Run `npx tsc --noEmit` + `npm test` + `npm run build`. Review all .ts/.tsx files for: `as any`/`@ts-ignore`, empty catches, `console.log` in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic variable names (data/result/item/temp). Verify component count ≤ 8 files. Verify no state management library installed.
   Output: `Build [PASS/FAIL] | TypeCheck [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
+- [x] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill)
   Start dev server. Open in Playwright. Verify: (1) App renders with countdown visible, (2) All 6 tabs exist and are clickable, (3) Group Stage tab shows group matches with real team names, (4) Knockout tabs show bracket position labels, (5) Match cards show date/time/venue, (6) Responsive at mobile width (375px). Capture screenshots for each tab. Save to `.sisyphus/evidence/final-qa/`.
   Output: `Scenarios [N/N pass] | Tabs [6/6] | Responsive [PASS/FAIL] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   For each task: read "What to do", verify actual implementation matches. Check: no React Router installed, no state management library, no animation library, no i18n, no backend code, no API calls. Verify component count ≤ 8. Verify total utility files = 1 (dateUtils.ts). Flag any unplanned additions.
   Output: `Tasks [N/N compliant] | Forbidden Deps [CLEAN/N found] | Scope [CLEAN/N issues] | VERDICT`
 
