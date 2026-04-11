@@ -14,9 +14,11 @@ COPY tsconfig*.json ./
 ARG VITE_GOOGLE_CLIENT_ID
 ARG VITE_APP_VERSION=dev
 ENV VITE_API_URL=""
-ENV VITE_APP_VERSION=${VITE_APP_VERSION}
 
-RUN npm run build
+RUN VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID} \
+    VITE_APP_VERSION=${VITE_APP_VERSION} \
+    VITE_API_URL="" \
+    npm run build
 
 # Stage 2: Backend build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-build
