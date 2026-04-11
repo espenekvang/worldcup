@@ -19,6 +19,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
+      - name: Calculate version with GitVersion
+        id: gitversion
+        run: |
+          version_json=$(dotnet dotnet-gitversion /output json)
+          echo "$version_json"
+          semver=$(echo "$version_json" | jq -r '.SemVer')
+          major_minor_patch=$(echo "$version_json" | jq -r '.MajorMinorPatch')
+          echo "semver=$semver" >> "$GITHUB_OUTPUT"
+          echo "major_minor_patch=$major_minor_patch" >> "$GITHUB_OUTPUT"
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -29,7 +49,8 @@ jobs:
         run: |
           az acr build \
             --registry ${{ secrets.ACR_NAME }} \
-            --image worldcup:${{ github.sha }} \
+            --image worldcup:${{ steps.gitversion.outputs.semver }} \
+            --image worldcup:latest \
             --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
             .
 
@@ -39,7 +60,7 @@ jobs:
             --name ${{ secrets.CONTAINER_APP_NAME }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --container-name worldcup \
-            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ github.sha }}
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ steps.gitversion.outputs.semver }}
 
       - name: Update ingress target port to app port
         run: |
