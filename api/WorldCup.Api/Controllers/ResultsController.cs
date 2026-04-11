@@ -69,6 +69,29 @@ public class ResultsController(AppDbContext dbContext, ScoringService scoringSer
         return Ok(points);
     }
 
+    [HttpGet("leaderboard")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<LeaderboardEntry>>> GetLeaderboard()
+    {
+        var leaderboard = await dbContext.Users
+            .Select(u => new LeaderboardEntry
+            {
+                Name = u.Name,
+                Picture = u.Picture,
+                TotalPoints = dbContext.Predictions
+                    .Where(p => p.UserId == u.Id && p.Points != null)
+                    .Sum(p => (int?)p.Points) ?? 0,
+                MatchCount = dbContext.Predictions
+                    .Count(p => p.UserId == u.Id && p.Points != null)
+            })
+            .OrderByDescending(e => e.TotalPoints)
+            .ThenBy(e => e.Name)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(leaderboard);
+    }
+
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
