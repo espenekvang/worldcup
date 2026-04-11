@@ -128,6 +128,7 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
                 Picture = p.User.Picture,
                 HomeScore = locked ? p.HomeScore : null,
                 AwayScore = locked ? p.AwayScore : null,
+                Points = locked ? p.Points : null,
             })
             .OrderBy(p => p.Name)
             .AsNoTracking()
