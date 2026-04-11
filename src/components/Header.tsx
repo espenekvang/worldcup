@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext'
+import { firstName } from '../utils/nameUtils'
 import ThemeToggle from './ThemeToggle'
 
 interface HeaderProps {
@@ -31,13 +32,13 @@ export default function Header({ onAdminClick }: HeaderProps) {
                 {user.picture ? (
                   <img
                     src={user.picture}
-                    alt={user.name}
+                    alt={firstName(user.name)}
                     className="h-7 w-7 rounded-full sm:h-8 sm:w-8"
                     referrerPolicy="no-referrer"
                   />
                 ) : null}
                 <span className="hidden text-sm sm:block" style={{ color: 'var(--color-header-text-muted)' }}>
-                  {user.name}
+                  {firstName(user.name)}
                 </span>
                 {onAdminClick ? (
                   <button

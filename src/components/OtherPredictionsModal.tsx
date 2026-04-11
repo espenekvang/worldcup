@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team } from '../types'
 import { getMatchPredictions, type MatchPredictionResponse } from '../api/client'
+import { firstName } from '../utils/nameUtils'
 
 interface OtherPredictionsModalProps {
   match: Match
@@ -81,10 +82,10 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
                       className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                       style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
                     >
-                      {p.name.charAt(0)}
+                      {firstName(p.name).charAt(0)}
                     </div>
                   )}
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{p.name}</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{firstName(p.name)}</span>
                 </div>
                 {p.homeScore !== null && p.awayScore !== null ? (
                   <div className="flex items-center gap-2">

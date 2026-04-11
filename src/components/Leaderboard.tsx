@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getLeaderboard, type LeaderboardEntry } from '../api/client'
+import { firstName } from '../utils/nameUtils'
 
 export default function Leaderboard() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
@@ -81,12 +82,12 @@ export default function Leaderboard() {
                   className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                   style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
                 >
-                  {entry.name.charAt(0)}
+                  {firstName(entry.name).charAt(0)}
                 </div>
               )}
               <div>
                 <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                  {entry.name}
+                  {firstName(entry.name)}
                 </span>
                 <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   {entry.matchCount} {entry.matchCount === 1 ? 'kamp' : 'kamper'}
