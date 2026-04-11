@@ -18,7 +18,7 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false)
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-surface)' }}>
       <Header onAdminClick={user?.isAdmin ? () => setShowAdmin((v) => !v) : undefined} />
       <main className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
         {showAdmin && user?.isAdmin ? (
