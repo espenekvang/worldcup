@@ -12,6 +12,22 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
+
+if (!File.Exists(matchesJsonPath))
+{
+    var seedSource = Path.Combine(AppContext.BaseDirectory, "data", "matches.json");
+    if (File.Exists(seedSource))
+    {
+        var dir = Path.GetDirectoryName(matchesJsonPath);
+        if (!string.IsNullOrWhiteSpace(dir))
+        {
+            Directory.CreateDirectory(dir);
+        }
+
+        File.Copy(seedSource, matchesJsonPath, overwrite: true);
+    }
+}
+
 builder.Services.AddSingleton(new MatchScheduleProvider(matchesJsonPath));
 builder.Services.AddSingleton<TeamCodeMapper>();
 builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
@@ -94,9 +110,6 @@ static string ResolveMatchesJsonPath(IWebHostEnvironment environment)
     var configuredPath = Environment.GetEnvironmentVariable("MATCHES_JSON_PATH");
     if (!string.IsNullOrWhiteSpace(configuredPath))
     {
-        // Always honour the configured path even if the file does not yet exist.
-        // MatchFileWriter.EnsureSeeded() will copy the built-in default there on
-        // first startup (container / persistent-volume scenario).
         return configuredPath;
     }
 
