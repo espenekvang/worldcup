@@ -17,7 +17,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
         <div className="flex items-center justify-between">
           <div className="min-w-0 flex-1 text-center">
             <h1 className="text-2xl font-bold sm:text-4xl">
-              <span className="text-wc-gold">⚽</span> FIFA VM 2026 <span className="text-wc-gold">🏆</span>
+              <span className="text-wc-gold">⚽</span> VM-Betting 2026 <span className="text-wc-gold">🏆</span>
             </h1>
             <p className="mt-1 text-sm sm:mt-2 sm:text-base" style={{ color: 'var(--color-header-text-muted)' }}>
               USA • Mexico • Canada

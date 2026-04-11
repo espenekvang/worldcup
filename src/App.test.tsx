@@ -23,6 +23,6 @@ describe('App', () => {
   it('renders the title', () => {
     render(<App />, { wrapper: Wrapper })
 
-    expect(screen.getByText(/FIFA VM 2026/)).toBeInTheDocument()
+    expect(screen.getByText(/VM-Betting 2026/)).toBeInTheDocument()
   })
 })
