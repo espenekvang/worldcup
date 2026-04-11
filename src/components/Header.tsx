@@ -16,12 +16,15 @@ export default function Header({ onAdminClick }: HeaderProps) {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <div className="min-w-0 flex-1 text-center">
-            <h1 className="text-2xl font-bold sm:text-4xl">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-thin sm:text-4xl">
               <span className="text-wc-gold">⚽</span> VM-Betting 2026 <span className="text-wc-gold">🏆</span>
             </h1>
-            <p className="mt-1 text-sm sm:mt-2 sm:text-base" style={{ color: 'var(--color-header-text-muted)' }}>
+            <p className="mt-1 text-sm font-thin sm:mt-2 sm:text-base" style={{ color: 'var(--color-header-text-muted)' }}>
               USA • Mexico • Canada
+            </p>
+            <p className="mt-0.5 text-[10px] font-thin opacity-40" style={{ color: 'var(--color-header-text-muted)' }}>
+              v{__APP_VERSION__}
             </p>
           </div>
 
