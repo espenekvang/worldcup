@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Countdown from './components/Countdown'
 import TabNav from './components/TabNav'
 import MatchList from './components/MatchList'
+import Leaderboard from './components/Leaderboard'
 import PredictionModal from './components/PredictionModal'
 import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
@@ -32,14 +33,18 @@ export default function App() {
             ) : null}
             <Countdown matches={matches} teams={teams} venues={venues} />
             <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-            <MatchList
-              matches={matches}
-              teams={teams}
-              venues={venues}
-              activeStage={activeTab}
-              onTipClick={setBettingMatch}
-              onViewOthers={setViewingOthersMatch}
-            />
+            {activeTab === 'leaderboard' ? (
+              <Leaderboard />
+            ) : (
+              <MatchList
+                matches={matches}
+                teams={teams}
+                venues={venues}
+                activeStage={activeTab}
+                onTipClick={setBettingMatch}
+                onViewOthers={setViewingOthersMatch}
+              />
+            )}
           </main>
 
           {bettingMatch ? (

@@ -12,6 +12,7 @@ const TABS: { stage: Stage; label: string }[] = [
   { stage: 'quarter-final', label: 'Kvartfinale' },
   { stage: 'semi-final', label: 'Semifinale' },
   { stage: 'final', label: 'Finale' },
+  { stage: 'leaderboard', label: 'The Boss' },
 ]
 
 export default function TabNav({ activeTab, onTabChange }: TabNavProps) {
