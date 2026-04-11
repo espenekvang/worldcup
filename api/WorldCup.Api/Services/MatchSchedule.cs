@@ -50,5 +50,20 @@ public sealed class MatchEntry
     [JsonPropertyName("awayTeam")]
     public string? AwayTeam { get; init; }
 
+    [JsonPropertyName("homePlaceholder")]
+    public string? HomePlaceholder { get; init; }
+
+    [JsonPropertyName("awayPlaceholder")]
+    public string? AwayPlaceholder { get; init; }
+
+    [JsonPropertyName("group")]
+    public string? Group { get; init; }
+
+    [JsonPropertyName("venueId")]
+    public string VenueId { get; init; } = string.Empty;
+
+    [JsonPropertyName("manualOverride")]
+    public bool ManualOverride { get; init; }
+
     public bool AreTeamsUndetermined => HomeTeam is null || AwayTeam is null;
 }

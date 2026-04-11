@@ -12,7 +12,7 @@ namespace WorldCup.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/predictions")]
-public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSchedule) : ControllerBase
+public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider matchScheduleProvider) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PredictionResponse>>> GetPredictions()
@@ -57,13 +57,13 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
             return BadRequest("Route matchId must match request MatchId.");
         }
 
-        var matchEntry = matchSchedule.GetMatch(matchId);
+        var matchEntry = matchScheduleProvider.Current.GetMatch(matchId);
         if (matchEntry is null)
         {
             return NotFound("Match not found.");
         }
 
-        if (matchSchedule.IsStageLocked(matchEntry.Stage))
+        if (matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage))
         {
             return BadRequest("Betting er stengt for denne runden.");
         }
@@ -117,13 +117,13 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
     [HttpGet("match/{matchId:int}")]
     public async Task<ActionResult<IEnumerable<MatchPredictionResponse>>> GetMatchPredictions(int matchId)
     {
-        var matchEntry = matchSchedule.GetMatch(matchId);
+        var matchEntry = matchScheduleProvider.Current.GetMatch(matchId);
         if (matchEntry is null)
         {
             return NotFound("Match not found.");
         }
 
-        var locked = matchSchedule.IsStageLocked(matchEntry.Stage);
+        var locked = matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage);
 
         var predictions = await dbContext.Predictions
             .Where(p => p.MatchId == matchId)

@@ -11,7 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
-builder.Services.AddSingleton(MatchSchedule.LoadFromJson(matchesJsonPath));
+builder.Services.AddSingleton(new MatchScheduleProvider(matchesJsonPath));
+builder.Services.AddSingleton<TeamCodeMapper>();
+builder.Services.AddSingleton(new MatchFileWriterOptions { JsonPath = matchesJsonPath });
+builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
 builder.Services.AddHostedService<ResultFetcherService>();
