@@ -6,6 +6,7 @@ export type Stage =
   | "semi-final"
   | "third-place"
   | "final"
+  | "leaderboard"
 
 export interface Team {
   code: string

@@ -129,6 +129,17 @@ export interface MatchPredictionResponse {
   points: number | null
 }
 
+export interface LeaderboardEntry {
+  name: string
+  picture: string | null
+  totalPoints: number
+  matchCount: number
+}
+
 export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {
   return request<MatchPredictionResponse[]>(`/api/predictions/match/${matchId}`)
+}
+
+export function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  return request<LeaderboardEntry[]>('/api/results/leaderboard')
 }
