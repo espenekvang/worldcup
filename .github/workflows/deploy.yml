@@ -38,6 +38,7 @@ jobs:
           az containerapp update \
             --name ${{ secrets.CONTAINER_APP_NAME }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --container-name worldcup \
             --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ github.sha }}
 
       - name: Update ingress target port to app port
