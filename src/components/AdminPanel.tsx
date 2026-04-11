@@ -56,7 +56,7 @@ export default function AdminPanel() {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
       <h2 className="text-lg font-semibold text-gray-900">Administrer invitasjoner</h2>
-      <p className="mt-1 text-sm text-gray-500">Kun inviterte brukere kan logge inn og tippe.</p>
+      <p className="mt-1 text-sm text-gray-500">Kun inviterte brukere kan logge inn og bette.</p>
 
       <form onSubmit={handleInvite} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input

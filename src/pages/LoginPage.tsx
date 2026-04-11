@@ -31,8 +31,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg sm:p-8">
         <div className="mb-6 text-center sm:mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">⚽ VM-Tipping 2026 🏆</h1>
-          <p className="mt-2 text-sm text-gray-500 sm:text-base">Logg inn for å tippe på VM-kampene</p>
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">⚽ VM-Betting 2026 🏆</h1>
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">Logg inn for å bette på VM-kampene</p>
         </div>
 
         <div className="flex flex-col items-center gap-4">

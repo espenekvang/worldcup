@@ -65,7 +65,7 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
 
         if (matchSchedule.IsStageLocked(matchEntry.Stage))
         {
-            return BadRequest("Tipping er stengt for denne runden.");
+            return BadRequest("Betting er stengt for denne runden.");
         }
 
         var prediction = await dbContext.Predictions

@@ -26,7 +26,7 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
         if (!cancelled) setPredictions(data)
       })
       .catch(err => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Kunne ikke hente tipp')
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Kunne ikke hente bets')
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -42,7 +42,7 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Andres tipp</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Andres bets</h2>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -62,7 +62,7 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
         ) : error ? (
           <p className="text-center text-sm text-red-600">{error}</p>
         ) : predictions.length === 0 ? (
-          <p className="text-center text-sm text-gray-400">Ingen har tippet på denne kampen ennå</p>
+          <p className="text-center text-sm text-gray-400">Ingen har bettet på denne kampen ennå</p>
         ) : (
           <ul className="divide-y divide-gray-100">
             {predictions.map((p, i) => (
@@ -83,7 +83,7 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
                   </span>
                 ) : (
                   <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">
-                    Har tippet
+                    Har bettet
                   </span>
                 )}
               </li>

@@ -38,7 +38,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
     }
 
     if (isStageLocked(match.stage, allMatches)) {
-      setError('Tipping er stengt for denne runden')
+      setError('Betting er stengt for denne runden')
       return
     }
 
@@ -49,7 +49,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
       await savePrediction(match.id, home, away)
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunne ikke lagre tippet')
+      setError(err instanceof Error ? err.message : 'Kunne ikke lagre bettet')
     } finally {
       setIsSaving(false)
     }
@@ -62,7 +62,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Tipp resultat</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Bet resultat</h2>
           <button
             onClick={onClose}
             className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -126,7 +126,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
               disabled={isSaving}
               className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 sm:py-2.5"
             >
-              {isSaving ? 'Lagrer...' : existing ? 'Oppdater tipp' : 'Lagre tipp'}
+              {isSaving ? 'Lagrer...' : existing ? 'Oppdater bet' : 'Lagre bet'}
             </button>
           </div>
         </form>

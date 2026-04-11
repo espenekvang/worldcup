@@ -78,15 +78,15 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
           <div className="flex items-center justify-between">
             {prediction ? (
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-green-600">Ditt tipp:</span>
+                <span className="text-xs font-medium text-green-600">Ditt bet:</span>
                 <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
                   {prediction.homeScore} – {prediction.awayScore}
                 </span>
               </div>
             ) : (
-              <span className="text-xs text-gray-400">Ingen tipp registrert</span>
+              <span className="text-xs text-gray-400">Ingen bet registrert</span>
             )}
-            <span className="flex items-center gap-1 text-xs text-gray-400" title="Tipping er stengt for denne runden">
+            <span className="flex items-center gap-1 text-xs text-gray-400" title="Betting er stengt for denne runden">
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
@@ -97,7 +97,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         ) : prediction ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-green-600">Ditt tipp:</span>
+              <span className="text-xs font-medium text-green-600">Ditt bet:</span>
               <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
                 {prediction.homeScore} – {prediction.awayScore}
               </span>
@@ -114,7 +114,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
             onClick={() => onTipClick(match)}
             className="w-full rounded-md bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
           >
-            Tipp resultat
+            Bet resultat
           </button>
         )}
       </div>
@@ -123,7 +123,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         onClick={() => onViewOthers(match)}
         className="mt-2 w-full text-center text-xs font-medium text-gray-400 hover:text-gray-600"
       >
-        Se andres tipp
+        Se andres bets
       </button>
     </div>
   )

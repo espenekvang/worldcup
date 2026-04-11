@@ -13,7 +13,7 @@ import { useAuth } from './context/AuthContext'
 export default function App() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<Stage>('group')
-  const [tippingMatch, setTippingMatch] = useState<Match | null>(null)
+  const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
 
@@ -33,16 +33,16 @@ export default function App() {
           teams={teams}
           venues={venues}
           activeStage={activeTab}
-          onTipClick={setTippingMatch}
+          onTipClick={setBettingMatch}
           onViewOthers={setViewingOthersMatch}
         />
       </main>
 
-      {tippingMatch ? (
+      {bettingMatch ? (
         <PredictionModal
-          match={tippingMatch}
+          match={bettingMatch}
           teams={teams}
-          onClose={() => setTippingMatch(null)}
+          onClose={() => setBettingMatch(null)}
         />
       ) : null}
 
