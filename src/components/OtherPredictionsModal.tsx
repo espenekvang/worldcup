@@ -87,12 +87,22 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
                   <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{p.name}</span>
                 </div>
                 {p.homeScore !== null && p.awayScore !== null ? (
-                  <span
-                    className="rounded-md px-2 py-1 text-sm font-bold"
-                    style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
-                  >
-                    {p.homeScore} – {p.awayScore}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="rounded-md px-2 py-1 text-sm font-bold"
+                      style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                    >
+                      {p.homeScore} – {p.awayScore}
+                    </span>
+                    {p.points !== null && (
+                      <span
+                        className="rounded-md px-2 py-1 text-xs font-bold"
+                        style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
+                      >
+                        {p.points}p
+                      </span>
+                    )}
+                  </div>
                 ) : (
                   <span
                     className="rounded-md px-2 py-1 text-xs font-medium"

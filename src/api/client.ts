@@ -126,6 +126,7 @@ export interface MatchPredictionResponse {
   picture: string | null
   homeScore: number | null
   awayScore: number | null
+  points: number | null
 }
 
 export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {
