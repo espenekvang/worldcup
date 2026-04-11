@@ -1,3 +1,5 @@
+import type { Match } from '../types'
+
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5211'
 
 function getToken(): string | null {
@@ -142,4 +144,15 @@ export function getMatchPredictions(matchId: number): Promise<MatchPredictionRes
 
 export function getLeaderboard(): Promise<LeaderboardEntry[]> {
   return request<LeaderboardEntry[]>('/api/results/leaderboard')
+}
+
+export function getMatches(): Promise<Match[]> {
+  return request<Match[]>('/api/matches')
+}
+
+export function updateMatchTeams(matchId: number, homeTeam?: string, awayTeam?: string): Promise<unknown> {
+  return request<unknown>(`/api/admin/matches/${matchId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ homeTeam: homeTeam ?? null, awayTeam: awayTeam ?? null }),
+  })
 }
