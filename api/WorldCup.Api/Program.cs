@@ -19,8 +19,6 @@ var defaultConnectionString = builder.Configuration.GetConnectionString("Default
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(defaultConnectionString));
 
-builder.Services.AddHostedService<SqliteBackupService>();
-
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() is { Length: > 0 } configuredOrigins
     ? configuredOrigins
     : ["http://localhost:5173", "http://localhost:5174"];
@@ -62,8 +60,6 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-RestoreDatabaseFromBackup(defaultConnectionString, builder.Configuration, builder.Environment);
-
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -100,27 +96,4 @@ static string ResolveMatchesJsonPath(IWebHostEnvironment environment)
     }
 
     return Path.Combine(environment.ContentRootPath, "..", "..", "src", "data", "matches.json");
-}
-
-static void RestoreDatabaseFromBackup(string connectionString, IConfiguration configuration, IWebHostEnvironment environment)
-{
-    var localDatabasePath = SqliteBackupPaths.ResolveLocalDatabasePath(connectionString, environment.ContentRootPath);
-    if (File.Exists(localDatabasePath))
-    {
-        return;
-    }
-
-    var backupDatabasePath = Path.Combine("/mnt/backup", "worldcup.db");
-    if (!File.Exists(backupDatabasePath))
-    {
-        return;
-    }
-
-    var localDirectory = Path.GetDirectoryName(localDatabasePath);
-    if (!string.IsNullOrWhiteSpace(localDirectory))
-    {
-        Directory.CreateDirectory(localDirectory);
-    }
-
-    File.Copy(backupDatabasePath, localDatabasePath);
 }

@@ -87,12 +87,7 @@ resource "azurerm_container_app" "main" {
 
       env {
         name  = "ConnectionStrings__DefaultConnection"
-        value = "Data Source=/app/data/worldcup.db"
-      }
-
-      env {
-        name  = "Backup__Path"
-        value = "/mnt/backup"
+        value = "Data Source=/mnt/backup/worldcup.db"
       }
 
       volume_mounts {
