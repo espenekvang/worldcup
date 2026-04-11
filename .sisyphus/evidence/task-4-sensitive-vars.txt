@@ -1,0 +1,9 @@
+24:variable "jwt_key" {
+25-  description = "JWT signing key (minimum 32 characters)"
+26-  type        = string
+27-  sensitive   = true
+--
+42:variable "google_client_id" {
+43-  description = "Google OAuth client ID"
+44-  type        = string
+45-  sensitive   = true

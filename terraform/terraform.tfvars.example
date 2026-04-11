@@ -1,0 +1,15 @@
+# Terraform variable values — copy to terraform.tfvars and fill in
+# Do NOT commit terraform.tfvars (contains secrets)
+
+resource_group_name   = "rg-worldcup"
+location              = "northeurope"
+acr_name              = "acrworldcupXXXXX"  # Must be globally unique, lowercase alphanumeric only
+container_app_name    = "ca-worldcup"
+
+jwt_key               = "CHANGE_ME_AT_LEAST_32_CHARS_LONG_RANDOM_STRING"  # SENSITIVE — do not commit actual values
+jwt_issuer            = "worldcup"
+jwt_audience          = "worldcup"
+
+google_client_id      = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"  # SENSITIVE — do not commit actual values
+admin_email           = "your.email@gmail.com"
+vite_google_client_id = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
