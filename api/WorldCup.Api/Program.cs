@@ -92,8 +92,11 @@ app.Run();
 static string ResolveMatchesJsonPath(IWebHostEnvironment environment)
 {
     var configuredPath = Environment.GetEnvironmentVariable("MATCHES_JSON_PATH");
-    if (!string.IsNullOrWhiteSpace(configuredPath) && File.Exists(configuredPath))
+    if (!string.IsNullOrWhiteSpace(configuredPath))
     {
+        // Always honour the configured path even if the file does not yet exist.
+        // MatchFileWriter.EnsureSeeded() will copy the built-in default there on
+        // first startup (container / persistent-volume scenario).
         return configuredPath;
     }
 
