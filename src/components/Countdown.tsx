@@ -59,37 +59,37 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
   if (isTournamentOver) {
     return (
       <div className="py-8 text-center">
-        <p className="text-xl font-semibold text-gray-600">{contextText}</p>
+        <p className="text-xl font-semibold" style={{ color: 'var(--color-text-secondary)' }}>{contextText}</p>
       </div>
     )
   }
 
   return (
     <div className="py-6 text-center sm:py-8">
-      <div className="flex items-center justify-center gap-2 text-3xl font-bold text-gray-900 sm:gap-4 sm:text-5xl">
+      <div className="flex items-center justify-center gap-2 text-3xl font-bold sm:gap-4 sm:text-5xl" style={{ color: 'var(--color-text-primary)' }}>
         <div className="flex flex-col items-center">
           <span>{timeLeft.days}</span>
-          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">dager</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide sm:text-xs" style={{ color: 'var(--color-text-muted)' }}>dager</span>
         </div>
-        <span className="text-gray-300">:</span>
+        <span style={{ color: 'var(--color-border)' }}>:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">timer</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide sm:text-xs" style={{ color: 'var(--color-text-muted)' }}>timer</span>
         </div>
-        <span className="text-gray-300">:</span>
+        <span style={{ color: 'var(--color-border)' }}>:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">min</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide sm:text-xs" style={{ color: 'var(--color-text-muted)' }}>min</span>
         </div>
-        <span className="text-gray-300">:</span>
+        <span style={{ color: 'var(--color-border)' }}>:</span>
         <div className="flex flex-col items-center">
           <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-          <span className="text-[10px] font-normal uppercase tracking-wide text-gray-500 sm:text-xs">sek</span>
+          <span className="text-[10px] font-normal uppercase tracking-wide sm:text-xs" style={{ color: 'var(--color-text-muted)' }}>sek</span>
         </div>
       </div>
-      <p className="mt-3 text-base font-medium text-gray-700 sm:mt-4 sm:text-lg">{contextText}</p>
+      <p className="mt-3 text-base font-medium sm:mt-4 sm:text-lg" style={{ color: 'var(--color-text-secondary)' }}>{contextText}</p>
       {venue ? (
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           {venue.name}, {venue.city}
         </p>
       ) : null}

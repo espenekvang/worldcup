@@ -45,48 +45,58 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
   }
 
   return (
-    <div data-testid="match-card" className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className="flex items-center justify-between text-xs text-gray-500 sm:text-sm">
+    <div
+      data-testid="match-card"
+      className="rounded-lg border p-3 shadow-sm transition-colors sm:p-4"
+      style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+    >
+      <div className="flex items-center justify-between text-xs sm:text-sm" style={{ color: 'var(--color-text-muted)' }}>
         <div>
           <span>{formatMatchDate(match.date)}</span>
           <span className="mx-1">·</span>
           <span>{formatMatchTime(match.date)}</span>
         </div>
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+        <span
+          className="rounded-full px-2 py-0.5 text-xs font-medium"
+          style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
+        >
           {isGroupStage ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage}
         </span>
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-2 text-base font-semibold text-gray-900 sm:gap-3 sm:text-lg">
+      <div className="mt-3 flex items-center justify-center gap-2 text-base font-semibold sm:gap-3 sm:text-lg" style={{ color: 'var(--color-text-primary)' }}>
         <span className="min-w-0 truncate text-right">
           {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
         </span>
-        <span className="shrink-0 text-sm font-normal text-gray-400">mot</span>
+        <span className="shrink-0 text-sm font-normal" style={{ color: 'var(--color-text-muted)' }}>mot</span>
         <span className="min-w-0 truncate text-left">
           {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
         </span>
       </div>
 
       {venue ? (
-        <p className="mt-2 text-center text-sm text-gray-500">
+        <p className="mt-2 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
           {venue.name}, {venue.city}
         </p>
       ) : null}
 
-      <div className="mt-3 border-t border-gray-100 pt-3">
+      <div className="mt-3 border-t pt-3" style={{ borderColor: 'var(--color-border-light)' }}>
         {locked ? (
           <div className="flex items-center justify-between">
             {prediction ? (
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-green-600">Ditt bet:</span>
-                <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
+                <span className="text-xs font-medium" style={{ color: 'var(--color-success)' }}>Ditt bet:</span>
+                <span
+                  className="rounded-md px-2 py-1 text-sm font-bold"
+                  style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                >
                   {prediction.homeScore} – {prediction.awayScore}
                 </span>
               </div>
             ) : (
-              <span className="text-xs text-gray-400">Ingen bet registrert</span>
+              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Ingen bet registrert</span>
             )}
-            <span className="flex items-center gap-1 text-xs text-gray-400" title="Betting er stengt for denne runden">
+            <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-muted)' }} title="Betting er stengt for denne runden">
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
@@ -97,14 +107,18 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         ) : prediction ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-green-600">Ditt bet:</span>
-              <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
+              <span className="text-xs font-medium" style={{ color: 'var(--color-success)' }}>Ditt bet:</span>
+              <span
+                className="rounded-md px-2 py-1 text-sm font-bold"
+                style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+              >
                 {prediction.homeScore} – {prediction.awayScore}
               </span>
             </div>
             <button
               onClick={() => onTipClick(match)}
-              className="rounded-md px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+              className="rounded-md px-3 py-1 text-xs font-medium"
+              style={{ color: 'var(--color-primary)' }}
             >
               Endre
             </button>
@@ -112,7 +126,8 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         ) : (
           <button
             onClick={() => onTipClick(match)}
-            className="w-full rounded-md bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
+            className="w-full rounded-md px-3 py-2 text-sm font-medium transition-colors"
+            style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
           >
             Bet resultat
           </button>
@@ -121,7 +136,8 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
 
       <button
         onClick={() => onViewOthers(match)}
-        className="mt-2 w-full text-center text-xs font-medium text-gray-400 hover:text-gray-600"
+        className="mt-2 w-full text-center text-xs font-medium transition-colors"
+        style={{ color: 'var(--color-text-muted)' }}
       >
         Se andres bets
       </button>

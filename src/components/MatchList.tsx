@@ -33,10 +33,10 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
     return (
       <div className="space-y-6 p-2 sm:p-4">
-        <p className="text-sm text-gray-500">{sorted.length} kamper</p>
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
         {sortedGroups.map(([group, groupMatches]) => (
           <div key={group}>
-            <h3 className="mb-3 text-lg font-semibold text-gray-800">Gruppe {group}</h3>
+            <h3 className="mb-3 text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Gruppe {group}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {groupMatches.map(match => (
                 <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
@@ -50,7 +50,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   return (
     <div className="space-y-3 p-2 sm:p-4">
-      <p className="text-sm text-gray-500">{sorted.length} kamper</p>
+      <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sorted.map(match => (
           <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
