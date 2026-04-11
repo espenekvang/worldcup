@@ -12,6 +12,9 @@ builder.Services.AddOpenApi();
 
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
 builder.Services.AddSingleton(MatchSchedule.LoadFromJson(matchesJsonPath));
+builder.Services.AddScoped<ScoringService>();
+builder.Services.AddHttpClient<Wc2026ApiClient>();
+builder.Services.AddHostedService<ResultFetcherService>();
 
 var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Default database connection string is not configured.");

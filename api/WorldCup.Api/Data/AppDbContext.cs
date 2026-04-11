@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users => Set<User>();
     public DbSet<Prediction> Predictions => Set<Prediction>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
+    public DbSet<MatchResult> MatchResults => Set<MatchResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +27,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(prediction => prediction.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<MatchResult>()
+            .HasIndex(result => result.MatchId)
+            .IsUnique();
 
         modelBuilder.Entity<Invitation>()
             .HasIndex(invitation => invitation.Email)

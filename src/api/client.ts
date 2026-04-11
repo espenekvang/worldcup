@@ -51,6 +51,21 @@ export interface PredictionResponse {
   updatedAt: string
 }
 
+export interface ResultResponse {
+  matchId: number
+  homeScore: number
+  awayScore: number
+  fetchedAt: string
+}
+
+export interface PointsResponse {
+  matchId: number
+  points: number
+  outcomePoints: number
+  homeGoalPoints: number
+  awayGoalPoints: number
+}
+
 export interface PredictionDto {
   matchId: number
   homeScore: number
@@ -66,6 +81,14 @@ export function loginWithGoogle(idToken: string): Promise<AuthResponse> {
 
 export function getPredictions(): Promise<PredictionResponse[]> {
   return request<PredictionResponse[]>('/api/predictions')
+}
+
+export function getResults(): Promise<ResultResponse[]> {
+  return request<ResultResponse[]>('/api/results')
+}
+
+export function getUserPoints(): Promise<PointsResponse[]> {
+  return request<PointsResponse[]>('/api/results/points')
 }
 
 export function putPrediction(matchId: number, prediction: PredictionDto): Promise<PredictionResponse> {

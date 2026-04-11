@@ -19,6 +19,8 @@ public sealed class MatchSchedule
     public MatchEntry? GetMatch(int matchId) =>
         _matchesById.GetValueOrDefault(matchId);
 
+    public IReadOnlyList<MatchEntry> GetAllMatches() => _matchesById.Values.ToList();
+
     public bool IsStageLocked(string stage) =>
         _earliestKickoffByStage.TryGetValue(stage, out var earliest) && DateTime.UtcNow >= earliest;
 

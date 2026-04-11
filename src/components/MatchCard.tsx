@@ -1,6 +1,7 @@
 import type { Match, Team, Venue } from '../types'
 import { formatMatchTime } from '../utils/dateUtils'
 import { usePredictions } from '../context/PredictionsContext'
+import { useResults } from '../context/ResultsContext'
 
 interface MatchCardProps {
   match: Match
@@ -23,7 +24,12 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default function MatchCard({ match, teams, venues, locked, onTipClick, onViewOthers }: MatchCardProps) {
   const { predictions } = usePredictions()
+  const { results, points } = useResults()
+  
   const prediction = predictions.get(match.id)
+  const result = results.get(match.id)
+  const pts = points.get(match.id)
+
   const venue = venues.find(v => v.id === match.venueId)
   const isGroupStage = match.stage === 'group'
 
@@ -67,13 +73,30 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
           <span className="min-w-0 truncate text-right">
             {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
           </span>
-          <span className="shrink-0 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>–</span>
+          {result ? (
+            <span className="shrink-0 font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              {result.homeScore} – {result.awayScore}
+            </span>
+          ) : (
+            <span className="shrink-0 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>–</span>
+          )}
           <span className="min-w-0 truncate text-left">
             {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
           </span>
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          {result && pts !== undefined && (
+            <span
+              className="rounded-md px-1.5 py-0.5 text-xs font-bold"
+              style={{
+                backgroundColor: pts.points === 4 ? '#fef9c3' : pts.points >= 2 ? 'var(--color-success-light)' : pts.points === 1 ? '#fff7ed' : '#fee2e2',
+                color: pts.points === 4 ? '#854d0e' : pts.points >= 2 ? 'var(--color-success-text)' : pts.points === 1 ? '#9a3412' : '#991b1b',
+              }}
+            >
+              {pts.points}p
+            </span>
+          )}
           {locked ? (
             <>
               {prediction ? (

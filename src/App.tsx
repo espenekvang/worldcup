@@ -9,6 +9,8 @@ import PredictionModal from './components/PredictionModal'
 import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
 import { useAuth } from './context/AuthContext'
+import { ResultsProvider } from './context/ResultsContext'
+import { PredictionsProvider } from './context/PredictionsContext'
 
 export default function App() {
   const { user } = useAuth()
@@ -18,41 +20,45 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false)
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-surface)' }}>
-      <Header onAdminClick={user?.isAdmin ? () => setShowAdmin((v) => !v) : undefined} />
-      <main className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
-        {showAdmin && user?.isAdmin ? (
-          <div className="mb-6">
-            <AdminPanel />
-          </div>
-        ) : null}
-        <Countdown matches={matches} teams={teams} venues={venues} />
-        <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-        <MatchList
-          matches={matches}
-          teams={teams}
-          venues={venues}
-          activeStage={activeTab}
-          onTipClick={setBettingMatch}
-          onViewOthers={setViewingOthersMatch}
-        />
-      </main>
+    <PredictionsProvider>
+      <ResultsProvider>
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <Header onAdminClick={user?.isAdmin ? () => setShowAdmin((v) => !v) : undefined} />
+          <main className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+            {showAdmin && user?.isAdmin ? (
+              <div className="mb-6">
+                <AdminPanel />
+              </div>
+            ) : null}
+            <Countdown matches={matches} teams={teams} venues={venues} />
+            <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+            <MatchList
+              matches={matches}
+              teams={teams}
+              venues={venues}
+              activeStage={activeTab}
+              onTipClick={setBettingMatch}
+              onViewOthers={setViewingOthersMatch}
+            />
+          </main>
 
-      {bettingMatch ? (
-        <PredictionModal
-          match={bettingMatch}
-          teams={teams}
-          onClose={() => setBettingMatch(null)}
-        />
-      ) : null}
+          {bettingMatch ? (
+            <PredictionModal
+              match={bettingMatch}
+              teams={teams}
+              onClose={() => setBettingMatch(null)}
+            />
+          ) : null}
 
-      {viewingOthersMatch ? (
-        <OtherPredictionsModal
-          match={viewingOthersMatch}
-          teams={teams}
-          onClose={() => setViewingOthersMatch(null)}
-        />
-      ) : null}
-    </div>
+          {viewingOthersMatch ? (
+            <OtherPredictionsModal
+              match={viewingOthersMatch}
+              teams={teams}
+              onClose={() => setViewingOthersMatch(null)}
+            />
+          ) : null}
+        </div>
+      </ResultsProvider>
+    </PredictionsProvider>
   )
 }
