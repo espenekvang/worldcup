@@ -1,11 +1,11 @@
 import type { Match, Stage } from '../types'
 
 export function formatMatchDate(isoDate: string): string {
-  return new Intl.DateTimeFormat(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(isoDate))
+  return new Intl.DateTimeFormat('nb-NO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(isoDate))
 }
 
 export function formatMatchTime(isoDate: string): string {
-  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(isoDate))
+  return new Intl.DateTimeFormat('nb-NO', { hour: 'numeric', minute: '2-digit' }).format(new Date(isoDate))
 }
 
 export function getTimeUntil(targetDate: string): { days: number; hours: number; minutes: number; seconds: number } {

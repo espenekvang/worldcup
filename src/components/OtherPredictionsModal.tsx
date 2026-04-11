@@ -15,8 +15,8 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
 
   const homeTeam = match.homeTeam ? teams[match.homeTeam] : null
   const awayTeam = match.awayTeam ? teams[match.awayTeam] : null
-  const homeDisplay = homeTeam?.name ?? match.homePlaceholder ?? 'TBD'
-  const awayDisplay = awayTeam?.name ?? match.awayPlaceholder ?? 'TBD'
+  const homeDisplay = homeTeam?.name ?? match.homePlaceholder ?? 'Ikke avgjort'
+  const awayDisplay = awayTeam?.name ?? match.awayPlaceholder ?? 'Ikke avgjort'
 
   useEffect(() => {
     let cancelled = false
