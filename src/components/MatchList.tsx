@@ -1,4 +1,5 @@
 import type { Match, Team, Venue, Stage } from '../types'
+import { formatMatchDate } from '../utils/dateUtils'
 import { isStageLocked } from '../utils/dateUtils'
 import MatchCard from './MatchCard'
 
@@ -21,41 +22,31 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const isLocked = (match: Match) => isStageLocked(match.stage, matches)
 
-  if (activeStage === 'group') {
-    const groups = new Map<string, Match[]>()
-    for (const match of sorted) {
-      const group = match.group ?? '?'
-      if (!groups.has(group)) groups.set(group, [])
-      groups.get(group)!.push(match)
-    }
-
-    const sortedGroups = [...groups.entries()].sort(([a], [b]) => a.localeCompare(b))
-
-    return (
-      <div className="space-y-6 p-2 sm:p-4">
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
-        {sortedGroups.map(([group, groupMatches]) => (
-          <div key={group}>
-            <h3 className="mb-3 text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Gruppe {group}</h3>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {groupMatches.map(match => (
-                <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    )
+  const dayGroups = new Map<string, Match[]>()
+  for (const match of sorted) {
+    const dayKey = match.date.slice(0, 10)
+    if (!dayGroups.has(dayKey)) dayGroups.set(dayKey, [])
+    dayGroups.get(dayKey)!.push(match)
   }
 
   return (
-    <div className="space-y-3 p-2 sm:p-4">
+    <div className="space-y-6 p-2 sm:p-4">
       <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {sorted.map(match => (
-          <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
-        ))}
-      </div>
+      {[...dayGroups.entries()].map(([dayKey, dayMatches]) => (
+        <div key={dayKey}>
+          <h3
+            className="mb-3 text-sm font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {formatMatchDate(dayMatches[0].date)}
+          </h3>
+          <div className="space-y-3">
+            {dayMatches.map(match => (
+              <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
