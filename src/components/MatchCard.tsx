@@ -53,10 +53,10 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
       style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
     >
       <div className="flex items-center gap-3">
-        <div className="flex w-14 shrink-0 flex-col items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
+        <div className="flex w-20 shrink-0 flex-col items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
           <span className="font-medium">{formatMatchTime(match.date)}</span>
           <span
-            className="mt-0.5 rounded-full px-1.5 py-px text-[10px] font-medium"
+            className="mt-0.5 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
             style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
           >
             {stageLabel}
