@@ -10,17 +10,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-var matchesJsonPath = Path.Combine(builder.Environment.ContentRootPath, "..", "..", "src", "data", "matches.json");
+var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
 builder.Services.AddSingleton(MatchSchedule.LoadFromJson(matchesJsonPath));
 
+var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Default database connection string is not configured.");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(defaultConnectionString));
+
+builder.Services.AddHostedService<SqliteBackupService>();
+
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() is { Length: > 0 } configuredOrigins
+    ? configuredOrigins
+    : ["http://localhost:5173", "http://localhost:5174"];
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ViteClient", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
+        policy.WithOrigins(corsOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -53,6 +62,14 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+RestoreDatabaseFromBackup(defaultConnectionString, builder.Configuration, builder.Environment);
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -61,7 +78,49 @@ if (app.Environment.IsDevelopment())
 app.UseCors("ViteClient");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
+
+static string ResolveMatchesJsonPath(IWebHostEnvironment environment)
+{
+    var configuredPath = Environment.GetEnvironmentVariable("MATCHES_JSON_PATH");
+    if (!string.IsNullOrWhiteSpace(configuredPath) && File.Exists(configuredPath))
+    {
+        return configuredPath;
+    }
+
+    var contentRootPath = Path.Combine(environment.ContentRootPath, "data", "matches.json");
+    if (File.Exists(contentRootPath))
+    {
+        return contentRootPath;
+    }
+
+    return Path.Combine(environment.ContentRootPath, "..", "..", "src", "data", "matches.json");
+}
+
+static void RestoreDatabaseFromBackup(string connectionString, IConfiguration configuration, IWebHostEnvironment environment)
+{
+    var localDatabasePath = SqliteBackupPaths.ResolveLocalDatabasePath(connectionString, environment.ContentRootPath);
+    if (File.Exists(localDatabasePath))
+    {
+        return;
+    }
+
+    var backupDatabasePath = Path.Combine("/mnt/backup", "worldcup.db");
+    if (!File.Exists(backupDatabasePath))
+    {
+        return;
+    }
+
+    var localDirectory = Path.GetDirectoryName(localDatabasePath);
+    if (!string.IsNullOrWhiteSpace(localDirectory))
+    {
+        Directory.CreateDirectory(localDirectory);
+    }
+
+    File.Copy(backupDatabasePath, localDatabasePath);
+}
