@@ -12,7 +12,9 @@ COPY vite.config.ts ./
 COPY tsconfig*.json ./
 
 ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_APP_VERSION=dev
 ENV VITE_API_URL=""
+ENV VITE_APP_VERSION=${VITE_APP_VERSION}
 
 RUN npm run build
 

@@ -52,6 +52,7 @@ jobs:
             --image worldcup:${{ steps.gitversion.outputs.semver }} \
             --image worldcup:latest \
             --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
+            --build-arg VITE_APP_VERSION=${{ steps.gitversion.outputs.semver }} \
             .
 
       - name: Deploy to Container App
