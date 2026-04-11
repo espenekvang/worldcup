@@ -1,0 +1,4 @@
+Scenario 2: API endpoint reachable
+Command: curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" -d '{}' http://localhost:8080/api/auth/google
+Result: HTTP 400 (endpoint exists, rejects empty body as expected)
+STATUS: PASS

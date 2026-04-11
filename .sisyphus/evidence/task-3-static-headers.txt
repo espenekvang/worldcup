@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Content-Length: 277866
+Content-Type: text/javascript
+Date: Sat, 11 Apr 2026 06:00:22 GMT
+Server: Kestrel
+Accept-Ranges: bytes
+ETag: "1dcc97812036dea"
+Last-Modified: Sat, 11 Apr 2026 05:57:25 GMT
+

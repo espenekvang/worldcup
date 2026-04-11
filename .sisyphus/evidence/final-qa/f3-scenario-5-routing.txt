@@ -1,0 +1,4 @@
+Scenario 5: SPA routing works (non-API route returns HTML)
+Command: curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/some-frontend-route
+Result: HTTP 200 (SPA fallback serves index.html)
+STATUS: PASS

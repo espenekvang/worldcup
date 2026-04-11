@@ -76,7 +76,7 @@ Add these secrets in GitHub → Settings → Secrets and variables → Actions:
 | `AZURE_CREDENTIALS` | JSON from Step 1 |
 | `ACR_NAME` | ACR name from terraform output |
 | `RESOURCE_GROUP` | `rg-worldcup` |
-| `CONTAINER_APP_NAME` | Container App name from terraform output |
+| `CONTAINER_APP_NAME` | Container App name (value you set in terraform.tfvars) |
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID |
 
 ## Step 6: Update Google OAuth

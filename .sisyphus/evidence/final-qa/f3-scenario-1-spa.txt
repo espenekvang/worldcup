@@ -1,0 +1,4 @@
+Scenario 1: Container starts and serves React SPA
+Command: curl -s http://localhost:8080/ | grep -o '<div id="root">'
+Result: <div id="root">
+STATUS: PASS
