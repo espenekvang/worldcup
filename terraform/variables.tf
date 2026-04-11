@@ -1,0 +1,10 @@
+variable "resource_group_name" { type = string }
+variable "location" { type = string }
+variable "acr_name" { type = string }
+variable "container_app_name" { type = string }
+variable "jwt_key" { type = string }
+variable "jwt_issuer" { type = string }
+variable "jwt_audience" { type = string }
+variable "google_client_id" { type = string }
+variable "admin_email" { type = string }
+variable "vite_google_client_id" { type = string }

@@ -1,0 +1,1 @@
+Verified: GitHub secrets and Terraform variables match.

@@ -1,0 +1,10 @@
+## Prerequisites
+## Step 1: Azure Setup
+## Step 2: Configure Variables
+## Step 3: Deploy Infrastructure
+## Step 4: Build and Deploy App Image
+## Step 5: Configure GitHub Secrets
+## Step 6: Update Google OAuth
+## Step 7: Verify
+## Ongoing
+## Troubleshooting
