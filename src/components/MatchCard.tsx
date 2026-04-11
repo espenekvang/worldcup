@@ -1,5 +1,5 @@
 import type { Match, Team, Venue } from '../types'
-import { formatMatchTime } from '../utils/dateUtils'
+import { formatMatchTime, areTeamsUndetermined } from '../utils/dateUtils'
 import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 
@@ -32,6 +32,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
 
   const venue = venues.find(v => v.id === match.venueId)
   const isGroupStage = match.stage === 'group'
+  const teamsUndetermined = areTeamsUndetermined(match)
 
   let homeDisplay: string
   let awayDisplay: string
@@ -97,7 +98,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
               {pts.points}p
             </span>
           )}
-          {locked ? (
+          {locked || teamsUndetermined ? (
             <>
               {prediction ? (
                 <span
@@ -106,13 +107,21 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
                 >
                   {prediction.homeScore}–{prediction.awayScore}
                 </span>
+              ) : teamsUndetermined ? (
+                <span className="rounded-md px-2.5 py-1 text-xs font-medium opacity-40"
+                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+                >
+                  Bet
+                </span>
               ) : (
                 <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
               )}
-              <svg className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
-              </svg>
+              {!teamsUndetermined && (
+                <svg className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
+                </svg>
+              )}
             </>
           ) : prediction ? (
             <>

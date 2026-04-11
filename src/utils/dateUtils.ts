@@ -52,5 +52,5 @@ export function isStageLocked(stage: Stage, matches: Match[], now: number = Date
 }
 
 export function areTeamsUndetermined(match: Match): boolean {
-  return match.homeTeam === null || match.awayTeam === null
+  return !match.homeTeam || !match.awayTeam
 }
