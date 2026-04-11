@@ -54,3 +54,9 @@ variable "vite_google_client_id" {
   description = "Google OAuth client ID for frontend build (baked into JS bundle)"
   type        = string
 }
+
+variable "custom_domain" {
+  description = "Custom domain for the Container App (e.g. vm.ekvang.no)"
+  type        = string
+  default     = ""
+}

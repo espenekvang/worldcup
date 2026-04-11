@@ -119,6 +119,28 @@ resource "azurerm_container_app" "main" {
   }
 }
 
+resource "azurerm_container_app_custom_domain" "main" {
+  count            = var.custom_domain != "" ? 1 : 0
+  name             = var.custom_domain
+  container_app_id = azurerm_container_app.main.id
+
+  lifecycle {
+    ignore_changes = [certificate_binding_type, container_app_environment_certificate_id]
+  }
+}
+
+resource "terraform_data" "certificate_binding" {
+  count = var.custom_domain != "" ? 1 : 0
+
+  input = var.custom_domain
+
+  provisioner "local-exec" {
+    command = "az containerapp hostname bind --hostname ${var.custom_domain} -g ${azurerm_resource_group.main.name} -n ${azurerm_container_app.main.name} --environment ${azurerm_container_app_environment.main.name} --validation-method CNAME"
+  }
+
+  depends_on = [azurerm_container_app_custom_domain.main]
+}
+
 resource "azurerm_role_assignment" "acr_pull" {
   scope                = azurerm_container_registry.main.id
   role_definition_name = "AcrPull"
