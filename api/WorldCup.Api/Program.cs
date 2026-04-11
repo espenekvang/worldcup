@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using WorldCup.Api.Data;
 using WorldCup.Api.Services;
 
@@ -13,7 +14,8 @@ builder.Services.AddOpenApi();
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
 builder.Services.AddSingleton(new MatchScheduleProvider(matchesJsonPath));
 builder.Services.AddSingleton<TeamCodeMapper>();
-builder.Services.AddSingleton(new MatchFileWriterOptions { JsonPath = matchesJsonPath });
+builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
+    Options.Create(new MatchFileWriterOptions { JsonPath = matchesJsonPath }));
 builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
