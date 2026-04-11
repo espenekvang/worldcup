@@ -68,6 +68,11 @@ public class PredictionsController(AppDbContext dbContext, MatchSchedule matchSc
             return BadRequest("Betting er stengt for denne runden.");
         }
 
+        if (matchEntry.AreTeamsUndetermined)
+        {
+            return BadRequest("Lagene er ikke avgjort ennå – betting er stengt for denne kampen.");
+        }
+
         var prediction = await dbContext.Predictions
             .SingleOrDefaultAsync(existingPrediction =>
                 existingPrediction.UserId == userId.Value && existingPrediction.MatchId == matchId);

@@ -43,4 +43,12 @@ public sealed class MatchEntry
 
     [JsonPropertyName("stage")]
     public string Stage { get; init; } = string.Empty;
+
+    [JsonPropertyName("homeTeam")]
+    public string? HomeTeam { get; init; }
+
+    [JsonPropertyName("awayTeam")]
+    public string? AwayTeam { get; init; }
+
+    public bool AreTeamsUndetermined => HomeTeam is null || AwayTeam is null;
 }

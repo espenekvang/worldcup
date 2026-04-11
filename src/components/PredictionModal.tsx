@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Match, Team } from '../types'
 import { usePredictions } from '../context/PredictionsContext'
-import { isStageLocked } from '../utils/dateUtils'
+import { isStageLocked, areTeamsUndetermined } from '../utils/dateUtils'
 import { matches as allMatches } from '../data'
 
 interface PredictionModalProps {
@@ -34,6 +34,11 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
 
     if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
       setError('Skriv inn gyldige resultater (0 eller høyere)')
+      return
+    }
+
+    if (areTeamsUndetermined(match)) {
+      setError('Lagene er ikke avgjort ennå – betting er stengt')
       return
     }
 
