@@ -72,10 +72,47 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
         }
     }
 
+    public async Task<List<Wc2026MatchDto>> GetScheduledMatchesAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var response = await _httpClient.GetAsync("/matches?status=scheduled", ct);
+
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                logger.LogWarning("WC2026 API rate limit hit");
+                return [];
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var matches = await response.Content.ReadFromJsonAsync<List<Wc2026MatchDto>>(JsonOptions, ct);
+            return matches ?? [];
+        }
+        catch (TaskCanceledException)
+        {
+            logger.LogWarning("WC2026 API request timed out");
+            return [];
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("WC2026 API request timed out");
+            return [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "WC2026 API request failed");
+            return [];
+        }
+    }
+
     public int? MapToLocalMatchId(DateTime kickoffAt, MatchSchedule schedule) =>
         schedule.GetAllMatches()
             .FirstOrDefault(m => Math.Abs((m.Date - kickoffAt).TotalMinutes) <= TimeSpan.FromMinutes(60).TotalMinutes)
             ?.Id;
+
+    public int? MapToLocalMatchIdByMatchNumber(int matchNumber, MatchSchedule schedule) =>
+        schedule.GetMatch(matchNumber)?.Id;
 }
 
 public sealed class Wc2026MatchDto
