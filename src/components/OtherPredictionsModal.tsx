@@ -36,16 +36,22 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
   }, [match.id])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
+      style={{ backgroundColor: 'var(--color-surface-overlay)' }}
+      onClick={onClose}
+    >
       <div
-        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-xl bg-white p-5 shadow-xl sm:rounded-xl sm:p-6"
+        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-xl p-5 shadow-xl sm:rounded-xl sm:p-6"
+        style={{ backgroundColor: 'var(--color-surface-card)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Andres bets</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Andres bets</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-full p-1 transition-colors"
+            style={{ color: 'var(--color-text-muted)' }}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -53,36 +59,45 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
           </button>
         </div>
 
-        <p className="mb-4 text-center text-sm text-gray-500">
+        <p className="mb-4 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
           {homeDisplay} mot {awayDisplay}
         </p>
 
         {loading ? (
-          <p className="text-center text-sm text-gray-400">Laster...</p>
+          <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Laster...</p>
         ) : error ? (
-          <p className="text-center text-sm text-red-600">{error}</p>
+          <p className="text-center text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
         ) : predictions.length === 0 ? (
-          <p className="text-center text-sm text-gray-400">Ingen har bettet på denne kampen ennå</p>
+          <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen har bettet på denne kampen ennå</p>
         ) : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
             {predictions.map((p, i) => (
               <li key={i} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
                   {p.picture ? (
                     <img src={p.picture} alt="" className="h-8 w-8 rounded-full" referrerPolicy="no-referrer" />
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-sm font-medium text-gray-500">
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
+                      style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
+                    >
                       {p.name.charAt(0)}
                     </div>
                   )}
-                  <span className="text-sm font-medium text-gray-800">{p.name}</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{p.name}</span>
                 </div>
                 {p.homeScore !== null && p.awayScore !== null ? (
-                  <span className="rounded-md bg-green-50 px-2 py-1 text-sm font-bold text-green-700">
+                  <span
+                    className="rounded-md px-2 py-1 text-sm font-bold"
+                    style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                  >
                     {p.homeScore} – {p.awayScore}
                   </span>
                 ) : (
-                  <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">
+                  <span
+                    className="rounded-md px-2 py-1 text-xs font-medium"
+                    style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
+                  >
                     Har bettet
                   </span>
                 )}
@@ -94,7 +109,12 @@ export default function OtherPredictionsModal({ match, teams, onClose }: OtherPr
         <div className="mt-4">
           <button
             onClick={onClose}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:py-2.5"
+            className="w-full rounded-lg border px-4 py-3 text-sm font-medium transition-colors sm:py-2.5"
+            style={{
+              borderColor: 'var(--color-border)',
+              color: 'var(--color-text-secondary)',
+              backgroundColor: 'var(--color-surface-card)',
+            }}
           >
             Lukk
           </button>

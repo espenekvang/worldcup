@@ -54,9 +54,12 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
-      <h2 className="text-lg font-semibold text-gray-900">Administrer invitasjoner</h2>
-      <p className="mt-1 text-sm text-gray-500">Kun inviterte brukere kan logge inn og bette.</p>
+    <div
+      className="rounded-xl border p-4 sm:p-6"
+      style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+    >
+      <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer invitasjoner</h2>
+      <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Kun inviterte brukere kan logge inn og bette.</p>
 
       <form onSubmit={handleInvite} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input
@@ -64,30 +67,37 @@ export default function AdminPanel() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="navn@eksempel.no"
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:py-2"
+          className="flex-1 rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+          style={{
+            backgroundColor: 'var(--color-surface-card)',
+            borderColor: 'var(--color-input-border)',
+            color: 'var(--color-text-primary)',
+          }}
           required
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 sm:py-2"
+          className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+          style={{ backgroundColor: 'var(--color-primary)' }}
         >
           {isLoading ? 'Sender...' : 'Inviter'}
         </button>
       </form>
 
       {error ? (
-        <p className="mt-3 text-sm text-red-600">{error}</p>
+        <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
       ) : null}
 
       {invitations.length > 0 ? (
-        <ul className="mt-4 divide-y divide-gray-100">
+        <ul className="mt-4 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
           {invitations.map((invitation) => (
             <li key={invitation.id} className="flex items-center justify-between py-3">
-              <span className="text-sm text-gray-700">{invitation.email}</span>
+              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{invitation.email}</span>
               <button
                 onClick={() => handleDelete(invitation.id)}
-                className="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                className="rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                style={{ color: 'var(--color-danger)' }}
               >
                 Fjern
               </button>
@@ -95,7 +105,7 @@ export default function AdminPanel() {
           ))}
         </ul>
       ) : (
-        <p className="mt-4 text-sm text-gray-400">Ingen invitasjoner ennå.</p>
+        <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen invitasjoner ennå.</p>
       )}
     </div>
   )

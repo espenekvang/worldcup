@@ -56,16 +56,22 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4"
+      style={{ backgroundColor: 'var(--color-surface-overlay)' }}
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-md rounded-t-xl bg-white p-5 shadow-xl sm:rounded-xl sm:p-6"
+        className="w-full max-w-md rounded-t-xl p-5 shadow-xl sm:rounded-xl sm:p-6"
+        style={{ backgroundColor: 'var(--color-surface-card)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Bet resultat</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Bet resultat</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-full p-1 transition-colors"
+            style={{ color: 'var(--color-text-muted)' }}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -76,7 +82,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
         <form onSubmit={handleSubmit}>
           <div className="flex items-center justify-center gap-4">
             <div className="flex flex-1 flex-col items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                 {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
               </span>
               <input
@@ -85,16 +91,21 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 max="99"
                 value={homeScore}
                 onChange={(e) => setHomeScore(e.target.value)}
-                className="w-20 rounded-lg border border-gray-300 p-3 text-center text-2xl font-bold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: 'var(--color-surface-card)',
+                  borderColor: 'var(--color-input-border)',
+                  color: 'var(--color-text-primary)',
+                }}
                 placeholder="0"
                 autoFocus
               />
             </div>
 
-            <span className="mt-6 text-lg font-medium text-gray-400">–</span>
+            <span className="mt-6 text-lg font-medium" style={{ color: 'var(--color-text-muted)' }}>–</span>
 
             <div className="flex flex-1 flex-col items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                 {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
               </span>
               <input
@@ -103,28 +114,39 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 max="99"
                 value={awayScore}
                 onChange={(e) => setAwayScore(e.target.value)}
-                className="w-20 rounded-lg border border-gray-300 p-3 text-center text-2xl font-bold focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
+                style={{
+                  backgroundColor: 'var(--color-surface-card)',
+                  borderColor: 'var(--color-input-border)',
+                  color: 'var(--color-text-primary)',
+                }}
                 placeholder="0"
               />
             </div>
           </div>
 
           {error ? (
-            <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+            <p className="mt-4 text-center text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
           ) : null}
 
           <div className="mt-6 flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:py-2.5"
+              className="flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors sm:py-2.5"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-secondary)',
+                backgroundColor: 'var(--color-surface-card)',
+              }}
             >
               Avbryt
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 sm:py-2.5"
+              className="flex-1 rounded-lg px-4 py-3 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2.5"
+              style={{ backgroundColor: 'var(--color-primary)' }}
             >
               {isSaving ? 'Lagrer...' : existing ? 'Oppdater bet' : 'Lagre bet'}
             </button>
