@@ -1,5 +1,135 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * FIFA World Cup 2026 Design System
+ *
+ * Official branding: Black / White / Gold (minimalist emblem)
+ * Extended palette from bid materials: Dark Blue, Red, Green
+ * Dark mode supported via .dark class on <html>
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* FIFA WC2026 brand colors */
+  --color-wc-gold: #D4AF37;
+  --color-wc-gold-light: #E8CC6E;
+  --color-wc-navy: #1A1F4B;
+  --color-wc-navy-light: #2A398D;
+  --color-wc-red: #E61D25;
+  --color-wc-green: #3CAC3B;
+}
+
+/* ─── Light mode (default) ─── */
+:root {
+  --color-surface: #f8fafc;
+  --color-surface-card: #ffffff;
+  --color-surface-elevated: #f1f5f9;
+  --color-surface-overlay: rgba(0, 0, 0, 0.5);
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+
+  --color-primary: #1A1F4B;
+  --color-primary-hover: #2A398D;
+  --color-primary-light: rgba(26, 31, 75, 0.08);
+
+  --color-accent: #D4AF37;
+  --color-accent-hover: #E8CC6E;
+
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-success-text: #15803d;
+
+  --color-danger: #dc2626;
+
+  --color-input-border: #cbd5e1;
+  --color-input-focus: #2A398D;
+  --color-input-focus-ring: rgba(42, 57, 141, 0.2);
+
+  --color-header-from: #1A1F4B;
+  --color-header-to: #2A398D;
+  --color-header-text-muted: #a5b4fc;
+  --color-header-btn: #141838;
+  --color-header-btn-hover: #2A398D;
+
+  --color-badge-bg: #f1f5f9;
+  --color-badge-text: #475569;
+
+  --color-tab-active: #1A1F4B;
+  --color-tab-inactive: #64748b;
+  --color-tab-inactive-hover: #334155;
+}
+
+/* ─── Dark mode ─── */
+.dark {
+  --color-surface: #0c0f1a;
+  --color-surface-card: #151929;
+  --color-surface-elevated: #1e2340;
+  --color-surface-overlay: rgba(0, 0, 0, 0.7);
+
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #0f172a;
+
+  --color-border: #2a3050;
+  --color-border-light: #1e2340;
+
+  --color-primary: #6375d0;
+  --color-primary-hover: #8191e0;
+  --color-primary-light: rgba(99, 117, 208, 0.12);
+
+  --color-accent: #E8CC6E;
+  --color-accent-hover: #D4AF37;
+
+  --color-success: #4ade80;
+  --color-success-light: rgba(74, 222, 128, 0.1);
+  --color-success-text: #4ade80;
+
+  --color-danger: #f87171;
+
+  --color-input-border: #2a3050;
+  --color-input-focus: #6375d0;
+  --color-input-focus-ring: rgba(99, 117, 208, 0.3);
+
+  --color-header-from: #0c0f1a;
+  --color-header-to: #151929;
+  --color-header-text-muted: #94a3b8;
+  --color-header-btn: #1e2340;
+  --color-header-btn-hover: #2a3050;
+
+  --color-badge-bg: #1e2340;
+  --color-badge-text: #94a3b8;
+
+  --color-tab-active: #6375d0;
+  --color-tab-inactive: #64748b;
+  --color-tab-inactive-hover: #94a3b8;
+}
+
+/* ─── Base styles ─── */
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ─── Utility ─── */
 @utility scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
