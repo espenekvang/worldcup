@@ -87,10 +87,13 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
               </span>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="99"
+                step="1"
                 value={homeScore}
                 onChange={(e) => setHomeScore(e.target.value)}
+                onFocus={(e) => { if (e.target.value === '') setHomeScore('0') }}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
@@ -110,10 +113,13 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
               </span>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="99"
+                step="1"
                 value={awayScore}
                 onChange={(e) => setAwayScore(e.target.value)}
+                onFocus={(e) => { if (e.target.value === '') setAwayScore('0') }}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
