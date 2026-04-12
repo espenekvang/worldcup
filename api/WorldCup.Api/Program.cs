@@ -87,7 +87,45 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    var migrationLogger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseMigration");
+
+    const int maxRetries = 5;
+    for (var attempt = 1; attempt <= maxRetries; attempt++)
+    {
+        try
+        {
+            dbContext.Database.Migrate();
+            migrationLogger.LogInformation("Database migration completed successfully on attempt {Attempt}", attempt);
+            break;
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 15 && attempt < maxRetries)
+        {
+            migrationLogger.LogWarning(
+                "SQLite locking protocol error on migration attempt {Attempt}/{MaxRetries}, retrying in {Delay}s...",
+                attempt, maxRetries, attempt * 2);
+            Thread.Sleep(TimeSpan.FromSeconds(attempt * 2));
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 15)
+        {
+            migrationLogger.LogWarning(
+                ex,
+                "SQLite locking protocol error persisted after {MaxRetries} attempts. "
+                + "Checking if migrations are already applied...",
+                maxRetries);
+
+            var pending = dbContext.Database.GetPendingMigrations().ToList();
+            if (pending.Count == 0)
+            {
+                migrationLogger.LogInformation("All migrations already applied — continuing startup");
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Cannot apply {pending.Count} pending migration(s) due to SQLite locking error: {string.Join(", ", pending)}",
+                    ex);
+            }
+        }
+    }
 }
 
 if (app.Environment.IsDevelopment())
