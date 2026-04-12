@@ -30,8 +30,8 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    const home = parseInt(homeScore, 10)
-    const away = parseInt(awayScore, 10)
+    const home = homeScore.trim() === '' ? 0 : parseInt(homeScore, 10)
+    const away = awayScore.trim() === '' ? 0 : parseInt(awayScore, 10)
 
     if (isNaN(home) || isNaN(away) || home < 0 || away < 0) {
       setError('Skriv inn gyldige resultater (0 eller høyere)')
@@ -99,7 +99,6 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 step="1"
                 value={homeScore}
                 onChange={(e) => setHomeScore(e.target.value)}
-                onFocus={(e) => { if (e.target.value === '') setHomeScore('0') }}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
@@ -125,7 +124,6 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 step="1"
                 value={awayScore}
                 onChange={(e) => setAwayScore(e.target.value)}
-                onFocus={(e) => { if (e.target.value === '') setAwayScore('0') }}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
