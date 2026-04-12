@@ -34,15 +34,15 @@ A match prediction app for the FIFA World Cup 2026. Invite friends, predict full
 │  ┌───────▼────────────────────────▼─────────────┐   │
 │  │              Controllers                      │   │
 │  │  ┌──────┐  ┌─────────────┐  ┌────────────┐   │   │
-│  │  │ Auth │  │ Predictions │  │ Invitations│   │   │
+│  │  │ Auth │  │ Predictions │  │  Results  │   │   │
 │  │  └──┬───┘  └──────┬──────┘  └─────┬──────┘   │   │
 │  └─────┼─────────────┼───────────────┼───────────┘   │
 │        │             │               │               │
 │  ┌─────▼─────────────▼───────────────▼───────────┐   │
 │  │          EF Core + SQLite                     │   │
-│  │  ┌───────┐  ┌────────────┐  ┌────────────┐   │   │
-│  │  │ Users │  │ Predictions│  │ Invitations│   │   │
-│  │  └───────┘  └────────────┘  └────────────┘   │   │
+│  │  ┌───────┐  ┌────────────┐  ┌─────────────┐  │   │
+│  │  │ Users │  │ Predictions│  │MatchResults │  │   │
+│  │  └───────┘  └────────────┘  └─────────────┘  │   │
 │  └───────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────┘
 ```
@@ -118,25 +118,28 @@ npm test
 
 - **Match Overview** — Browse all World Cup 2026 matches grouped by date and stage
 - **Predictions** — Submit full-time score predictions for each match
+- **Live Results** — Automatic result fetching with point calculation
+- **Leaderboard** — Compete with friends based on prediction accuracy
 - **Google Sign-In** — Secure authentication via Google accounts
 - **Invitation System** — Only invited users can access the app
-- **Admin Panel** — Admin can invite/remove users by email
+- **Admin Panel** — Invite/remove users, override knockout match teams, and manually set match results
 
 ## Project Structure
 
 ```
 worldcup/
 ├── api/WorldCup.Api/        # .NET backend
-│   ├── Controllers/          #   Auth, Predictions, Invitations
-│   ├── Models/               #   User, Prediction, Invitation
+│   ├── Controllers/          #   Auth, Predictions, Results, Invitations, Admin
+│   ├── Models/               #   User, Prediction, Invitation, MatchResult
 │   ├── DTOs/                 #   Request/response objects
+│   ├── Services/             #   ResultFetcher, Scoring, MatchSchedule
 │   ├── Data/                 #   EF Core DbContext
 │   └── Migrations/           #   Database migrations
 ├── src/                      # React frontend
 │   ├── api/                  #   API client
 │   ├── components/           #   UI components
-│   ├── context/              #   Auth + Predictions state
-│   ├── data/                 #   Match data
+│   ├── context/              #   Auth, Predictions, Results, Matches state
+│   ├── data/                 #   Match/team/venue data
 │   ├── pages/                #   Login page
 │   └── types/                #   TypeScript types
 └── public/                   # Static assets
