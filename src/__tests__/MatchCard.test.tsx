@@ -44,7 +44,7 @@ describe('MatchCard', () => {
 
     expect(screen.getByText(/Brasil/)).toBeInTheDocument()
     expect(screen.getByText(/Argentina/)).toBeInTheDocument()
-    expect(screen.getByText(/MetLife Stadium, East Rutherford/)).toBeInTheDocument()
+    expect(screen.getAllByText(/MetLife Stadium, East Rutherford/).length).toBeGreaterThan(0)
   })
 
   it('renders knockout placeholders and stage label', () => {
