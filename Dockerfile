@@ -32,8 +32,9 @@ RUN dotnet publish -c Release -o /publish
 # Copy React build output into wwwroot
 COPY --from=frontend-build /app/dist /publish/wwwroot/
 
-# Copy match data to expected runtime location
+# Copy match and team data to expected runtime location
 COPY src/data/matches.json /publish/data/matches.json
+COPY src/data/teams.json /publish/data/teams.json
 
 # Stage 3: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
