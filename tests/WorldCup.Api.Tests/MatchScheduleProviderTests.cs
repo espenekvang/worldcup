@@ -152,4 +152,43 @@ public class MatchScheduleProviderTests : IDisposable
             File.Delete(newTempPath);
         }
     }
+
+    [Fact]
+    public async Task Reload_ConcurrentCalls_DoesNotThrowAndCurrentRemainsValid()
+    {
+        var provider = new MatchScheduleProvider(_tempJsonPath);
+        var exceptions = new System.Collections.Concurrent.ConcurrentBag<Exception>();
+
+        var tasks = Enumerable.Range(0, 20).Select(i => Task.Run(() =>
+        {
+            try
+            {
+                var matches = new List<MatchEntry>
+                {
+                    new MatchEntry
+                    {
+                        Id = i,
+                        Date = new DateTime(2026, 6, 11, 18, 0, 0, DateTimeKind.Utc),
+                        Stage = "group",
+                        HomeTeam = "BRA",
+                        AwayTeam = "GER",
+                        VenueId = "venue-1",
+                    }
+                };
+
+                provider.Reload(matches);
+                provider.Current.GetAllMatches();
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }));
+
+        await Task.WhenAll(tasks);
+
+        exceptions.Should().BeEmpty();
+        provider.Current.GetAllMatches().Should().HaveCount(1);
+        provider.Current.GetAllMatches()[0].Should().NotBeNull();
+    }
 }

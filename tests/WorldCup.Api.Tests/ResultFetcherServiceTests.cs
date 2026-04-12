@@ -256,6 +256,74 @@ public class ResultFetcherServiceTests : IDisposable
         afterJson.Should().Be(originalJson,
             "when both team codes are null from mapper, the file must not be modified");
     }
+
+    [Fact]
+    public async Task CheckForFixtureUpdates_ValidTeamCodes_WritesUpdatedTeamsToFile()
+    {
+        var undeterminedMatch = new MatchEntry
+        {
+            Id = 1,
+            Date = new DateTime(2026, 7, 5, 18, 0, 0, DateTimeKind.Utc),
+            Stage = "semi-final",
+            HomeTeam = null,
+            AwayTeam = null,
+            HomePlaceholder = "W QF1",
+            AwayPlaceholder = "W QF2",
+            VenueId = "venue-sf",
+            ManualOverride = false,
+        };
+
+        WriteMatches([undeterminedMatch]);
+        _scheduleProvider.Reload([undeterminedMatch]);
+
+        var apiDto = new[]
+        {
+            new { matchNumber = 1, home = "Brasil", away = "Tyskland", kickoffAt = undeterminedMatch.Date }
+        };
+        var apiJson = JsonSerializer.Serialize(apiDto, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+        var handler = new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(apiJson, Encoding.UTF8, "application/json")
+            });
+
+        var apiClient = BuildApiClient(handler);
+
+        var teamsJson = """
+            {
+              "BRA": { "code": "BRA", "name": "Brasil", "flag": "🇧🇷" },
+              "GER": { "code": "GER", "name": "Tyskland", "flag": "🇩🇪" }
+            }
+            """;
+        var tempTeamsPath = Path.Combine(_tempDir, "teams_write_test.json");
+        File.WriteAllText(tempTeamsPath, teamsJson);
+        var teamMapper = BuildTeamCodeMapper(tempTeamsPath);
+
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+
+        var service = new ResultFetcherService(
+            scopeFactory, _scheduleProvider, apiClient, teamMapper, _matchFileWriter,
+            Substitute.For<ILogger<ResultFetcherService>>());
+
+        var method = typeof(ResultFetcherService).GetMethod(
+            "CheckForFixtureUpdatesAsync",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        var task = (Task)method!.Invoke(service, [CancellationToken.None])!;
+        await task;
+
+        var written = JsonSerializer.Deserialize<List<MatchEntry>>(
+            File.ReadAllText(_jsonPath),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        written.Should().NotBeNull();
+        var updated = written!.FirstOrDefault(m => m.Id == 1);
+        updated.Should().NotBeNull();
+        updated!.HomeTeam.Should().Be("BRA");
+        updated.AwayTeam.Should().Be("GER");
+    }
 }
 
 internal sealed class FakeHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler

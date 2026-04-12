@@ -166,4 +166,50 @@ public class MatchesControllerTests : IDisposable
 
         result.Result.Should().BeOfType<BadRequestObjectResult>();
     }
+
+    [Fact]
+    public async Task OverrideMatch_ValidKnockoutMatch_ReturnsOk()
+    {
+        var tmpDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tmpDir);
+
+        try
+        {
+            var tmpPath = Path.Combine(tmpDir, "matches.json");
+            var serializerOptions = new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var knockoutMatch = new MatchEntry
+            {
+                Id = 10,
+                Date = new DateTime(2026, 7, 1, 18, 0, 0, DateTimeKind.Utc),
+                Stage = "quarter-final",
+                HomeTeam = null,
+                AwayTeam = null,
+                HomePlaceholder = "W Match 5",
+                AwayPlaceholder = "W Match 6",
+                VenueId = "venue-qf",
+                ManualOverride = false,
+            };
+
+            File.WriteAllText(tmpPath, JsonSerializer.Serialize(new[] { knockoutMatch }, serializerOptions));
+
+            var provider = new MatchScheduleProvider(tmpPath);
+            var writerOptions = Options.Create(new MatchFileWriterOptions { JsonPath = tmpPath });
+            var writer = new MatchFileWriter(provider, Substitute.For<ILogger<MatchFileWriter>>(), writerOptions);
+            var controller = new MatchesController(provider, _teamCodeMapper, writer);
+
+            var request = new AdminMatchOverrideRequest("BRA", "GER");
+
+            var result = await controller.OverrideMatch(10, request, CancellationToken.None);
+
+            result.Result.Should().BeOfType<OkObjectResult>();
+            ((OkObjectResult)result.Result!).Value.Should().BeOfType<MatchResponse>();
+        }
+        finally
+        {
+            if (Directory.Exists(tmpDir))
+            {
+                Directory.Delete(tmpDir, recursive: true);
+            }
+        }
+    }
 }
