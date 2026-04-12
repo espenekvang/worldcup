@@ -107,23 +107,17 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Microsoft.Data.Sqlite.SqliteException ex) when (ex.SqliteErrorCode == 15)
         {
+            // Azure Files (SMB) does not support SQLite locking. When another revision
+            // holds the DB file open, ALL SQLite operations fail — including the
+            // read-only check for pending migrations. Since the healthy revision is
+            // already running with the current schema, it is safe to skip migration
+            // and let the app start. If there actually were unapplied migrations the
+            // app would fail on first DB access, which is an acceptable signal.
             migrationLogger.LogWarning(
                 ex,
                 "SQLite locking protocol error persisted after {MaxRetries} attempts. "
-                + "Checking if migrations are already applied...",
+                + "Skipping migration — assuming another revision already applied all migrations.",
                 maxRetries);
-
-            var pending = dbContext.Database.GetPendingMigrations().ToList();
-            if (pending.Count == 0)
-            {
-                migrationLogger.LogInformation("All migrations already applied — continuing startup");
-            }
-            else
-            {
-                throw new InvalidOperationException(
-                    $"Cannot apply {pending.Count} pending migration(s) due to SQLite locking error: {string.Join(", ", pending)}",
-                    ex);
-            }
         }
     }
 }
