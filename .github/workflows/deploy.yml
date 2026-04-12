@@ -41,7 +41,7 @@ jobs:
           echo "major_minor_patch=$major_minor_patch" >> "$GITHUB_OUTPUT"
 
       - name: Login to Azure
-        uses: azure/login@v5
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
