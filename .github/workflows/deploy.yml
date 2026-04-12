@@ -47,9 +47,11 @@ jobs:
 
       - name: Build and push image to ACR
         run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           az acr build \
             --registry ${{ secrets.ACR_NAME }} \
             --image worldcup:${{ steps.gitversion.outputs.semver }} \
+            --image worldcup:${{ steps.gitversion.outputs.semver }}-${SHORT_SHA} \
             --image worldcup:latest \
             --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
             --build-arg VITE_APP_VERSION=${{ steps.gitversion.outputs.semver }} \
@@ -57,11 +59,12 @@ jobs:
 
       - name: Deploy to Container App
         run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           az containerapp update \
             --name ${{ secrets.CONTAINER_APP_NAME }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --container-name worldcup \
-            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ steps.gitversion.outputs.semver }}
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ steps.gitversion.outputs.semver }}-${SHORT_SHA}
 
       - name: Update ingress target port to app port
         run: |
