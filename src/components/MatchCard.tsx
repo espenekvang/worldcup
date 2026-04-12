@@ -107,12 +107,6 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
                 >
                   {prediction.homeScore}–{prediction.awayScore}
                 </span>
-              ) : teamsUndetermined ? (
-                <span className="rounded-md px-2.5 py-1 text-xs font-medium opacity-40"
-                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-                >
-                  Bet
-                </span>
               ) : (
                 <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
               )}
