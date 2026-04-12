@@ -88,77 +88,87 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
           </div>
         </div>
 
-        {venue ? (
-          <p className="text-center text-[11px] sm:hidden" style={{ color: 'var(--color-text-muted)' }}>
-            {venue.name}, {venue.city}
-          </p>
-        ) : null}
-
-        <div className="flex flex-col items-start gap-1 sm:hidden">
-          {result && pts !== undefined && (
-            <span
-              className="rounded-md px-1.5 py-0.5 text-xs font-bold"
-              style={{
-                backgroundColor: pts.points === 4 ? '#fef9c3' : pts.points >= 2 ? 'var(--color-success-light)' : pts.points === 1 ? '#fff7ed' : '#fee2e2',
-                color: pts.points === 4 ? '#854d0e' : pts.points >= 2 ? 'var(--color-success-text)' : pts.points === 1 ? '#9a3412' : '#991b1b',
-              }}
-            >
-              {pts.points}p
-            </span>
-          )}
-          {locked || teamsUndetermined ? (
-            prediction ? (
+        <div className="flex items-start gap-2 sm:hidden">
+          <div className="flex w-20 shrink-0 flex-col items-center gap-1">
+            {result && pts !== undefined && (
               <span
                 className="rounded-md px-1.5 py-0.5 text-xs font-bold"
-                style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                style={{
+                  backgroundColor: pts.points === 4 ? '#fef9c3' : pts.points >= 2 ? 'var(--color-success-light)' : pts.points === 1 ? '#fff7ed' : '#fee2e2',
+                  color: pts.points === 4 ? '#854d0e' : pts.points >= 2 ? 'var(--color-success-text)' : pts.points === 1 ? '#9a3412' : '#991b1b',
+                }}
               >
-                Ditt bet: {prediction.homeScore}–{prediction.awayScore}
+                {pts.points}p
               </span>
+            )}
+            {locked || teamsUndetermined ? (
+              <>
+                {prediction ? (
+                  <span
+                    className="rounded-md px-1.5 py-0.5 text-xs font-bold"
+                    style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                  >
+                    {prediction.homeScore}–{prediction.awayScore}
+                  </span>
+                ) : (
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>—</span>
+                )}
+                {!teamsUndetermined && (
+                  <svg className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
+                  </svg>
+                )}
+              </>
+            ) : prediction ? (
+              <>
+                <span
+                  className="rounded-md px-1.5 py-0.5 text-xs font-bold"
+                  style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                >
+                  {prediction.homeScore}–{prediction.awayScore}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => onTipClick(match)}
+                    className="rounded-md px-2 py-0.5 text-xs font-medium"
+                    style={{ color: 'var(--color-primary)' }}
+                  >
+                    Endre
+                  </button>
+                  <button
+                    onClick={() => onViewOthers(match)}
+                    className="text-xs font-medium transition-colors"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    👥
+                  </button>
+                </div>
+              </>
             ) : (
-              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Ingen bet</span>
-            )
-          ) : prediction ? (
-            <span
-              className="rounded-md px-1.5 py-0.5 text-xs font-bold"
-              style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
-            >
-              Ditt bet: {prediction.homeScore}–{prediction.awayScore}
-            </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => onTipClick(match)}
+                  className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+                >
+                  Bet
+                </button>
+                <button
+                  onClick={() => onViewOthers(match)}
+                  className="text-xs font-medium transition-colors"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  👥
+                </button>
+              </div>
+            )}
+          </div>
+          {venue ? (
+            <p className="flex-1 text-center text-[11px] pt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+              {venue.name}, {venue.city}
+            </p>
           ) : null}
-        </div>
-
-        <div className="flex items-center gap-2 sm:hidden">
-          {locked || teamsUndetermined ? (
-            !teamsUndetermined && (
-              <svg className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth={2} strokeLinecap="round" />
-              </svg>
-            )
-          ) : prediction ? (
-            <button
-              onClick={() => onTipClick(match)}
-              className="rounded-md px-2 py-0.5 text-xs font-medium"
-              style={{ color: 'var(--color-primary)' }}
-            >
-              Endre
-            </button>
-          ) : (
-            <button
-              onClick={() => onTipClick(match)}
-              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-              style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-            >
-              Bet
-            </button>
-          )}
-          <button
-            onClick={() => onViewOthers(match)}
-            className="text-xs font-medium transition-colors"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            👥
-          </button>
         </div>
 
         <div className="hidden sm:flex items-center justify-end gap-2 sm:shrink-0">
