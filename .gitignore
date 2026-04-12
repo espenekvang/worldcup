@@ -5,9 +5,18 @@ dist
 coverage
 
 # .NET
-api/**/bin/
-api/**/obj/
+**/bin/
+**/obj/
 *.db
+*.db-shm
+*.db-wal
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfplan
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
 
 # Environment
 .env
