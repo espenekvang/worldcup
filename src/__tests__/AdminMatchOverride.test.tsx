@@ -12,8 +12,20 @@ vi.mock('../api/client', async (importOriginal) => {
     createInvitation: vi.fn(),
     deleteInvitation: vi.fn(),
     updateMatchTeams: vi.fn().mockResolvedValue({}),
+    getResults: vi.fn().mockResolvedValue([]),
+    getUserPoints: vi.fn().mockResolvedValue([]),
+    setMatchResult: vi.fn().mockResolvedValue({}),
   }
 })
+
+vi.mock('../context/ResultsContext', () => ({
+  useResults: () => ({
+    results: new Map(),
+    points: new Map(),
+    isLoading: false,
+    refreshResults: vi.fn().mockResolvedValue(undefined),
+  }),
+}))
 
 import { updateMatchTeams } from '../api/client'
 
@@ -60,7 +72,8 @@ describe('AdminPanel match override', () => {
     renderWithProvider()
 
     await waitFor(() => {
-      expect(screen.getByText(/Vinner gruppe A vs 2. plass gruppe B/)).toBeInTheDocument()
+      const options = screen.getAllByText(/Vinner gruppe A vs 2. plass gruppe B/)
+      expect(options.length).toBeGreaterThanOrEqual(1)
     })
   })
 
@@ -68,7 +81,8 @@ describe('AdminPanel match override', () => {
     renderWithProvider()
 
     await waitFor(() => {
-      expect(screen.getByText(/Vinner gruppe A vs 2. plass gruppe B/)).toBeInTheDocument()
+      const options = screen.getAllByText(/Vinner gruppe A vs 2. plass gruppe B/)
+      expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
     const [matchSelect] = screen.getAllByRole('combobox')
@@ -82,7 +96,8 @@ describe('AdminPanel match override', () => {
     renderWithProvider()
 
     await waitFor(() => {
-      expect(screen.getByText(/Vinner gruppe A vs 2. plass gruppe B/)).toBeInTheDocument()
+      const options = screen.getAllByText(/Vinner gruppe A vs 2. plass gruppe B/)
+      expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
     const [matchSelect] = screen.getAllByRole('combobox')

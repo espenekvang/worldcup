@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PointsResponse, ResultResponse } from '../api/client'
 import { getResults, getUserPoints } from '../api/client'
@@ -8,6 +8,7 @@ interface ResultsContextValue {
   results: Map<number, ResultResponse>
   points: Map<number, PointsResponse>
   isLoading: boolean
+  refreshResults: () => Promise<void>
 }
 
 const ResultsContext = createContext<ResultsContextValue | null>(null)
@@ -18,38 +19,30 @@ export function ResultsProvider({ children }: { children: ReactNode }) {
   const [points, setPoints] = useState<Map<number, PointsResponse>>(new Map())
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-
+  const fetchData = useCallback(async () => {
     setIsLoading(true)
-
-    Promise.all([
-      getResults(),
-      user ? getUserPoints() : Promise.resolve([] as PointsResponse[]),
-    ])
-      .then(([resultsData, pointsData]) => {
-        if (cancelled) return
-        setResults(new Map(resultsData.map((result) => [result.matchId, result])))
-        setPoints(new Map(pointsData.map((point) => [point.matchId, point])))
-      })
-      .catch(() => {
-        if (cancelled) return
-        setResults(new Map())
-        setPoints(new Map())
-      })
-      .finally(() => {
-        if (cancelled) return
-        setIsLoading(false)
-      })
-
-    return () => {
-      cancelled = true
+    try {
+      const [resultsData, pointsData] = await Promise.all([
+        getResults(),
+        user ? getUserPoints() : Promise.resolve([] as PointsResponse[]),
+      ])
+      setResults(new Map(resultsData.map((result) => [result.matchId, result])))
+      setPoints(new Map(pointsData.map((point) => [point.matchId, point])))
+    } catch {
+      setResults(new Map())
+      setPoints(new Map())
+    } finally {
+      setIsLoading(false)
     }
   }, [user])
 
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
   const value = useMemo(
-    () => ({ results, points, isLoading }),
-    [results, points, isLoading],
+    () => ({ results, points, isLoading, refreshResults: fetchData }),
+    [results, points, isLoading, fetchData],
   )
 
   return <ResultsContext value={value}>{children}</ResultsContext>

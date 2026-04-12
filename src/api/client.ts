@@ -156,3 +156,10 @@ export function updateMatchTeams(matchId: number, homeTeam?: string, awayTeam?: 
     body: JSON.stringify({ homeTeam: homeTeam ?? null, awayTeam: awayTeam ?? null }),
   })
 }
+
+export function setMatchResult(matchId: number, homeScore: number, awayScore: number): Promise<ResultResponse> {
+  return request<ResultResponse>(`/api/admin/results/${matchId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ homeScore, awayScore }),
+  })
+}

@@ -10,8 +10,73 @@ namespace WorldCup.Api.Controllers;
 
 [ApiController]
 [Route("api/results")]
-public class ResultsController(AppDbContext dbContext, ScoringService scoringService) : ControllerBase
+public class ResultsController(
+    AppDbContext dbContext,
+    ScoringService scoringService,
+    MatchScheduleProvider scheduleProvider) : ControllerBase
 {
+    [HttpPut("/api/admin/results/{matchId:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ResultResponse>> SetResult(
+        int matchId,
+        [FromBody] AdminSetResultRequest request,
+        CancellationToken ct)
+    {
+        var match = scheduleProvider.Current.GetMatch(matchId);
+        if (match is null)
+        {
+            return NotFound();
+        }
+
+        if (request.HomeScore < 0 || request.AwayScore < 0)
+        {
+            return BadRequest("Scores cannot be negative");
+        }
+
+        var existing = await dbContext.MatchResults
+            .FirstOrDefaultAsync(r => r.MatchId == matchId, ct);
+
+        if (existing is not null)
+        {
+            existing.HomeScore = request.HomeScore;
+            existing.AwayScore = request.AwayScore;
+            existing.FetchedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            dbContext.MatchResults.Add(new Models.MatchResult
+            {
+                Id = Guid.NewGuid(),
+                MatchId = matchId,
+                HomeScore = request.HomeScore,
+                AwayScore = request.AwayScore,
+                FetchedAt = DateTime.UtcNow
+            });
+        }
+
+        var predictions = await dbContext.Predictions
+            .Where(p => p.MatchId == matchId)
+            .ToListAsync(ct);
+
+        foreach (var prediction in predictions)
+        {
+            prediction.Points = scoringService.CalculatePoints(
+                prediction.HomeScore,
+                prediction.AwayScore,
+                request.HomeScore,
+                request.AwayScore);
+        }
+
+        await dbContext.SaveChangesAsync(ct);
+
+        return Ok(new ResultResponse
+        {
+            MatchId = matchId,
+            HomeScore = request.HomeScore,
+            AwayScore = request.AwayScore,
+            FetchedAt = DateTime.UtcNow
+        });
+    }
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ResultResponse>>> GetResults()
@@ -122,3 +187,5 @@ public class ResultsController(AppDbContext dbContext, ScoringService scoringSer
         return 0;
     }
 }
+
+public sealed record AdminSetResultRequest(int HomeScore, int AwayScore);
