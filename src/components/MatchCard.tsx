@@ -59,8 +59,9 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
       className="rounded-lg border px-3 py-2 shadow-sm transition-colors sm:px-4 sm:py-2.5"
       style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
     >
-      <div className="flex items-center gap-3">
-        <div className="flex w-20 shrink-0 flex-col items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+        <div className="flex items-center gap-2 sm:contents">
+          <div className="flex w-20 shrink-0 flex-col items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
           <span className="font-medium">{formatMatchTime(match.date)}</span>
           <span
             className="mt-0.5 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
@@ -71,7 +72,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold sm:gap-2 sm:text-base" style={{ color: 'var(--color-text-primary)' }}>
-          <span className="min-w-0 truncate text-right">
+          <span className="min-w-0 break-words sm:truncate text-right">
             {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
           </span>
           {result ? (
@@ -81,12 +82,13 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
           ) : (
             <span className="shrink-0 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>–</span>
           )}
-          <span className="min-w-0 truncate text-left">
+          <span className="min-w-0 break-words sm:truncate text-left">
             {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
           </span>
         </div>
+        </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center justify-end gap-2 sm:shrink-0">
           {result && pts !== undefined && (
             <span
               className="rounded-md px-1.5 py-0.5 text-xs font-bold"
