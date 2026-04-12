@@ -15,8 +15,8 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
   const { predictions, savePrediction } = usePredictions()
   const existing = predictions.get(match.id)
 
-  const [homeScore, setHomeScore] = useState<string>(existing ? String(existing.homeScore) : '')
-  const [awayScore, setAwayScore] = useState<string>(existing ? String(existing.awayScore) : '')
+  const [homeScore, setHomeScore] = useState<string>(existing ? String(existing.homeScore) : '0')
+  const [awayScore, setAwayScore] = useState<string>(existing ? String(existing.awayScore) : '0')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
