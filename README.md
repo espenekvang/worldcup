@@ -52,8 +52,8 @@ A match prediction app for the FIFA World Cup 2026. Invite friends, predict full
 ```
 User → Google Sign-In → Google JWT → Backend validates →
   ├─ Admin email? → Allow, issue app JWT
-  ├─ Invited?     → Allow, issue app JWT
-  └─ Neither?     → 403 Forbidden
+  ├─ Invited to a league? → Allow, issue app JWT
+  └─ Neither?     → 403 Forbidden → Waiting page
 ```
 
 ## Tech Stack
@@ -120,17 +120,18 @@ npm test
 - **Predictions** — Submit full-time score predictions for each match
 - **Live Results** — Automatic result fetching with point calculation
 - **Leaderboard** — Compete with friends based on prediction accuracy
+- **Ligaer** — Opprett og administrer separate ligaer med egne medlemmer og poengtavler
 - **Google Sign-In** — Secure authentication via Google accounts
 - **Invitation System** — Only invited users can access the app
-- **Admin Panel** — Invite/remove users, override knockout match teams, and manually set match results
+- **Admin Panel** — Invite/remove users, manage leagues, override knockout match teams, and manually set match results
 
 ## Project Structure
 
 ```
 worldcup/
 ├── api/WorldCup.Api/        # .NET backend
-│   ├── Controllers/          #   Auth, Predictions, Results, Invitations, Admin
-│   ├── Models/               #   User, Prediction, Invitation, MatchResult
+│   ├── Controllers/          #   Auth, Predictions, Results, Invitations, BettingGroups
+│   ├── Models/               #   User, Prediction, Invitation, MatchResult, BettingGroup, BettingGroupMember
 │   ├── DTOs/                 #   Request/response objects
 │   ├── Services/             #   ResultFetcher, Scoring, MatchSchedule
 │   ├── Data/                 #   EF Core DbContext
@@ -138,9 +139,9 @@ worldcup/
 ├── src/                      # React frontend
 │   ├── api/                  #   API client
 │   ├── components/           #   UI components
-│   ├── context/              #   Auth, Predictions, Results, Matches state
+│   ├── context/              #   Auth, Predictions, Results, Matches, BettingGroup state
 │   ├── data/                 #   Match/team/venue data
-│   ├── pages/                #   Login page
+│   ├── pages/                #   Login, GroupSelector, Waiting pages
 │   └── types/                #   TypeScript types
 └── public/                   # Static assets
 ```
