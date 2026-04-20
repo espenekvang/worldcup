@@ -54,6 +54,7 @@ public class ResultsController(
             });
         }
 
+        // Score ALL predictions for this match across ALL groups
         var predictions = await dbContext.Predictions
             .Where(p => p.MatchId == matchId)
             .ToListAsync(ct);
@@ -77,6 +78,7 @@ public class ResultsController(
             FetchedAt = DateTime.UtcNow
         });
     }
+
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ResultResponse>>> GetResults()
@@ -101,15 +103,15 @@ public class ResultsController(
     public async Task<ActionResult<IEnumerable<PointsResponse>>> GetPoints()
     {
         var userId = GetAuthenticatedUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        if (userId is null) return Unauthorized();
+
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
         var rawData = await (
             from result in dbContext.MatchResults
             join prediction in dbContext.Predictions on result.MatchId equals prediction.MatchId
-            where prediction.UserId == userId.Value
+            where prediction.UserId == userId.Value && prediction.BettingGroupId == groupId
             orderby result.MatchId
             select new
             {
@@ -138,16 +140,20 @@ public class ResultsController(
     [Authorize]
     public async Task<ActionResult<IEnumerable<LeaderboardEntry>>> GetLeaderboard()
     {
-        var leaderboard = await dbContext.Users
-            .Select(u => new LeaderboardEntry
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
+        var leaderboard = await dbContext.BettingGroupMembers
+            .Where(m => m.BettingGroupId == groupId)
+            .Select(m => new LeaderboardEntry
             {
-                Name = u.Name,
-                Picture = u.Picture,
+                Name = m.User.Name,
+                Picture = m.User.Picture,
                 TotalPoints = dbContext.Predictions
-                    .Where(p => p.UserId == u.Id && p.Points != null)
+                    .Where(p => p.UserId == m.UserId && p.BettingGroupId == groupId && p.Points != null)
                     .Sum(p => (int?)p.Points) ?? 0,
                 MatchCount = dbContext.Predictions
-                    .Count(p => p.UserId == u.Id && p.Points != null)
+                    .Count(p => p.UserId == m.UserId && p.BettingGroupId == groupId && p.Points != null)
             })
             .OrderByDescending(e => e.TotalPoints)
             .ThenBy(e => e.Name)
@@ -160,8 +166,21 @@ public class ResultsController(
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+    }
+
+    private async Task<(Guid groupId, bool isValid)> ValidateGroupMembership()
+    {
+        var groupIdStr = Request.Headers["X-Group-Id"].FirstOrDefault();
+        if (!Guid.TryParse(groupIdStr, out var groupId)) return (Guid.Empty, false);
+
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return (Guid.Empty, false);
+
+        var isMember = await dbContext.BettingGroupMembers
+            .AnyAsync(m => m.BettingGroupId == groupId && m.UserId == userId.Value);
+
+        return (groupId, isMember);
     }
 
     private static int GetOutcomePoints(int predictedHome, int predictedAway, int actualHome, int actualAway)

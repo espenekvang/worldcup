@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useBettingGroup } from '../context/BettingGroupContext'
 import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
 
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 export default function Header({ onAdminClick }: HeaderProps) {
   const { user, logout } = useAuth()
+  const { groups, activeGroup, clearActiveGroup } = useBettingGroup()
   const { theme, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -37,7 +39,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
               VM-Betting 2026
             </h1>
             <p className="mt-0.5 text-xs font-thin sm:mt-1 sm:text-sm" style={{ color: 'var(--color-header-text-muted)' }}>
-              USA • Mexico • Canada
+              {activeGroup ? activeGroup.name : 'USA • Mexico • Canada'}
             </p>
             <p className="text-[10px] font-thin opacity-40" style={{ color: 'var(--color-header-text-muted)' }}>
               v{__APP_VERSION__}
@@ -101,6 +103,17 @@ export default function Header({ onAdminClick }: HeaderProps) {
                       >
                         <span className="w-5 text-center">⚙️</span>
                         Admin
+                      </button>
+                    ) : null}
+
+                    {groups.length > 1 ? (
+                      <button
+                        onClick={() => { setMenuOpen(false); clearActiveGroup() }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
+                        style={{ color: 'var(--color-text-primary)' }}
+                      >
+                        <span className="w-5 text-center">🔄</span>
+                        Bytt gruppe
                       </button>
                     ) : null}
 

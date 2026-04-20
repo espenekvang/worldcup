@@ -2,12 +2,15 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react'
 import type { AuthResponse } from '../api/client'
 import { loginWithGoogle as apiLoginWithGoogle } from '../api/client'
+import type { BettingGroup } from '../types'
+import { useBettingGroup } from './BettingGroupContext'
 
 interface AuthUser {
   email: string
   name: string
   picture: string | null
   isAdmin: boolean
+  groups: BettingGroup[]
 }
 
 interface AuthContextValue {
@@ -59,14 +62,22 @@ function loadStoredUser(): AuthUser | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(loadStoredUser)
   const [isLoading, setIsLoading] = useState(false)
+  const { setGroups, clearActiveGroup } = useBettingGroup()
 
+  // On mount: restore groups from stored user
   useEffect(() => {
     const token = safeGetItem(TOKEN_KEY)
     if (!token) {
       setUser(null)
       safeRemoveItem(USER_KEY)
+      setGroups([])
+    } else {
+      const storedUser = loadStoredUser()
+      if (storedUser?.groups) {
+        setGroups(storedUser.groups)
+      }
     }
-  }, [])
+  }, [setGroups])
 
   const loginWithGoogle = useCallback(async (idToken: string) => {
     setIsLoading(true)
@@ -79,20 +90,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: response.name,
         picture: response.picture,
         isAdmin: response.isAdmin,
+        groups: response.groups,
       }
 
       safeSetItem(USER_KEY, JSON.stringify(authUser))
       setUser(authUser)
+      setGroups(response.groups)
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [setGroups])
 
   const logout = useCallback(() => {
     safeRemoveItem(TOKEN_KEY)
     safeRemoveItem(USER_KEY)
+    safeRemoveItem('active_group_id')
     setUser(null)
-  }, [])
+    setGroups([])
+    clearActiveGroup()
+  }, [setGroups, clearActiveGroup])
 
   const value = useMemo(
     () => ({ user, isLoading, loginWithGoogle, logout }),
