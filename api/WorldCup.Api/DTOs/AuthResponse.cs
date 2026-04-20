@@ -7,4 +7,5 @@ public class AuthResponse
     public string Name { get; set; } = string.Empty;
     public string? Picture { get; set; }
     public bool IsAdmin { get; set; }
+    public List<BettingGroupResponse> Groups { get; set; } = [];
 }

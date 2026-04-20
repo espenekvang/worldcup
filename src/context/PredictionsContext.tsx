@@ -4,6 +4,7 @@ import { createContext, useContext } from 'react'
 import type { PredictionResponse } from '../api/client'
 import { getPredictions, putPrediction } from '../api/client'
 import { useAuth } from './AuthContext'
+import { useBettingGroup } from './BettingGroupContext'
 
 interface PredictionsContextValue {
   predictions: Map<number, PredictionResponse>
@@ -15,11 +16,12 @@ const PredictionsContext = createContext<PredictionsContextValue | null>(null)
 
 export function PredictionsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
+  const { activeGroup } = useBettingGroup()
   const [predictions, setPredictions] = useState<Map<number, PredictionResponse>>(new Map())
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !activeGroup) {
       setPredictions(new Map())
       return
     }
@@ -37,7 +39,7 @@ export function PredictionsProvider({ children }: { children: ReactNode }) {
         setPredictions(new Map())
       })
       .finally(() => setIsLoading(false))
-  }, [user])
+  }, [user, activeGroup])
 
   const savePrediction = useCallback(async (matchId: number, homeScore: number, awayScore: number) => {
     const result = await putPrediction(matchId, { matchId, homeScore, awayScore })

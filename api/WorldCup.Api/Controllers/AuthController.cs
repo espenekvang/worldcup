@@ -83,6 +83,66 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
 
         await dbContext.SaveChangesAsync();
 
+        // Fresh-DB bootstrap: if admin and no groups exist, create Default group
+        if (isAdmin && !await dbContext.BettingGroups.AnyAsync())
+        {
+            var defaultGroup = new BettingGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = "Default",
+                CreatedByUserId = user.Id
+            };
+
+            dbContext.BettingGroups.Add(defaultGroup);
+            dbContext.BettingGroupMembers.Add(new BettingGroupMember
+            {
+                Id = Guid.NewGuid(),
+                BettingGroupId = defaultGroup.Id,
+                UserId = user.Id
+            });
+
+            await dbContext.SaveChangesAsync();
+        }
+
+        // Auto-join: consume pending invitations
+        var pendingInvitations = await dbContext.Invitations
+            .Where(i => i.Email.ToLower() == user.Email.ToLower())
+            .ToListAsync();
+
+        foreach (var invitation in pendingInvitations)
+        {
+            var alreadyMember = await dbContext.BettingGroupMembers
+                .AnyAsync(m => m.BettingGroupId == invitation.BettingGroupId && m.UserId == user.Id);
+
+            if (!alreadyMember)
+            {
+                dbContext.BettingGroupMembers.Add(new BettingGroupMember
+                {
+                    Id = Guid.NewGuid(),
+                    BettingGroupId = invitation.BettingGroupId,
+                    UserId = user.Id
+                });
+            }
+
+            // Consume the invitation
+            dbContext.Invitations.Remove(invitation);
+        }
+
+        if (pendingInvitations.Count > 0)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+
+        // Fetch user's groups for response
+        var groups = await dbContext.BettingGroupMembers
+            .Where(m => m.UserId == user.Id)
+            .Select(m => new BettingGroupResponse(
+                m.BettingGroupId,
+                m.BettingGroup.Name,
+                m.BettingGroup.Members.Count,
+                m.BettingGroup.CreatedAt))
+            .ToListAsync();
+
         var jwtKey = configuration["Jwt:Key"]
             ?? throw new InvalidOperationException("JWT signing key is not configured.");
         var jwtIssuer = configuration["Jwt:Issuer"]
@@ -115,7 +175,8 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
             Email = user.Email,
             Name = user.Name,
             Picture = user.Picture,
-            IsAdmin = user.IsAdmin
+            IsAdmin = user.IsAdmin,
+            Groups = groups
         };
 
         return Ok(response);

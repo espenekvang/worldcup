@@ -14,14 +14,23 @@ namespace WorldCup.Api.Controllers;
 public class InvitationsController(AppDbContext dbContext) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<InvitationResponse>>> GetInvitations()
+    public async Task<ActionResult<IEnumerable<InvitationResponse>>> GetInvitations([FromQuery] Guid? groupId)
     {
-        var invitations = await dbContext.Invitations
+        var query = dbContext.Invitations.AsQueryable();
+
+        if (groupId.HasValue)
+        {
+            query = query.Where(i => i.BettingGroupId == groupId.Value);
+        }
+
+        var invitations = await query
             .OrderBy(i => i.Email)
             .Select(i => new InvitationResponse
             {
                 Id = i.Id,
                 Email = i.Email,
+                BettingGroupId = i.BettingGroupId,
+                GroupName = i.BettingGroup.Name,
                 CreatedAt = i.CreatedAt
             })
             .ToListAsync();
@@ -37,14 +46,25 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
             return BadRequest("E-postadresse er påkrevd.");
         }
 
+        if (request.BettingGroupId == Guid.Empty)
+        {
+            return BadRequest("BettingGroupId er påkrevd.");
+        }
+
+        var group = await dbContext.BettingGroups.FindAsync(request.BettingGroupId);
+        if (group is null)
+        {
+            return NotFound("Liga ikke funnet.");
+        }
+
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var exists = await dbContext.Invitations
-            .AnyAsync(i => i.Email.ToLower() == normalizedEmail);
+            .AnyAsync(i => i.Email.ToLower() == normalizedEmail && i.BettingGroupId == request.BettingGroupId);
 
         if (exists)
         {
-            return Conflict("Denne e-postadressen er allerede invitert.");
+            return Conflict("Denne e-postadressen er allerede invitert til denne gruppen.");
         }
 
         var userId = GetAuthenticatedUserId();
@@ -57,7 +77,8 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
         {
             Id = Guid.NewGuid(),
             Email = normalizedEmail,
-            InvitedByUserId = userId.Value
+            InvitedByUserId = userId.Value,
+            BettingGroupId = request.BettingGroupId
         };
 
         dbContext.Invitations.Add(invitation);
@@ -67,6 +88,8 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
         {
             Id = invitation.Id,
             Email = invitation.Email,
+            BettingGroupId = invitation.BettingGroupId,
+            GroupName = group.Name,
             CreatedAt = invitation.CreatedAt
         });
     }

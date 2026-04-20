@@ -18,13 +18,13 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     public async Task<ActionResult<IEnumerable<PredictionResponse>>> GetPredictions()
     {
         var userId = GetAuthenticatedUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        if (userId is null) return Unauthorized();
+
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
         var predictions = await dbContext.Predictions
-            .Where(prediction => prediction.UserId == userId.Value)
+            .Where(prediction => prediction.UserId == userId.Value && prediction.BettingGroupId == groupId)
             .OrderBy(prediction => prediction.MatchId)
             .Select(prediction => new PredictionResponse
             {
@@ -42,10 +42,10 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     public async Task<ActionResult<PredictionResponse>> UpsertPrediction(int matchId, [FromBody] PredictionDto request)
     {
         var userId = GetAuthenticatedUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
-        }
+        if (userId is null) return Unauthorized();
+
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
         if (matchId <= 0 || request.MatchId <= 0 || request.HomeScore < 0 || request.AwayScore < 0)
         {
@@ -74,8 +74,8 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
         }
 
         var prediction = await dbContext.Predictions
-            .SingleOrDefaultAsync(existingPrediction =>
-                existingPrediction.UserId == userId.Value && existingPrediction.MatchId == matchId);
+            .SingleOrDefaultAsync(p =>
+                p.UserId == userId.Value && p.MatchId == matchId && p.BettingGroupId == groupId);
 
         var now = DateTime.UtcNow;
         var isNewPrediction = prediction is null;
@@ -87,6 +87,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
                 Id = Guid.NewGuid(),
                 UserId = userId.Value,
                 MatchId = matchId,
+                BettingGroupId = groupId,
                 HomeScore = request.HomeScore,
                 AwayScore = request.AwayScore,
                 UpdatedAt = now
@@ -117,6 +118,9 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     [HttpGet("match/{matchId:int}")]
     public async Task<ActionResult<IEnumerable<MatchPredictionResponse>>> GetMatchPredictions(int matchId)
     {
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
         var matchEntry = matchScheduleProvider.Current.GetMatch(matchId);
         if (matchEntry is null)
         {
@@ -126,7 +130,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
         var locked = matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage);
 
         var predictions = await dbContext.Predictions
-            .Where(p => p.MatchId == matchId)
+            .Where(p => p.MatchId == matchId && p.BettingGroupId == groupId)
             .Select(p => new MatchPredictionResponse
             {
                 Name = p.User.Name,
@@ -145,7 +149,20 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
         return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+    }
+
+    private async Task<(Guid groupId, bool isValid)> ValidateGroupMembership()
+    {
+        var groupIdStr = Request.Headers["X-Group-Id"].FirstOrDefault();
+        if (!Guid.TryParse(groupIdStr, out var groupId)) return (Guid.Empty, false);
+
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return (Guid.Empty, false);
+
+        var isMember = await dbContext.BettingGroupMembers
+            .AnyAsync(m => m.BettingGroupId == groupId && m.UserId == userId.Value);
+
+        return (groupId, isMember);
     }
 }

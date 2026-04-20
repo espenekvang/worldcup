@@ -15,6 +15,13 @@ vi.mock('../api/client', async (importOriginal) => {
     getResults: vi.fn().mockResolvedValue([]),
     getUserPoints: vi.fn().mockResolvedValue([]),
     setMatchResult: vi.fn().mockResolvedValue({}),
+    getAllGroups: vi.fn().mockResolvedValue([]),
+    createGroup: vi.fn(),
+    updateGroup: vi.fn(),
+    deleteGroup: vi.fn(),
+    getGroupMembers: vi.fn().mockResolvedValue([]),
+    addGroupMember: vi.fn(),
+    removeGroupMember: vi.fn(),
   }
 })
 
@@ -85,11 +92,11 @@ describe('AdminPanel match override', () => {
       expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
-    const [matchSelect] = screen.getAllByRole('combobox')
+    const matchSelect = screen.getAllByRole('combobox')[1]
     fireEvent.change(matchSelect, { target: { value: String(knockoutMatch.id) } })
 
     const selects = screen.getAllByRole('combobox')
-    expect(selects.length).toBeGreaterThanOrEqual(3)
+    expect(selects.length).toBeGreaterThanOrEqual(4)
   })
 
   it('calls updateMatchTeams with correct args on form submit', async () => {
@@ -100,13 +107,18 @@ describe('AdminPanel match override', () => {
       expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
-    const [matchSelect] = screen.getAllByRole('combobox')
+    // Index 0 = invitation group select, index 1 = match override select
+    const matchSelect = screen.getAllByRole('combobox')[1]
     fireEvent.change(matchSelect, { target: { value: String(knockoutMatch.id) } })
 
-    const [, homeSelect, awaySelect] = screen.getAllByRole('combobox')
+    await waitFor(() => {
+      expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(4)
+    })
 
-    fireEvent.change(homeSelect, { target: { value: 'BRA' } })
-    fireEvent.change(awaySelect, { target: { value: 'ARG' } })
+    const selects = screen.getAllByRole('combobox')
+    // Index 0 = invitation group, 1 = match, 2 = home team, 3 = away team
+    fireEvent.change(selects[2], { target: { value: 'BRA' } })
+    fireEvent.change(selects[3], { target: { value: 'ARG' } })
 
     const saveButton = screen.getByRole('button', { name: /lagre/i })
     fireEvent.click(saveButton)

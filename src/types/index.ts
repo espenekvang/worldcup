@@ -39,3 +39,18 @@ export interface MatchData {
   venues: Venue[]
   matches: Match[]
 }
+
+export interface BettingGroup {
+  id: string
+  name: string
+  memberCount: number
+  createdAt: string
+}
+
+export interface BettingGroupMember {
+  userId: string
+  name: string
+  email: string
+  picture: string | null
+  joinedAt: string
+}

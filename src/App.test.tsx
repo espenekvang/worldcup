@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { PredictionsProvider } from './context/PredictionsContext'
+import { BettingGroupProvider } from './context/BettingGroupContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -9,11 +10,13 @@ function Wrapper({ children }: { children: React.ReactNode }) {
   return (
     <GoogleOAuthProvider clientId="test">
       <MemoryRouter>
-        <AuthProvider>
-          <PredictionsProvider>
-            {children}
-          </PredictionsProvider>
-        </AuthProvider>
+        <BettingGroupProvider>
+          <AuthProvider>
+            <PredictionsProvider>
+              {children}
+            </PredictionsProvider>
+          </AuthProvider>
+        </BettingGroupProvider>
       </MemoryRouter>
     </GoogleOAuthProvider>
   )
