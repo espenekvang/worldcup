@@ -54,7 +54,7 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
         var group = await dbContext.BettingGroups.FindAsync(request.BettingGroupId);
         if (group is null)
         {
-            return NotFound("Betting-gruppe ikke funnet.");
+            return NotFound("Liga ikke funnet.");
         }
 
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();

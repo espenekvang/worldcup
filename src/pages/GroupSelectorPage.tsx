@@ -12,7 +12,7 @@ export default function GroupSelectorPage() {
     >
       <div className="w-full max-w-md">
         <h1 className="mb-6 text-center text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-          Velg betting-gruppe
+          Velg liga
         </h1>
         <div className="space-y-3">
           {groups.map(group => (

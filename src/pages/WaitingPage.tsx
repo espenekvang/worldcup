@@ -19,7 +19,7 @@ export default function WaitingPage() {
           Venter på tilgang
         </h1>
         <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Du er ikke lagt til i noen betting-gruppe ennå. Kontakt administratoren for å bli invitert.
+          Du er ikke lagt til i noen liga ennå. Kontakt administratoren for å bli invitert.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <button

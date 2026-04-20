@@ -288,7 +288,7 @@ export default function AdminPanel() {
         className="rounded-xl border p-4 sm:p-6"
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
-        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer betting-grupper</h2>
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer ligaer</h2>
         <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett grupper og administrer medlemmer.</p>
 
         <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row">
