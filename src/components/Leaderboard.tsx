@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react'
 import { getLeaderboard, type LeaderboardEntry } from '../api/client'
+import { useBettingGroup } from '../context/BettingGroupContext'
 import { firstName } from '../utils/nameUtils'
 
 export default function Leaderboard() {
+  const { activeGroup } = useBettingGroup()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!activeGroup) return
+
     let cancelled = false
+    setLoading(true)
 
     getLeaderboard()
       .then(data => {
@@ -22,7 +27,7 @@ export default function Leaderboard() {
       })
 
     return () => { cancelled = true }
-  }, [])
+  }, [activeGroup])
 
   if (loading) {
     return (
@@ -52,6 +57,9 @@ export default function Leaderboard() {
 
   return (
     <div className="space-y-3 p-2 sm:p-4">
+      {activeGroup ? (
+        <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{activeGroup.name}</p>
+      ) : null}
       <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{entries.length} deltakere</p>
       <div
         className="overflow-hidden rounded-xl"

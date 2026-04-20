@@ -7,5 +7,8 @@ public class Invitation
     public Guid InvitedByUserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    public Guid BettingGroupId { get; set; }
+
     public User InvitedByUser { get; set; } = null!;
+    public BettingGroup BettingGroup { get; set; } = null!;
 }

@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { InvitationResponse } from '../api/client'
-import { getInvitations, createInvitation, deleteInvitation, updateMatchTeams, setMatchResult } from '../api/client'
+import {
+  getInvitations, createInvitation, deleteInvitation,
+  updateMatchTeams, setMatchResult,
+  getAllGroups, createGroup, updateGroup, deleteGroup,
+  getGroupMembers, addGroupMember, removeGroupMember,
+} from '../api/client'
+import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
 import { teams } from '../data'
@@ -16,8 +22,23 @@ const stageNames: Record<string, string> = {
 }
 
 export default function AdminPanel() {
+  // Group management state
+  const [groupList, setGroupList] = useState<BettingGroup[]>([])
+  const [newGroupName, setNewGroupName] = useState('')
+  const [groupLoading, setGroupLoading] = useState(false)
+  const [groupError, setGroupError] = useState<string | null>(null)
+  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null)
+  const [groupMembers, setGroupMembers] = useState<BettingGroupMember[]>([])
+  const [membersLoading, setMembersLoading] = useState(false)
+  const [newMemberEmail, setNewMemberEmail] = useState('')
+  const [memberError, setMemberError] = useState<string | null>(null)
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null)
+  const [editingGroupName, setEditingGroupName] = useState('')
+
+  // Invitation state
   const [invitations, setInvitations] = useState<InvitationResponse[]>([])
   const [email, setEmail] = useState('')
+  const [inviteGroupId, setInviteGroupId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,6 +63,124 @@ export default function AdminPanel() {
   const knockoutMatches = matches.filter((m) => m.stage !== 'group')
   const sortedTeams = Object.values(teams).sort((a, b) => a.name.localeCompare(b.name))
 
+  // Load groups
+  const loadGroups = useCallback(async () => {
+    try {
+      const data = await getAllGroups()
+      setGroupList(data)
+      if (data.length > 0 && !inviteGroupId) {
+        setInviteGroupId(data[0].id)
+      }
+    } catch {
+      setGroupError('Kunne ikke laste grupper')
+    }
+  }, [inviteGroupId])
+
+  useEffect(() => {
+    loadGroups()
+  }, [loadGroups])
+
+  // Load members when expanding a group
+  async function loadMembers(groupId: string) {
+    setMembersLoading(true)
+    setMemberError(null)
+    try {
+      const data = await getGroupMembers(groupId)
+      setGroupMembers(data)
+    } catch {
+      setMemberError('Kunne ikke laste medlemmer')
+    } finally {
+      setMembersLoading(false)
+    }
+  }
+
+  function handleExpandGroup(groupId: string) {
+    if (expandedGroupId === groupId) {
+      setExpandedGroupId(null)
+      setGroupMembers([])
+    } else {
+      setExpandedGroupId(groupId)
+      loadMembers(groupId)
+    }
+  }
+
+  async function handleCreateGroup(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newGroupName.trim()) return
+
+    setGroupLoading(true)
+    setGroupError(null)
+    try {
+      await createGroup(newGroupName.trim())
+      setNewGroupName('')
+      await loadGroups()
+    } catch (err) {
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke opprette gruppe')
+    } finally {
+      setGroupLoading(false)
+    }
+  }
+
+  async function handleDeleteGroup(id: string) {
+    if (!confirm('Er du sikker på at du vil slette denne gruppen? Alle prediksjoner i gruppen slettes.')) return
+
+    try {
+      await deleteGroup(id)
+      if (expandedGroupId === id) {
+        setExpandedGroupId(null)
+        setGroupMembers([])
+      }
+      await loadGroups()
+    } catch (err) {
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke slette gruppe')
+    }
+  }
+
+  async function handleRenameGroup(id: string) {
+    if (!editingGroupName.trim()) return
+    try {
+      await updateGroup(id, editingGroupName.trim())
+      setEditingGroupId(null)
+      setEditingGroupName('')
+      await loadGroups()
+    } catch (err) {
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre navn')
+    }
+  }
+
+  async function handleAddMember(e: React.FormEvent) {
+    e.preventDefault()
+    if (!expandedGroupId || !newMemberEmail.trim()) return
+
+    setMemberError(null)
+    try {
+      await addGroupMember(expandedGroupId, newMemberEmail.trim())
+      setNewMemberEmail('')
+      await loadMembers(expandedGroupId)
+      await loadGroups()
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('409')) {
+        setMemberError('Brukeren er allerede medlem av denne gruppen.')
+      } else if (err instanceof Error && err.message.includes('404')) {
+        setMemberError('Bruker ikke funnet. Inviter dem først.')
+      } else {
+        setMemberError(err instanceof Error ? err.message : 'Kunne ikke legge til medlem')
+      }
+    }
+  }
+
+  async function handleRemoveMember(userId: string) {
+    if (!expandedGroupId) return
+    try {
+      await removeGroupMember(expandedGroupId, userId)
+      await loadMembers(expandedGroupId)
+      await loadGroups()
+    } catch (err) {
+      setMemberError(err instanceof Error ? err.message : 'Kunne ikke fjerne medlem')
+    }
+  }
+
+  // Invitations
   const loadInvitations = useCallback(async () => {
     try {
       const data = await getInvitations()
@@ -58,18 +197,18 @@ export default function AdminPanel() {
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = email.trim()
-    if (!trimmed) return
+    if (!trimmed || !inviteGroupId) return
 
     setIsLoading(true)
     setError(null)
 
     try {
-      await createInvitation(trimmed)
+      await createInvitation(trimmed, inviteGroupId)
       setEmail('')
       await loadInvitations()
     } catch (err) {
       if (err instanceof Error && err.message.includes('409')) {
-        setError('Denne e-postadressen er allerede invitert.')
+        setError('Denne e-postadressen er allerede invitert til denne gruppen.')
       } else {
         setError(err instanceof Error ? err.message : 'Kunne ikke sende invitasjon')
       }
@@ -144,286 +283,492 @@ export default function AdminPanel() {
 
   return (
     <>
+      {/* Group Management */}
       <div
         className="rounded-xl border p-4 sm:p-6"
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer betting-grupper</h2>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett grupper og administrer medlemmer.</p>
+
+        <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="text"
+            value={newGroupName}
+            onChange={(e) => setNewGroupName(e.target.value)}
+            placeholder="Navn på ny gruppe"
+            className="flex-1 rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+            style={{
+              backgroundColor: 'var(--color-surface-card)',
+              borderColor: 'var(--color-input-border)',
+              color: 'var(--color-text-primary)',
+            }}
+            required
+          />
+          <button
+            type="submit"
+            disabled={groupLoading}
+            className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            {groupLoading ? 'Oppretter...' : 'Opprett gruppe'}
+          </button>
+        </form>
+
+        {groupError ? (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{groupError}</p>
+        ) : null}
+
+        {groupList.length > 0 ? (
+          <div className="mt-4 space-y-2">
+            {groupList.map((group) => (
+              <div key={group.id}>
+                <div
+                  className="flex items-center justify-between rounded-lg border px-4 py-3"
+                  style={{ borderColor: 'var(--color-border-light)' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleExpandGroup(group.id)}
+                    className="flex-1 text-left"
+                  >
+                    {editingGroupId === group.id ? (
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="text"
+                          value={editingGroupName}
+                          onChange={(e) => setEditingGroupName(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') handleRenameGroup(group.id); if (e.key === 'Escape') setEditingGroupId(null) }}
+                          className="rounded border px-2 py-1 text-sm"
+                          style={{
+                            backgroundColor: 'var(--color-surface-card)',
+                            borderColor: 'var(--color-input-border)',
+                            color: 'var(--color-text-primary)',
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => handleRenameGroup(group.id)}
+                          className="text-xs font-medium"
+                          style={{ color: 'var(--color-primary)' }}
+                        >
+                          Lagre
+                        </button>
+                        <button
+                          onClick={() => setEditingGroupId(null)}
+                          className="text-xs"
+                          style={{ color: 'var(--color-text-muted)' }}
+                        >
+                          Avbryt
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                          {group.name}
+                        </span>
+                        <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                          {group.memberCount} {group.memberCount === 1 ? 'medlem' : 'medlemmer'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setEditingGroupId(group.id); setEditingGroupName(group.name) }}
+                      className="text-xs"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      Endre
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.id) }}
+                      className="text-xs"
+                      style={{ color: 'var(--color-danger)' }}
+                    >
+                      Slett
+                    </button>
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      {expandedGroupId === group.id ? '▲' : '▼'}
+                    </span>
+                  </div>
+                </div>
+
+                {expandedGroupId === group.id && (
+                  <div
+                    className="ml-4 mt-1 rounded-lg border p-3"
+                    style={{ borderColor: 'var(--color-border-light)', backgroundColor: 'var(--color-surface-elevated)' }}
+                  >
+                    <form onSubmit={handleAddMember} className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        type="email"
+                        value={newMemberEmail}
+                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                        placeholder="Legg til medlem (e-post)"
+                        className="flex-1 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
+                        style={{
+                          backgroundColor: 'var(--color-surface-card)',
+                          borderColor: 'var(--color-input-border)',
+                          color: 'var(--color-text-primary)',
+                        }}
+                        required
+                      />
+                      <button
+                        type="submit"
+                        className="rounded-lg px-3 py-2 text-sm font-medium text-white"
+                        style={{ backgroundColor: 'var(--color-primary)' }}
+                      >
+                        Legg til
+                      </button>
+                    </form>
+
+                    {memberError ? (
+                      <p className="mt-2 text-xs" style={{ color: 'var(--color-danger)' }}>{memberError}</p>
+                    ) : null}
+
+                    {membersLoading ? (
+                      <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Laster...</p>
+                    ) : (
+                      <ul className="mt-2 space-y-1">
+                        {groupMembers.map((m) => (
+                          <li key={m.userId} className="flex items-center justify-between py-1">
+                            <div className="flex items-center gap-2">
+                              {m.picture ? (
+                                <img src={m.picture} alt="" className="h-6 w-6 rounded-full" referrerPolicy="no-referrer" />
+                              ) : (
+                                <div
+                                  className="flex h-6 w-6 items-center justify-center rounded-full text-xs"
+                                  style={{ backgroundColor: 'var(--color-surface-card)', color: 'var(--color-text-muted)' }}
+                                >
+                                  {m.name.charAt(0)}
+                                </div>
+                              )}
+                              <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{m.name}</span>
+                              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{m.email}</span>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveMember(m.userId)}
+                              className="text-xs"
+                              style={{ color: 'var(--color-danger)' }}
+                            >
+                              Fjern
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen grupper opprettet ennå.</p>
+        )}
+      </div>
+
+      {/* Invitations (scoped by group) */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer invitasjoner</h2>
-      <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Kun inviterte brukere kan logge inn og bette.</p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Kun inviterte brukere kan logge inn og bette.</p>
 
-      <form onSubmit={handleInvite} className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="navn@eksempel.no"
-          className="flex-1 rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-          style={{
-            backgroundColor: 'var(--color-surface-card)',
-            borderColor: 'var(--color-input-border)',
-            color: 'var(--color-text-primary)',
-          }}
-          required
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
-          style={{ backgroundColor: 'var(--color-primary)' }}
-        >
-          {isLoading ? 'Sender...' : 'Inviter'}
-        </button>
-      </form>
-
-      {error ? (
-        <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
-      ) : null}
-
-      {invitations.length > 0 ? (
-        <ul className="mt-4 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
-          {invitations.map((invitation) => (
-            <li key={invitation.id} className="flex items-center justify-between py-3">
-              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{invitation.email}</span>
-              <button
-                onClick={() => handleDelete(invitation.id)}
-                className="rounded-md px-2 py-1 text-xs font-medium transition-colors"
-                style={{ color: 'var(--color-danger)' }}
-              >
-                Fjern
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen invitasjoner ennå.</p>
-      )}
-    </div>
-
-    <div
-      className="rounded-xl border p-4 sm:p-6 mt-6"
-      style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
-    >
-      <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Kamp-overstyring</h2>
-      <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett lag manuelt for sluttspillkamper.</p>
-
-      <form onSubmit={handleOverrideSubmit} className="mt-4 flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Kamp</label>
+        <form onSubmit={handleInvite} className="mt-4 flex flex-col gap-2 sm:flex-row">
           <select
-            value={selectedMatchId}
-            onChange={(e) => {
-              setSelectedMatchId(e.target.value === '' ? '' : Number(e.target.value))
-              setOverrideSuccess(false)
-            }}
+            value={inviteGroupId}
+            onChange={(e) => setInviteGroupId(e.target.value)}
             className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
             style={{
               backgroundColor: 'var(--color-surface-card)',
               borderColor: 'var(--color-input-border)',
               color: 'var(--color-text-primary)',
             }}
+            required
           >
-            <option value="">-- Velg kamp --</option>
-            {knockoutMatches.map((m) => {
-              const homeLabel = m.homePlaceholder || m.homeTeam || '?'
-              const awayLabel = m.awayPlaceholder || m.awayTeam || '?'
-              const stageLabel = stageNames[m.stage] || m.stage
-              return (
-                <option key={m.id} value={m.id}>
-                  {stageLabel}: {homeLabel} vs {awayLabel} (kamp {m.id})
-                </option>
-              )
-            })}
+            <option value="">-- Velg gruppe --</option>
+            {groupList.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
           </select>
-        </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="navn@eksempel.no"
+            className="flex-1 rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+            style={{
+              backgroundColor: 'var(--color-surface-card)',
+              borderColor: 'var(--color-input-border)',
+              color: 'var(--color-text-primary)',
+            }}
+            required
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            {isLoading ? 'Sender...' : 'Inviter'}
+          </button>
+        </form>
 
-        {selectedMatchId && (
-          <>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Hjemmelag</label>
-                <select
-                  value={overrideHome}
-                  onChange={(e) => setOverrideHome(e.target.value)}
-                  className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-                  style={{
-                    backgroundColor: 'var(--color-surface-card)',
-                    borderColor: 'var(--color-input-border)',
-                    color: 'var(--color-text-primary)',
-                  }}
+        {error ? (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
+        ) : null}
+
+        {invitations.length > 0 ? (
+          <ul className="mt-4 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+            {invitations.map((invitation) => (
+              <li key={invitation.id} className="flex items-center justify-between py-3">
+                <div>
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{invitation.email}</span>
+                  <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>({invitation.groupName})</span>
+                </div>
+                <button
+                  onClick={() => handleDelete(invitation.id)}
+                  className="rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                  style={{ color: 'var(--color-danger)' }}
                 >
-                  <option value="">-- Velg lag --</option>
-                  {sortedTeams.map((t) => (
-                    <option key={`home-${t.code}`} value={t.code}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
+                  Fjern
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen invitasjoner ennå.</p>
+        )}
+      </div>
+
+      {/* Match Override */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Kamp-overstyring</h2>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett lag manuelt for sluttspillkamper.</p>
+
+        <form onSubmit={handleOverrideSubmit} className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Kamp</label>
+            <select
+              value={selectedMatchId}
+              onChange={(e) => {
+                setSelectedMatchId(e.target.value === '' ? '' : Number(e.target.value))
+                setOverrideSuccess(false)
+              }}
+              className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+              style={{
+                backgroundColor: 'var(--color-surface-card)',
+                borderColor: 'var(--color-input-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              <option value="">-- Velg kamp --</option>
+              {knockoutMatches.map((m) => {
+                const homeLabel = m.homePlaceholder || m.homeTeam || '?'
+                const awayLabel = m.awayPlaceholder || m.awayTeam || '?'
+                const stageLabel = stageNames[m.stage] || m.stage
+                return (
+                  <option key={m.id} value={m.id}>
+                    {stageLabel}: {homeLabel} vs {awayLabel} (kamp {m.id})
+                  </option>
+                )
+              })}
+            </select>
+          </div>
+
+          {selectedMatchId && (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Hjemmelag</label>
+                  <select
+                    value={overrideHome}
+                    onChange={(e) => setOverrideHome(e.target.value)}
+                    className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+                    style={{
+                      backgroundColor: 'var(--color-surface-card)',
+                      borderColor: 'var(--color-input-border)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                  >
+                    <option value="">-- Velg lag --</option>
+                    {sortedTeams.map((t) => (
+                      <option key={`home-${t.code}`} value={t.code}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bortelag</label>
+                  <select
+                    value={overrideAway}
+                    onChange={(e) => setOverrideAway(e.target.value)}
+                    className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+                    style={{
+                      backgroundColor: 'var(--color-surface-card)',
+                      borderColor: 'var(--color-input-border)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                  >
+                    <option value="">-- Velg lag --</option>
+                    {sortedTeams.map((t) => (
+                      <option key={`away-${t.code}`} value={t.code}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bortelag</label>
-                <select
-                  value={overrideAway}
-                  onChange={(e) => setOverrideAway(e.target.value)}
-                  className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-                  style={{
-                    backgroundColor: 'var(--color-surface-card)',
-                    borderColor: 'var(--color-input-border)',
-                    color: 'var(--color-text-primary)',
-                  }}
+              <div className="flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={overrideLoading}
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
                 >
-                  <option value="">-- Velg lag --</option>
-                  {sortedTeams.map((t) => (
-                    <option key={`away-${t.code}`} value={t.code}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
+                  {overrideLoading ? 'Lagrer...' : 'Lagre'}
+                </button>
+
+                {overrideSuccess && (
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
+                    Oppdatert!
+                  </p>
+                )}
               </div>
-            </div>
+            </>
+          )}
 
-            <div className="flex items-center gap-4">
-              <button
-                type="submit"
-                disabled={overrideLoading}
-                className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              >
-                {overrideLoading ? 'Lagrer...' : 'Lagre'}
-              </button>
+          {overrideError && (
+            <p className="mt-2 text-sm" style={{ color: 'var(--color-danger)' }}>
+              Feil: {overrideError}
+            </p>
+          )}
+        </form>
+      </div>
 
-              {overrideSuccess && (
-                <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
-                  Oppdatert!
-                </p>
-              )}
-            </div>
-          </>
-        )}
+      {/* Result Override */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Sett resultat</h2>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett eller overstyr kampresultat manuelt. Poeng beregnes automatisk.</p>
 
-        {overrideError && (
-          <p className="mt-2 text-sm" style={{ color: 'var(--color-danger)' }}>
-            Feil: {overrideError}
-          </p>
-        )}
-      </form>
-    </div>
-
-    <div
-      className="rounded-xl border p-4 sm:p-6 mt-6"
-      style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
-    >
-      <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Sett resultat</h2>
-      <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett eller overstyr kampresultat manuelt. Poeng beregnes automatisk.</p>
-
-      <form onSubmit={handleResultSubmit} className="mt-4 flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Kamp</label>
-          <select
-            value={resultMatchId}
-            onChange={(e) => {
-              const id = e.target.value === '' ? '' as const : Number(e.target.value)
-              setResultMatchId(id)
-              setResultSuccess(false)
-              if (id !== '') {
-                const existing = results.get(id)
-                if (existing) {
-                  setResultHome(String(existing.homeScore))
-                  setResultAway(String(existing.awayScore))
-                } else {
-                  setResultHome('')
-                  setResultAway('')
+        <form onSubmit={handleResultSubmit} className="mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Kamp</label>
+            <select
+              value={resultMatchId}
+              onChange={(e) => {
+                const id = e.target.value === '' ? '' as const : Number(e.target.value)
+                setResultMatchId(id)
+                setResultSuccess(false)
+                if (id !== '') {
+                  const existing = results.get(id)
+                  if (existing) {
+                    setResultHome(String(existing.homeScore))
+                    setResultAway(String(existing.awayScore))
+                  } else {
+                    setResultHome('')
+                    setResultAway('')
+                  }
                 }
-              }
-            }}
-            className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-            style={{
-              backgroundColor: 'var(--color-surface-card)',
-              borderColor: 'var(--color-input-border)',
-              color: 'var(--color-text-primary)',
-            }}
-          >
-            <option value="">-- Velg kamp --</option>
-            {matches.map((m) => {
-              const homeLabel = m.homeTeam ? (teams[m.homeTeam]?.name ?? m.homeTeam) : (m.homePlaceholder || '?')
-              const awayLabel = m.awayTeam ? (teams[m.awayTeam]?.name ?? m.awayTeam) : (m.awayPlaceholder || '?')
-              const stageLabel = stageNames[m.stage] || m.stage
-              const existingResult = results.get(m.id)
-              const resultLabel = existingResult ? ` (${existingResult.homeScore}-${existingResult.awayScore})` : ''
-              return (
-                <option key={m.id} value={m.id}>
-                  {stageLabel}: {homeLabel} vs {awayLabel}{resultLabel} (kamp {m.id})
-                </option>
-              )
-            })}
-          </select>
-        </div>
+              }}
+              className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+              style={{
+                backgroundColor: 'var(--color-surface-card)',
+                borderColor: 'var(--color-input-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              <option value="">-- Velg kamp --</option>
+              {matches.map((m) => {
+                const homeLabel = m.homeTeam ? (teams[m.homeTeam]?.name ?? m.homeTeam) : (m.homePlaceholder || '?')
+                const awayLabel = m.awayTeam ? (teams[m.awayTeam]?.name ?? m.awayTeam) : (m.awayPlaceholder || '?')
+                const stageLabel = stageNames[m.stage] || m.stage
+                const existingResult = results.get(m.id)
+                const resultLabel = existingResult ? ` (${existingResult.homeScore}-${existingResult.awayScore})` : ''
+                return (
+                  <option key={m.id} value={m.id}>
+                    {stageLabel}: {homeLabel} vs {awayLabel}{resultLabel} (kamp {m.id})
+                  </option>
+                )
+              })}
+            </select>
+          </div>
 
-        {resultMatchId !== '' && (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Hjemmemål</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={resultHome}
-                  onChange={(e) => setResultHome(e.target.value)}
-                  placeholder="0"
-                  className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-                  style={{
-                    backgroundColor: 'var(--color-surface-card)',
-                    borderColor: 'var(--color-input-border)',
-                    color: 'var(--color-text-primary)',
-                  }}
-                  required
-                />
+          {resultMatchId !== '' && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Hjemmemål</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={resultHome}
+                    onChange={(e) => setResultHome(e.target.value)}
+                    placeholder="0"
+                    className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+                    style={{
+                      backgroundColor: 'var(--color-surface-card)',
+                      borderColor: 'var(--color-input-border)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bortemål</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={resultAway}
+                    onChange={(e) => setResultAway(e.target.value)}
+                    placeholder="0"
+                    className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+                    style={{
+                      backgroundColor: 'var(--color-surface-card)',
+                      borderColor: 'var(--color-input-border)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                    required
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Bortemål</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={resultAway}
-                  onChange={(e) => setResultAway(e.target.value)}
-                  placeholder="0"
-                  className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
-                  style={{
-                    backgroundColor: 'var(--color-surface-card)',
-                    borderColor: 'var(--color-input-border)',
-                    color: 'var(--color-text-primary)',
-                  }}
-                  required
-                />
+
+              <div className="flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={resultLoading}
+                  className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+                  style={{ backgroundColor: 'var(--color-primary)' }}
+                >
+                  {resultLoading ? 'Lagrer...' : 'Lagre resultat'}
+                </button>
+
+                {resultSuccess && (
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
+                    Resultat lagret!
+                  </p>
+                )}
               </div>
-            </div>
+            </>
+          )}
 
-            <div className="flex items-center gap-4">
-              <button
-                type="submit"
-                disabled={resultLoading}
-                className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              >
-                {resultLoading ? 'Lagrer...' : 'Lagre resultat'}
-              </button>
-
-              {resultSuccess && (
-                <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
-                  Resultat lagret!
-                </p>
-              )}
-            </div>
-          </>
-        )}
-
-        {resultError && (
-          <p className="mt-2 text-sm" style={{ color: 'var(--color-danger)' }}>
-            Feil: {resultError}
-          </p>
-        )}
-      </form>
-    </div>
+          {resultError && (
+            <p className="mt-2 text-sm" style={{ color: 'var(--color-danger)' }}>
+              Feil: {resultError}
+            </p>
+          )}
+        </form>
+      </div>
     </>
   )
 }

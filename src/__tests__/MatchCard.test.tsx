@@ -5,6 +5,7 @@ import type { Match, Team, Venue } from '../types'
 import { AuthProvider } from '../context/AuthContext'
 import { PredictionsProvider } from '../context/PredictionsContext'
 import { ResultsProvider } from '../context/ResultsContext'
+import { BettingGroupProvider } from '../context/BettingGroupContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -21,13 +22,15 @@ function Wrapper({ children }: { children: React.ReactNode }) {
   return (
     <GoogleOAuthProvider clientId="test">
       <MemoryRouter>
-        <AuthProvider>
-          <ResultsProvider>
-            <PredictionsProvider>
-              {children}
-            </PredictionsProvider>
-          </ResultsProvider>
-        </AuthProvider>
+        <BettingGroupProvider>
+          <AuthProvider>
+            <ResultsProvider>
+              <PredictionsProvider>
+                {children}
+              </PredictionsProvider>
+            </ResultsProvider>
+          </AuthProvider>
+        </BettingGroupProvider>
       </MemoryRouter>
     </GoogleOAuthProvider>
   )
