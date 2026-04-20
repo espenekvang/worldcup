@@ -1,7 +1,0 @@
-terraform/acr.tf:resource "azurerm_container_registry" "main" {
-terraform/container-apps.tf:resource "azurerm_container_app_environment" "main" {
-terraform/container-apps.tf:resource "azurerm_container_app" "main" {
-terraform/main.tf:resource "azurerm_resource_group" "main" {
-terraform/main.tf:resource "azurerm_log_analytics_workspace" "main" {
-terraform/storage.tf:resource "azurerm_storage_account" "main" {
-terraform/storage.tf:resource "azurerm_storage_share" "backup" {

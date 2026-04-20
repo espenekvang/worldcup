@@ -1,3 +1,0 @@
-- MatchResult follows the same simple POCO pattern as Prediction: auto-properties only, UTC timestamp default, no constructor or navigation properties.
-- AppDbContext registration is expression-bodied DbSet plus a unique index on MatchId.
-- appsettings.json can introduce Wc2026Api as a top-level config section without disturbing existing structure.

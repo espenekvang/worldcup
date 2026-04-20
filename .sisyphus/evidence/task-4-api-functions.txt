@@ -1,2 +1,0 @@
-Added ResultResponse and PointsResponse interfaces plus getResults and getUserPoints to src/api/client.ts.
-Kept the existing request<T>() wrapper and existing API patterns unchanged.

@@ -1,5 +1,0 @@
-npx tsc --noEmit output — 2026-04-12
-
-(no output)
-EXIT CODE: 0
-STATUS: CLEAN — 0 TypeScript errors ✅

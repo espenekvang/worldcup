@@ -1,2 +1,0 @@
-- Kept MatchResult standalone with no navigation properties, matching the requested entity shape.
-- Added only the unique MatchId index required for result lookup consistency.

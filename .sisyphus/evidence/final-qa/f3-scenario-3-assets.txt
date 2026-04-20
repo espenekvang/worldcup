@@ -1,5 +1,0 @@
-Scenario 3: Static JS bundle served
-Bundle detected: /assets/index-ZPdTmTeX.js
-Command: curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/assets/index-ZPdTmTeX.js"
-Result: HTTP 200
-STATUS: PASS

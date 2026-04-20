@@ -1,1 +1,0 @@
-- No unresolved code issues identified; only the environment-level biome/LSP limitation remains for JSON diagnostics.
