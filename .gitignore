@@ -21,3 +21,6 @@ terraform/*.tfvars
 # Environment
 .env
 api/**/appsettings.Development.json
+
+# AI agent working files
+.sisyphus/
