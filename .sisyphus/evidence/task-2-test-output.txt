@@ -1,0 +1,14 @@
+npm test output — 2026-04-12
+
+> worldcup@0.0.0 test
+> vitest run
+
+ RUN  v4.1.4 /Users/eekvang/dev/aiworkshop/worldcup
+
+ Test Files  6 passed (6)
+      Tests  16 passed (16)
+   Start at  13:33:34
+   Duration  879ms
+
+EXIT CODE: 0
+STATUS: ALL PASS ✅

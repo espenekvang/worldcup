@@ -64,7 +64,7 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
 
         if (exists)
         {
-            return Conflict("Denne e-postadressen er allerede invitert til denne gruppen.");
+            return Conflict("Denne e-postadressen er allerede invitert til denne ligaen.");
         }
 
         var userId = GetAuthenticatedUserId();

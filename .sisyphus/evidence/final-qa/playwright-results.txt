@@ -1,0 +1,27 @@
+=== FINAL QA PLAYWRIGHT TESTS ===
+Started: 2026-04-11T15:05:36.300Z
+
+--- SCENARIO 1: MatchCard shows result (2-1) ---
+URL: http://localhost:5173/
+✅ PASS: Score pattern found: "2 – 1"
+Screenshot saved: matchcard-result.png
+Scenario 1 result: PASS
+
+--- SCENARIO 2: Upcoming match card unchanged (no result) ---
+Total elements with "match" in class: 0
+Normal prediction UI present: true
+Screenshot saved: matchcard-no-result.png
+Page has content (>200 chars): true
+Scenario 2 result: PASS
+
+--- SCENARIO 3: Edge case — 0-0 result ---
+✅ PASS: 0-0 score pattern found: "0 – 0"
+Screenshot saved: matchcard-00-result.png
+Scenario 3 result: PASS
+
+--- INTEGRATION: Both results visible on same page ---
+Match 1 (2-1) visible: ✅ YES
+Match 2 (0-0) visible: ✅ YES
+Integration result: PASS
+
+=== END OF PLAYWRIGHT TESTS ===

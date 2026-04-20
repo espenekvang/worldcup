@@ -1,0 +1,27 @@
+=== DATABASE / MIGRATION CHECKS ===
+
+1. Tables in worldcup.db:
+Invitations, MatchResults, Predictions, Users, __EFMigrationsHistory, __EFMigrationsLock
+→ MatchResults table EXISTS ✓
+PASS
+
+2. MatchResults schema:
+CREATE TABLE IF NOT EXISTS "MatchResults" (
+    "Id" TEXT NOT NULL CONSTRAINT "PK_MatchResults" PRIMARY KEY,
+    "MatchId" INTEGER NOT NULL,
+    "HomeScore" INTEGER NOT NULL,
+    "AwayScore" INTEGER NOT NULL,
+    "FetchedAt" TEXT NOT NULL
+);
+CREATE UNIQUE INDEX "IX_MatchResults_MatchId" ON "MatchResults" ("MatchId");
+→ All columns present: Id, MatchId, HomeScore, AwayScore, FetchedAt ✓
+PASS
+
+3. grep "wc2026_" api/ → NULL (no real API key in source)
+PASS
+
+4. grep "Wc2026Api" appsettings.json → Found: "Wc2026Api": {
+Config section EXISTS ✓
+PASS
+
+VERDICT: ALL 4 DB/MIGRATION CHECKS PASS

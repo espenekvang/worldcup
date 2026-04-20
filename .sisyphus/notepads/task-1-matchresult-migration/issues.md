@@ -1,0 +1,2 @@
+- EF CLI emitted a version warning: tools 9.0.1 vs runtime 10.0.5. Migration still succeeded.
+- LSP diagnostics for appsettings.json were blocked because the configured biome server is not installed in this environment.

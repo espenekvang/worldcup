@@ -167,7 +167,7 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
         var alreadyMember = await dbContext.BettingGroupMembers
             .AnyAsync(m => m.BettingGroupId == id && m.UserId == user.Id);
         if (alreadyMember)
-            return Conflict("Brukeren er allerede medlem av denne gruppen.");
+            return Conflict("Brukeren er allerede medlem av denne ligaen.");
 
         var member = new BettingGroupMember
         {
