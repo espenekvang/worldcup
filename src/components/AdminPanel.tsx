@@ -72,7 +72,7 @@ export default function AdminPanel() {
         setInviteGroupId(data[0].id)
       }
     } catch {
-      setGroupError('Kunne ikke laste grupper')
+      setGroupError('Kunne ikke laste ligaer')
     }
   }, [inviteGroupId])
 
@@ -115,14 +115,14 @@ export default function AdminPanel() {
       setNewGroupName('')
       await loadGroups()
     } catch (err) {
-      setGroupError(err instanceof Error ? err.message : 'Kunne ikke opprette gruppe')
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke opprette liga')
     } finally {
       setGroupLoading(false)
     }
   }
 
   async function handleDeleteGroup(id: string) {
-    if (!confirm('Er du sikker på at du vil slette denne gruppen? Alle prediksjoner i gruppen slettes.')) return
+    if (!confirm('Er du sikker på at du vil slette denne ligaen? Alle prediksjoner i ligaen slettes.')) return
 
     try {
       await deleteGroup(id)
@@ -132,7 +132,7 @@ export default function AdminPanel() {
       }
       await loadGroups()
     } catch (err) {
-      setGroupError(err instanceof Error ? err.message : 'Kunne ikke slette gruppe')
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke slette liga')
     }
   }
 
@@ -160,7 +160,7 @@ export default function AdminPanel() {
       await loadGroups()
     } catch (err) {
       if (err instanceof Error && err.message.includes('409')) {
-        setMemberError('Brukeren er allerede medlem av denne gruppen.')
+        setMemberError('Brukeren er allerede medlem av denne ligaen.')
       } else if (err instanceof Error && err.message.includes('404')) {
         setMemberError('Bruker ikke funnet. Inviter dem først.')
       } else {
@@ -208,7 +208,7 @@ export default function AdminPanel() {
       await loadInvitations()
     } catch (err) {
       if (err instanceof Error && err.message.includes('409')) {
-        setError('Denne e-postadressen er allerede invitert til denne gruppen.')
+        setError('Denne e-postadressen er allerede invitert til denne ligaen.')
       } else {
         setError(err instanceof Error ? err.message : 'Kunne ikke sende invitasjon')
       }
@@ -289,14 +289,14 @@ export default function AdminPanel() {
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer ligaer</h2>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett grupper og administrer medlemmer.</p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett ligaer og administrer medlemmer.</p>
 
         <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
-            placeholder="Navn på ny gruppe"
+            placeholder="Navn på ny liga"
             className="flex-1 rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
             style={{
               backgroundColor: 'var(--color-surface-card)',
@@ -311,7 +311,7 @@ export default function AdminPanel() {
             className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
             style={{ backgroundColor: 'var(--color-primary)' }}
           >
-            {groupLoading ? 'Oppretter...' : 'Opprett gruppe'}
+            {groupLoading ? 'Oppretter...' : 'Opprett liga'}
           </button>
         </form>
 
@@ -463,7 +463,7 @@ export default function AdminPanel() {
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen grupper opprettet ennå.</p>
+          <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen ligaer opprettet ennå.</p>
         )}
       </div>
 
@@ -487,7 +487,7 @@ export default function AdminPanel() {
             }}
             required
           >
-            <option value="">-- Velg gruppe --</option>
+            <option value="">-- Velg liga --</option>
             {groupList.map((g) => (
               <option key={g.id} value={g.id}>{g.name}</option>
             ))}

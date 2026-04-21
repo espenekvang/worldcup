@@ -113,7 +113,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
                         style={{ color: 'var(--color-text-primary)' }}
                       >
                         <span className="w-5 text-center">🔄</span>
-                        Bytt gruppe
+                        Bytt liga
                       </button>
                     ) : null}
 
