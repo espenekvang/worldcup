@@ -37,7 +37,7 @@ COPY src/data/matches.json /publish/data/matches.json
 COPY src/data/teams.json /publish/data/teams.json
 
 # Stage 3: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 
 COPY --from=backend-build /publish /app
 
