@@ -3,12 +3,13 @@ import type { InvitationResponse } from '../api/client'
 import {
   getInvitations, createInvitation, deleteInvitation,
   updateMatchTeams, setMatchResult,
-  getAllGroups, createGroup, updateGroup, deleteGroup,
-  getGroupMembers, addGroupMember, removeGroupMember,
+  getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
+  getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
+import { useAuth } from '../context/AuthContext'
 import { teams } from '../data'
 
 const stageNames: Record<string, string> = {
@@ -22,6 +23,10 @@ const stageNames: Record<string, string> = {
 }
 
 export default function AdminPanel() {
+  const { user } = useAuth()
+  const isGlobalAdmin = user?.isAdmin ?? false
+  const groupAdminGroupIds = user?.groupAdminGroupIds ?? []
+
   // Group management state
   const [groupList, setGroupList] = useState<BettingGroup[]>([])
   const [newGroupName, setNewGroupName] = useState('')
@@ -67,7 +72,14 @@ export default function AdminPanel() {
   // Load groups
   const loadGroups = useCallback(async () => {
     try {
-      const data = await getAllGroups()
+      let data: BettingGroup[]
+      if (isGlobalAdmin) {
+        data = await getAllGroups()
+      } else {
+        // Group admins only see groups they admin
+        const myGroups = await getMyGroups()
+        data = myGroups.filter((g) => groupAdminGroupIds.includes(g.id))
+      }
       setGroupList(data)
       if (data.length > 0 && !inviteGroupId) {
         setInviteGroupId(data[0].id)
@@ -75,7 +87,7 @@ export default function AdminPanel() {
     } catch {
       setGroupError('Kunne ikke laste ligaer')
     }
-  }, [inviteGroupId])
+  }, [inviteGroupId, isGlobalAdmin, groupAdminGroupIds])
 
   useEffect(() => {
     loadGroups()
@@ -179,6 +191,16 @@ export default function AdminPanel() {
       await loadGroups()
     } catch (err) {
       setMemberError(err instanceof Error ? err.message : 'Kunne ikke fjerne medlem')
+    }
+  }
+
+  async function handleToggleGroupAdmin(userId: string, currentStatus: boolean) {
+    if (!expandedGroupId) return
+    try {
+      await toggleGroupAdmin(expandedGroupId, userId, !currentStatus)
+      await loadMembers(expandedGroupId)
+    } catch (err) {
+      setMemberError(err instanceof Error ? err.message : 'Kunne ikke endre admin-status')
     }
   }
 
@@ -291,9 +313,12 @@ export default function AdminPanel() {
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer ligaer</h2>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett ligaer og administrer medlemmer.</p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {isGlobalAdmin ? 'Opprett ligaer og administrer medlemmer.' : 'Administrer medlemmer i dine ligaer.'}
+        </p>
 
-        <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        {isGlobalAdmin && (
+          <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="text"
             value={newGroupName}
@@ -325,6 +350,7 @@ export default function AdminPanel() {
             {groupLoading ? 'Oppretter...' : 'Opprett liga'}
           </button>
         </form>
+        )}
 
         {groupError ? (
           <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{groupError}</p>
@@ -385,20 +411,24 @@ export default function AdminPanel() {
                     )}
                   </button>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setEditingGroupId(group.id); setEditingGroupName(group.name) }}
-                      className="text-xs"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      Endre
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.id) }}
-                      className="text-xs"
-                      style={{ color: 'var(--color-danger)' }}
-                    >
-                      Slett
-                    </button>
+                    {isGlobalAdmin && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setEditingGroupId(group.id); setEditingGroupName(group.name) }}
+                          className="text-xs"
+                          style={{ color: 'var(--color-text-muted)' }}
+                        >
+                          Endre
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.id) }}
+                          className="text-xs"
+                          style={{ color: 'var(--color-danger)' }}
+                        >
+                          Slett
+                        </button>
+                      </>
+                    )}
                     <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {expandedGroupId === group.id ? '▲' : '▼'}
                     </span>
@@ -430,8 +460,8 @@ export default function AdminPanel() {
                         style={{ backgroundColor: 'var(--color-primary)' }}
                       >
                         Legg til
-                      </button>
-                    </form>
+          </button>
+        </form>
 
                     {memberError ? (
                       <p className="mt-2 text-xs" style={{ color: 'var(--color-danger)' }}>{memberError}</p>
@@ -456,14 +486,30 @@ export default function AdminPanel() {
                               )}
                               <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{m.name}</span>
                               <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{m.email}</span>
+                              {m.isGroupAdmin && (
+                                <span className="rounded-full px-1.5 py-0.5 text-[10px] font-medium" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
+                                  Liga-admin
+                                </span>
+                              )}
                             </div>
-                            <button
-                              onClick={() => handleRemoveMember(m.userId)}
-                              className="text-xs"
-                              style={{ color: 'var(--color-danger)' }}
-                            >
-                              Fjern
-                            </button>
+                            <div className="flex items-center gap-2">
+                              {isGlobalAdmin && (
+                                <button
+                                  onClick={() => handleToggleGroupAdmin(m.userId, m.isGroupAdmin)}
+                                  className="text-xs"
+                                  style={{ color: 'var(--color-primary)' }}
+                                >
+                                  {m.isGroupAdmin ? 'Fjern admin' : 'Gjør admin'}
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleRemoveMember(m.userId)}
+                                className="text-xs"
+                                style={{ color: 'var(--color-danger)' }}
+                              >
+                                Fjern
+                              </button>
+                            </div>
                           </li>
                         ))}
                       </ul>
@@ -553,6 +599,8 @@ export default function AdminPanel() {
         )}
       </div>
 
+      {isGlobalAdmin && (
+      <>
       {/* Match Override */}
       <div
         className="rounded-xl border p-4 sm:p-6 mt-6"
@@ -780,6 +828,8 @@ export default function AdminPanel() {
           )}
         </form>
       </div>
+      </>
+      )}
     </>
   )
 }

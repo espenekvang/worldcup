@@ -134,14 +134,26 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
         }
 
         // Fetch user's groups for response
-        var groups = await dbContext.BettingGroupMembers
+        var memberships = await dbContext.BettingGroupMembers
             .Where(m => m.UserId == user.Id)
-            .Select(m => new BettingGroupResponse(
+            .Select(m => new
+            {
                 m.BettingGroupId,
                 m.BettingGroup.Name,
-                m.BettingGroup.Members.Count,
-                m.BettingGroup.CreatedAt))
+                MemberCount = m.BettingGroup.Members.Count,
+                m.BettingGroup.CreatedAt,
+                m.IsGroupAdmin
+            })
             .ToListAsync();
+
+        var groups = memberships
+            .Select(m => new BettingGroupResponse(m.BettingGroupId, m.Name, m.MemberCount, m.CreatedAt))
+            .ToList();
+
+        var groupAdminGroupIds = memberships
+            .Where(m => m.IsGroupAdmin)
+            .Select(m => m.BettingGroupId)
+            .ToList();
 
         var jwtKey = configuration["Jwt:Key"]
             ?? throw new InvalidOperationException("JWT signing key is not configured.");
@@ -176,7 +188,8 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
             Name = user.Name,
             Picture = user.Picture,
             IsAdmin = user.IsAdmin,
-            Groups = groups
+            Groups = groups,
+            GroupAdminGroupIds = groupAdminGroupIds
         };
 
         return Ok(response);

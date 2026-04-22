@@ -133,9 +133,15 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
     }
 
     [HttpGet("{id:guid}/members")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<BettingGroupMemberResponse>>> GetMembers(Guid id)
     {
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        if (!await IsGlobalOrGroupAdmin(userId.Value, id))
+            return Forbid();
+
         var groupExists = await dbContext.BettingGroups.AnyAsync(g => g.Id == id);
         if (!groupExists) return NotFound();
 
@@ -146,6 +152,7 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
                 m.User.Name,
                 m.User.Email,
                 m.User.Picture,
+                m.IsGroupAdmin,
                 m.JoinedAt))
             .OrderBy(m => m.Name)
             .AsNoTracking()
@@ -155,9 +162,15 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
     }
 
     [HttpPost("{id:guid}/members")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult<BettingGroupMemberResponse>> AddMember(Guid id, [FromBody] AddGroupMemberRequest request)
     {
+        var callerUserId = GetAuthenticatedUserId();
+        if (callerUserId is null) return Unauthorized();
+
+        if (!await IsGlobalOrGroupAdmin(callerUserId.Value, id))
+            return Forbid();
+
         if (string.IsNullOrWhiteSpace(request.Email))
             return BadRequest("E-postadresse er påkrevd.");
 
@@ -185,13 +198,19 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
         await dbContext.SaveChangesAsync();
 
         return StatusCode(StatusCodes.Status201Created,
-            new BettingGroupMemberResponse(user.Id, user.Name, user.Email, user.Picture, member.JoinedAt));
+            new BettingGroupMemberResponse(user.Id, user.Name, user.Email, user.Picture, false, member.JoinedAt));
     }
 
     [HttpDelete("{id:guid}/members/{userId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult> RemoveMember(Guid id, Guid userId)
     {
+        var callerUserId = GetAuthenticatedUserId();
+        if (callerUserId is null) return Unauthorized();
+
+        if (!await IsGlobalOrGroupAdmin(callerUserId.Value, id))
+            return Forbid();
+
         var member = await dbContext.BettingGroupMembers
             .FirstOrDefaultAsync(m => m.BettingGroupId == id && m.UserId == userId);
 
@@ -217,9 +236,31 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:guid}/members/{userId:guid}/admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> ToggleGroupAdmin(Guid id, Guid userId, [FromBody] SetGroupAdminRequest request)
+    {
+        var member = await dbContext.BettingGroupMembers
+            .FirstOrDefaultAsync(m => m.BettingGroupId == id && m.UserId == userId);
+
+        if (member is null) return NotFound();
+
+        member.IsGroupAdmin = request.IsGroupAdmin;
+        await dbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+    }
+
+    private async Task<bool> IsGlobalOrGroupAdmin(Guid userId, Guid groupId)
+    {
+        if (User.IsInRole("Admin")) return true;
+        return await dbContext.BettingGroupMembers
+            .AnyAsync(m => m.UserId == userId && m.BettingGroupId == groupId && m.IsGroupAdmin);
     }
 }

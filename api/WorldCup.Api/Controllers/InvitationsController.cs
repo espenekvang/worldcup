@@ -9,18 +9,35 @@ using WorldCup.Api.Models;
 namespace WorldCup.Api.Controllers;
 
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 [Route("api/invitations")]
 public class InvitationsController(AppDbContext dbContext) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InvitationResponse>>> GetInvitations([FromQuery] Guid? groupId)
     {
-        var query = dbContext.Invitations.AsQueryable();
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        var isGlobalAdmin = User.IsInRole("Admin");
+
+        IQueryable<Invitation> query = dbContext.Invitations;
 
         if (groupId.HasValue)
         {
+            if (!isGlobalAdmin && !await IsGroupAdmin(userId.Value, groupId.Value))
+                return Forbid();
+
             query = query.Where(i => i.BettingGroupId == groupId.Value);
+        }
+        else if (!isGlobalAdmin)
+        {
+            // Non-global admins can only see invitations for groups they admin
+            var adminGroupIds = dbContext.BettingGroupMembers
+                .Where(m => m.UserId == userId.Value && m.IsGroupAdmin)
+                .Select(m => m.BettingGroupId);
+
+            query = query.Where(i => adminGroupIds.Contains(i.BettingGroupId));
         }
 
         var invitations = await query
@@ -51,6 +68,12 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
             return BadRequest("BettingGroupId er påkrevd.");
         }
 
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        if (!await IsGlobalOrGroupAdmin(userId.Value, request.BettingGroupId))
+            return Forbid();
+
         var group = await dbContext.BettingGroups.FindAsync(request.BettingGroupId);
         if (group is null)
         {
@@ -65,12 +88,6 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
         if (exists)
         {
             return Conflict("Denne e-postadressen er allerede invitert til denne ligaen.");
-        }
-
-        var userId = GetAuthenticatedUserId();
-        if (userId is null)
-        {
-            return Unauthorized();
         }
 
         var invitation = new Invitation
@@ -97,12 +114,14 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteInvitation(Guid id)
     {
-        var invitation = await dbContext.Invitations.FindAsync(id);
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
 
-        if (invitation is null)
-        {
-            return NotFound();
-        }
+        var invitation = await dbContext.Invitations.FindAsync(id);
+        if (invitation is null) return NotFound();
+
+        if (!await IsGlobalOrGroupAdmin(userId.Value, invitation.BettingGroupId))
+            return Forbid();
 
         dbContext.Invitations.Remove(invitation);
         await dbContext.SaveChangesAsync();
@@ -114,5 +133,17 @@ public class InvitationsController(AppDbContext dbContext) : ControllerBase
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+    }
+
+    private async Task<bool> IsGroupAdmin(Guid userId, Guid groupId)
+    {
+        return await dbContext.BettingGroupMembers
+            .AnyAsync(m => m.UserId == userId && m.BettingGroupId == groupId && m.IsGroupAdmin);
+    }
+
+    private async Task<bool> IsGlobalOrGroupAdmin(Guid userId, Guid groupId)
+    {
+        if (User.IsInRole("Admin")) return true;
+        return await IsGroupAdmin(userId, groupId);
     }
 }

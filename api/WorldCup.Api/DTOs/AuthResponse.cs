@@ -8,4 +8,5 @@ public class AuthResponse
     public string? Picture { get; set; }
     public bool IsAdmin { get; set; }
     public List<BettingGroupResponse> Groups { get; set; } = [];
+    public List<Guid> GroupAdminGroupIds { get; set; } = [];
 }

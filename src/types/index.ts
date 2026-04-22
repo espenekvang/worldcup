@@ -52,5 +52,6 @@ export interface BettingGroupMember {
   name: string
   email: string
   picture: string | null
+  isGroupAdmin: boolean
   joinedAt: string
 }
