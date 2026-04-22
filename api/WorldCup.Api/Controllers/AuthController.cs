@@ -48,12 +48,16 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
 
         if (!isAdmin)
         {
-            var isInvited = await dbContext.Invitations
-                .AnyAsync(i => i.Email.ToLower() == payload.Email.ToLower());
-
-            if (!isInvited)
+            var existingUser = await dbContext.Users.AnyAsync(u => u.GoogleId == payload.Subject);
+            if (!existingUser)
             {
-                return StatusCode(403, "Du er ikke invitert. Be administrator om en invitasjon.");
+                var isInvited = await dbContext.Invitations
+                    .AnyAsync(i => i.Email.ToLower() == payload.Email.ToLower());
+
+                if (!isInvited)
+                {
+                    return StatusCode(403, "Du er ikke invitert. Be administrator om en invitasjon.");
+                }
             }
         }
 
