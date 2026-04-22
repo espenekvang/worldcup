@@ -81,18 +81,23 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
 
         dbContext.BettingGroups.Add(group);
 
-        // Auto-add admin as member
-        dbContext.BettingGroupMembers.Add(new BettingGroupMember
+        var memberCount = 0;
+
+        if (request.JoinGroup)
         {
-            Id = Guid.NewGuid(),
-            BettingGroupId = group.Id,
-            UserId = userId.Value
-        });
+            dbContext.BettingGroupMembers.Add(new BettingGroupMember
+            {
+                Id = Guid.NewGuid(),
+                BettingGroupId = group.Id,
+                UserId = userId.Value
+            });
+            memberCount = 1;
+        }
 
         await dbContext.SaveChangesAsync();
 
         return StatusCode(StatusCodes.Status201Created,
-            new BettingGroupResponse(group.Id, group.Name, 1, group.CreatedAt));
+            new BettingGroupResponse(group.Id, group.Name, memberCount, group.CreatedAt));
     }
 
     [HttpPut("{id:guid}")]

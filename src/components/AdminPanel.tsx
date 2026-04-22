@@ -25,6 +25,7 @@ export default function AdminPanel() {
   // Group management state
   const [groupList, setGroupList] = useState<BettingGroup[]>([])
   const [newGroupName, setNewGroupName] = useState('')
+  const [joinGroup, setJoinGroup] = useState(true)
   const [groupLoading, setGroupLoading] = useState(false)
   const [groupError, setGroupError] = useState<string | null>(null)
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null)
@@ -111,8 +112,9 @@ export default function AdminPanel() {
     setGroupLoading(true)
     setGroupError(null)
     try {
-      await createGroup(newGroupName.trim())
+      await createGroup(newGroupName.trim(), joinGroup)
       setNewGroupName('')
+      setJoinGroup(true)
       await loadGroups()
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke opprette liga')
@@ -291,7 +293,7 @@ export default function AdminPanel() {
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Administrer ligaer</h2>
         <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Opprett ligaer og administrer medlemmer.</p>
 
-        <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="text"
             value={newGroupName}
@@ -305,6 +307,15 @@ export default function AdminPanel() {
             }}
             required
           />
+          <label className="flex items-center gap-1.5 text-sm whitespace-nowrap" style={{ color: 'var(--color-text-secondary)' }}>
+            <input
+              type="checkbox"
+              checked={joinGroup}
+              onChange={(e) => setJoinGroup(e.target.checked)}
+              className="rounded"
+            />
+            Bli med selv
+          </label>
           <button
             type="submit"
             disabled={groupLoading}
