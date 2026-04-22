@@ -190,10 +190,10 @@ export function getAllGroups(): Promise<BettingGroup[]> {
   return request<BettingGroup[]>('/api/admin/groups')
 }
 
-export function createGroup(name: string): Promise<BettingGroup> {
+export function createGroup(name: string, joinGroup: boolean = true): Promise<BettingGroup> {
   return request<BettingGroup>('/api/groups', {
     method: 'POST',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, joinGroup }),
   })
 }
 
