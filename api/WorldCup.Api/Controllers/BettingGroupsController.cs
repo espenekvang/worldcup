@@ -147,6 +147,7 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
 
         var members = await dbContext.BettingGroupMembers
             .Where(m => m.BettingGroupId == id)
+            .OrderBy(m => m.User.Name)
             .Select(m => new BettingGroupMemberResponse(
                 m.UserId,
                 m.User.Name,
@@ -154,7 +155,6 @@ public class BettingGroupsController(AppDbContext dbContext) : ControllerBase
                 m.User.Picture,
                 m.IsGroupAdmin,
                 m.JoinedAt))
-            .OrderBy(m => m.Name)
             .AsNoTracking()
             .ToListAsync();
 
