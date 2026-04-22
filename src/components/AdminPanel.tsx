@@ -577,23 +577,44 @@ export default function AdminPanel() {
         ) : null}
 
         {invitations.length > 0 ? (
-          <ul className="mt-4 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
-            {invitations.map((invitation) => (
-              <li key={invitation.id} className="flex items-center justify-between py-3">
-                <div>
-                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{invitation.email}</span>
-                  <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>({invitation.groupName})</span>
-                </div>
-                <button
-                  onClick={() => handleDelete(invitation.id)}
-                  className="rounded-md px-2 py-1 text-xs font-medium transition-colors"
-                  style={{ color: 'var(--color-danger)' }}
-                >
-                  Fjern
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 space-y-2">
+            {Object.entries(
+              invitations.reduce<Record<string, InvitationResponse[]>>((acc, inv) => {
+                const key = inv.groupName || 'Ukjent liga'
+                if (!acc[key]) acc[key] = []
+                acc[key].push(inv)
+                return acc
+              }, {})
+            )
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([groupName, groupInvitations]) => (
+                <details key={groupName}>
+                  <summary
+                    className="cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium"
+                    style={{ borderColor: 'var(--color-border-light)', color: 'var(--color-text-primary)' }}
+                  >
+                    {groupName}
+                    <span className="ml-2 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>
+                      ({groupInvitations.length} {groupInvitations.length === 1 ? 'invitasjon' : 'invitasjoner'})
+                    </span>
+                  </summary>
+                  <ul className="ml-4 mt-1 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+                    {groupInvitations.map((invitation) => (
+                      <li key={invitation.id} className="flex items-center justify-between py-2">
+                        <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{invitation.email}</span>
+                        <button
+                          onClick={() => handleDelete(invitation.id)}
+                          className="rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                          style={{ color: 'var(--color-danger)' }}
+                        >
+                          Fjern
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ))}
+          </div>
         ) : (
           <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen invitasjoner ennå.</p>
         )}
