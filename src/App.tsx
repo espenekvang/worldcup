@@ -22,11 +22,13 @@ function AppContent() {
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
 
+  const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-surface)' }}>
-      <Header onAdminClick={user?.isAdmin ? () => setShowAdmin((v) => !v) : undefined} />
+      <Header onAdminClick={canAccessAdmin ? () => setShowAdmin((v) => !v) : undefined} />
       <main className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
-        {showAdmin && user?.isAdmin ? (
+        {showAdmin && canAccessAdmin ? (
           <div className="mb-6">
             <AdminPanel />
           </div>

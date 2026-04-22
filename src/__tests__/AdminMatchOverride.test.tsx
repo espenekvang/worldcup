@@ -25,6 +25,15 @@ vi.mock('../api/client', async (importOriginal) => {
   }
 })
 
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: '1', name: 'Admin', email: 'admin@test.com', isAdmin: true, groupAdminGroupIds: [] },
+    isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}))
+
 vi.mock('../context/ResultsContext', () => ({
   useResults: () => ({
     results: new Map(),

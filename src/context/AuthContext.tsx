@@ -11,6 +11,7 @@ interface AuthUser {
   picture: string | null
   isAdmin: boolean
   groups: BettingGroup[]
+  groupAdminGroupIds: string[]
 }
 
 interface AuthContextValue {
@@ -91,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         picture: response.picture,
         isAdmin: response.isAdmin,
         groups: response.groups,
+        groupAdminGroupIds: response.groupAdminGroupIds ?? [],
       }
 
       safeSetItem(USER_KEY, JSON.stringify(authUser))

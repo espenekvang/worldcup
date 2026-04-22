@@ -58,6 +58,7 @@ export interface AuthResponse {
   picture: string | null
   isAdmin: boolean
   groups: BettingGroup[]
+  groupAdminGroupIds: string[]
 }
 
 export interface PredictionResponse {
@@ -224,5 +225,12 @@ export function addGroupMember(groupId: string, email: string): Promise<BettingG
 export function removeGroupMember(groupId: string, userId: string): Promise<void> {
   return request<void>(`/api/groups/${groupId}/members/${userId}`, {
     method: 'DELETE',
+  })
+}
+
+export function toggleGroupAdmin(groupId: string, userId: string, isGroupAdmin: boolean): Promise<void> {
+  return request<void>(`/api/groups/${groupId}/members/${userId}/admin`, {
+    method: 'PUT',
+    body: JSON.stringify({ isGroupAdmin }),
   })
 }
