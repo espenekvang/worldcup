@@ -1,6 +1,10 @@
-import type { Match, BettingGroup, BettingGroupMember } from '../types'
+import type { Match, BettingGroup, BettingGroupMember, ChatMessage } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5211'
+
+export function getApiBase(): string {
+  return API_BASE
+}
 
 function getToken(): string | null {
   try {
@@ -233,4 +237,31 @@ export function toggleGroupAdmin(groupId: string, userId: string, isGroupAdmin: 
     method: 'PUT',
     body: JSON.stringify({ isGroupAdmin }),
   })
+}
+
+// Chat API functions
+export function getChatMessages(before?: string, limit?: number): Promise<ChatMessage[]> {
+  const params = new URLSearchParams()
+  if (before) params.set('before', before)
+  if (limit) params.set('limit', String(limit))
+  const qs = params.toString()
+  return request<ChatMessage[]>(`/api/chat${qs ? `?${qs}` : ''}`)
+}
+
+export function postChatMessage(content: string): Promise<ChatMessage> {
+  return request<ChatMessage>('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  })
+}
+
+export function deleteChatMessage(id: string): Promise<void> {
+  return request<void>(`/api/chat/${id}`, { method: 'DELETE' })
+}
+
+export function getChatUnreadCount(since?: string): Promise<{ unreadCount: number }> {
+  const params = new URLSearchParams()
+  if (since) params.set('since', since)
+  const qs = params.toString()
+  return request<{ unreadCount: number }>(`/api/chat/unread-count${qs ? `?${qs}` : ''}`)
 }
