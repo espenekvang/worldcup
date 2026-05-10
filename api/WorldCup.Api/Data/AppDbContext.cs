@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<MatchResult> MatchResults => Set<MatchResult>();
     public DbSet<BettingGroup> BettingGroups => Set<BettingGroup>();
     public DbSet<BettingGroupMember> BettingGroupMembers => Set<BettingGroupMember>();
+    public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,5 +78,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(group => group.CreatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasIndex(message => new { message.BettingGroupId, message.CreatedAt });
+
+        modelBuilder.Entity<ChatMessage>()
+            .Property(message => message.Content)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(message => message.BettingGroup)
+            .WithMany()
+            .HasForeignKey(message => message.BettingGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(message => message.User)
+            .WithMany()
+            .HasForeignKey(message => message.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

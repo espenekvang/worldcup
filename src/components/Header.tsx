@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
+import { useChat } from '../context/ChatContext'
 import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
 
@@ -11,6 +12,7 @@ interface HeaderProps {
 export default function Header({ onAdminClick }: HeaderProps) {
   const { user, logout } = useAuth()
   const { groups, activeGroup, clearActiveGroup } = useBettingGroup()
+  const { unreadCount } = useChat()
   const { theme, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -50,7 +52,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
             <div className="relative ml-3 shrink-0" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen(prev => !prev)}
-                className="flex items-center rounded-full transition-opacity hover:opacity-80"
+                className="relative flex items-center rounded-full transition-opacity hover:opacity-80"
                 aria-label="Brukermeny"
                 aria-expanded={menuOpen}
               >
@@ -68,6 +70,20 @@ export default function Header({ onAdminClick }: HeaderProps) {
                   >
                     {firstName(user.name).charAt(0).toUpperCase()}
                   </div>
+                )}
+                {unreadCount > 0 && (
+                  <span
+                    className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold ring-2"
+                    style={{
+                      backgroundColor: 'var(--color-danger)',
+                      color: '#fff',
+                      // ring matches the header gradient — use a neutral that works on both
+                      // ring colour set inline so it picks up theme
+                    }}
+                    aria-label={`${unreadCount} uleste meldinger`}
+                  >
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
                 )}
               </button>
 

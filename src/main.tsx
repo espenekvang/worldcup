@@ -5,11 +5,13 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { BettingGroupProvider, useBettingGroup } from './context/BettingGroupContext'
 import { PredictionsProvider } from './context/PredictionsContext'
+import { ChatProvider } from './context/ChatContext'
 import './index.css'
 import App from './App'
 import LoginPage from './pages/LoginPage'
 import WaitingPage from './pages/WaitingPage'
 import GroupSelectorPage from './pages/GroupSelectorPage'
+import ChatPage from './pages/ChatPage'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''
 
@@ -29,7 +31,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <GroupSelectorPage />
   }
 
-  return <>{children}</>
+  return <ChatProvider>{children}</ChatProvider>
 }
 
 function AppRoutes() {
@@ -48,6 +50,14 @@ function AppRoutes() {
             <PredictionsProvider>
               <App />
             </PredictionsProvider>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <ChatPage />
           </ProtectedRoute>
         }
       />

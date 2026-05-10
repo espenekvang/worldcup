@@ -55,3 +55,13 @@ export interface BettingGroupMember {
   isGroupAdmin: boolean
   joinedAt: string
 }
+
+export interface ChatMessage {
+  id: string
+  userId: string
+  userName: string
+  userPicture: string | null
+  content: string
+  createdAt: string
+  isDeleted: boolean
+}
