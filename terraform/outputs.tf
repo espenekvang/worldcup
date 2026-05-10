@@ -23,3 +23,13 @@ output "custom_domain_verification_id" {
   value       = azurerm_container_app.main.custom_domain_verification_id
   sensitive   = true
 }
+
+output "app_configuration_endpoint" {
+  description = "Endpoint of the Azure App Configuration store. Use with `az appconfig` to manage feature flags."
+  value       = azurerm_app_configuration.main.endpoint
+}
+
+output "app_configuration_name" {
+  description = "Name of the Azure App Configuration store."
+  value       = azurerm_app_configuration.main.name
+}

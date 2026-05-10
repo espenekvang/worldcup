@@ -90,6 +90,11 @@ resource "azurerm_container_app" "main" {
         value = "Data Source=/mnt/backup/worldcup.db"
       }
 
+      env {
+        name  = "APP_CONFIGURATION_ENDPOINT"
+        value = azurerm_app_configuration.main.endpoint
+      }
+
       volume_mounts {
         name = "backup-volume"
         path = "/mnt/backup"
