@@ -265,3 +265,10 @@ export function getChatUnreadCount(since?: string): Promise<{ unreadCount: numbe
   const qs = params.toString()
   return request<{ unreadCount: number }>(`/api/chat/unread-count${qs ? `?${qs}` : ''}`)
 }
+
+export type FeatureFlags = Record<string, boolean>
+
+export function getFeatureFlags(groupId?: string): Promise<FeatureFlags> {
+  const query = groupId ? `?groupId=${encodeURIComponent(groupId)}` : ''
+  return request<FeatureFlags>(`/api/feature-flags${query}`)
+}

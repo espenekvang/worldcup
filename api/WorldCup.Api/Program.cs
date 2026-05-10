@@ -1,9 +1,11 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using WorldCup.Api.Data;
+using WorldCup.Api.Features;
 using WorldCup.Api.Hubs;
 using WorldCup.Api.Services;
 
@@ -12,6 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
+
+// Feature flag system. The BettingGroupFilter enables flags for a configured set of group ids.
+// Configure flags under the "FeatureManagement" section of appsettings.json.
+builder.Services.AddFeatureManagement()
+    .AddFeatureFilter<BettingGroupFilter>();
 
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
 
