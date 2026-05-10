@@ -1,17 +1,50 @@
 using System.Text;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using WorldCup.Api.Data;
+using WorldCup.Api.Features;
 using WorldCup.Api.Hubs;
 using WorldCup.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Optionally pull configuration (including feature flags) from Azure App Configuration.
+// When APP_CONFIGURATION_ENDPOINT is set we authenticate with the workload's managed identity
+// (or DefaultAzureCredential locally), so no connection string / secret is needed.
+// When the variable is not set we fall back to appsettings.json — which keeps local dev simple
+// and means tests don't need any Azure setup.
+var appConfigEndpoint = builder.Configuration["AppConfiguration:Endpoint"]
+    ?? Environment.GetEnvironmentVariable("APP_CONFIGURATION_ENDPOINT");
+
+if (!string.IsNullOrWhiteSpace(appConfigEndpoint))
+{
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options.Connect(new Uri(appConfigEndpoint), new DefaultAzureCredential())
+            .UseFeatureFlags(featureFlagOptions =>
+            {
+                // Refresh feature flags every 30 seconds so toggles can be flipped without redeploy.
+                featureFlagOptions.SetRefreshInterval(TimeSpan.FromSeconds(30));
+            });
+    });
+
+    builder.Services.AddAzureAppConfiguration();
+}
+
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+builder.Services.AddHttpContextAccessor();
+
+// Feature flag system. The BettingGroupFilter enables flags for a configured set of group ids.
+// Configure flags under the "FeatureManagement" section of appsettings.json.
+builder.Services.AddFeatureManagement()
+    .AddFeatureFilter<BettingGroupFilter>();
 
 var matchesJsonPath = ResolveMatchesJsonPath(builder.Environment);
 
@@ -110,6 +143,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("ViteClient");
+if (!string.IsNullOrWhiteSpace(appConfigEndpoint))
+{
+    // Triggers periodic feature-flag refresh from Azure App Configuration on incoming requests.
+    app.UseAzureAppConfiguration();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { BettingGroupProvider, useBettingGroup } from './context/BettingGroupContext'
+import { FeatureFlagsProvider } from './context/FeatureFlagsContext'
 import { PredictionsProvider } from './context/PredictionsContext'
 import { ChatProvider } from './context/ChatContext'
 import './index.css'
@@ -31,7 +32,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <GroupSelectorPage />
   }
 
-  return <ChatProvider>{children}</ChatProvider>
+  return <ChatProvider><FeatureFlagsProvider>{children}</FeatureFlagsProvider></ChatProvider>
 }
 
 function AppRoutes() {
