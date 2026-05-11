@@ -158,6 +158,8 @@ export interface LeaderboardEntry {
   picture: string | null
   totalPoints: number
   matchCount: number
+  /** Plassering før siste registrerte kamp. Null hvis ingen tidligere kamp finnes. */
+  previousRank: number | null
 }
 
 export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {

@@ -103,9 +103,43 @@ export default function Leaderboard() {
               </div>
             </div>
             <span
-              className="rounded-md px-2.5 py-1 text-sm font-bold"
+              className="flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-bold"
               style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
             >
+              {(() => {
+                const currentRank = i + 1
+                const prev = entry.previousRank
+                if (prev == null) return null
+                if (prev === currentRank) {
+                  return (
+                    <span
+                      aria-label="Uendret plassering"
+                      title="Uendret plassering"
+                      style={{
+                        color: 'var(--color-text-muted)',
+                        fontSize: '0.85em',
+                        lineHeight: 1,
+                      }}
+                    >
+                      ▬
+                    </span>
+                  )
+                }
+                const movedUp = currentRank < prev
+                return (
+                  <span
+                    aria-label={movedUp ? `Opp ${prev - currentRank} plass(er)` : `Ned ${currentRank - prev} plass(er)`}
+                    title={movedUp ? `Opp ${prev - currentRank} plass(er)` : `Ned ${currentRank - prev} plass(er)`}
+                    style={{
+                      color: movedUp ? 'var(--color-success-text)' : 'var(--color-danger)',
+                      fontSize: '0.85em',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {movedUp ? '▲' : '▼'}
+                  </span>
+                )
+              })()}
               {entry.totalPoints}p
             </span>
           </div>
