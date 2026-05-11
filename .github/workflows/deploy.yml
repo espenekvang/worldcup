@@ -58,13 +58,51 @@ jobs:
             .
 
       - name: Deploy to Container App
+        id: deploy
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          az containerapp update \
+          revision_json=$(az containerapp update \
             --name ${{ secrets.CONTAINER_APP_NAME }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --container-name worldcup \
-            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ steps.gitversion.outputs.semver }}-${SHORT_SHA}
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/worldcup:${{ steps.gitversion.outputs.semver }}-${SHORT_SHA})
+          revision_name=$(echo "$revision_json" | jq -r '.properties.latestRevisionName')
+          echo "revision_name=$revision_name" >> "$GITHUB_OUTPUT"
+          echo "Deployed revision: $revision_name"
+
+      - name: Wait for new revision to become healthy
+        # az containerapp update returns success once Azure accepts the new revision
+        # spec — NOT once the replicas are actually running. If the container crashes
+        # on startup (e.g. segfault, missing config), traffic silently stays on the
+        # previous healthy revision and the workflow looks green. Poll explicitly so
+        # we surface startup failures here instead of discovering them in production.
+        run: |
+          revision="${{ steps.deploy.outputs.revision_name }}"
+          rg="${{ secrets.RESOURCE_GROUP }}"
+          app="${{ secrets.CONTAINER_APP_NAME }}"
+          deadline=$(( $(date +%s) + 300 ))
+          while [ "$(date +%s)" -lt "$deadline" ]; do
+            state=$(az containerapp revision show -n "$app" -g "$rg" --revision "$revision" \
+              --query "{health:properties.healthState, running:properties.runningState, details:properties.runningStateDetails}" -o json)
+            health=$(echo "$state" | jq -r '.health')
+            running=$(echo "$state" | jq -r '.running')
+            details=$(echo "$state" | jq -r '.details // ""')
+            echo "[$(date -u +%H:%M:%S)] revision=$revision health=$health running=$running ${details:+- $details}"
+            if [ "$health" = "Healthy" ] && [ "$running" = "Running" -o "$running" = "RunningAtMaxScale" ]; then
+              echo "Revision is healthy and serving traffic."
+              exit 0
+            fi
+            if [ "$running" = "ActivationFailed" ] || [ "$running" = "Failed" ]; then
+              echo "::error::Revision $revision failed to activate: $details"
+              echo "--- Recent system logs for this container app ---"
+              az containerapp logs show -n "$app" -g "$rg" --type system --tail 50 || true
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::Revision $revision did not become healthy within 5 minutes."
+          az containerapp logs show -n "$app" -g "$rg" --type system --tail 50 || true
+          exit 1
 
       - name: Update ingress target port to app port
         run: |
