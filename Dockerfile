@@ -37,7 +37,13 @@ COPY src/data/matches.json /publish/data/matches.json
 COPY src/data/teams.json /publish/data/teams.json
 
 # Stage 3: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
+# NOTE: We deliberately use the Debian-based runtime image (not -alpine) because
+# Azure SDK packages (Azure.Identity, Azure.Extensions.AspNetCore.Configuration.Secrets,
+# Microsoft.Extensions.Configuration.AzureAppConfiguration) pull in native dependencies
+# (libicu, krb5, openssl) that are not present in the minimal Alpine runtime image.
+# Running on Alpine without those caused the .NET process to segfault on startup
+# (exit code 139), preventing new Container App revisions from becoming healthy.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 COPY --from=backend-build /publish /app
 
