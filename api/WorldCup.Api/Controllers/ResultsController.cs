@@ -143,22 +143,70 @@ public class ResultsController(
         var (groupId, isValid) = await ValidateGroupMembership();
         if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
-        var leaderboard = await dbContext.BettingGroupMembers
+        // Finn den siste kampen som har et registrert resultat (basert på FetchedAt).
+        // Brukes for å beregne plassering FØR denne kampen, slik at frontend kan vise
+        // pil opp/ned ved siden av poengsummen.
+        var latestMatchId = await dbContext.MatchResults
+            .OrderByDescending(r => r.FetchedAt)
+            .Select(r => (int?)r.MatchId)
+            .FirstOrDefaultAsync();
+
+        var rawEntries = await dbContext.BettingGroupMembers
             .Where(m => m.BettingGroupId == groupId)
-            .Select(m => new LeaderboardEntry
+            .Select(m => new
             {
+                m.UserId,
                 Name = m.User.Name,
                 Picture = m.User.Picture,
                 TotalPoints = dbContext.Predictions
                     .Where(p => p.UserId == m.UserId && p.BettingGroupId == groupId && p.Points != null)
                     .Sum(p => (int?)p.Points) ?? 0,
                 MatchCount = dbContext.Predictions
-                    .Count(p => p.UserId == m.UserId && p.BettingGroupId == groupId && p.Points != null)
+                    .Count(p => p.UserId == m.UserId && p.BettingGroupId == groupId && p.Points != null),
+                LastMatchPoints = latestMatchId == null ? 0 : dbContext.Predictions
+                    .Where(p => p.UserId == m.UserId
+                                && p.BettingGroupId == groupId
+                                && p.MatchId == latestMatchId.Value
+                                && p.Points != null)
+                    .Select(p => (int?)p.Points)
+                    .FirstOrDefault() ?? 0
             })
-            .OrderByDescending(e => e.TotalPoints)
-            .ThenBy(e => e.Name)
             .AsNoTracking()
             .ToListAsync();
+
+        // Beregn forrige plassering ved å sortere på (TotalPoints - LastMatchPoints).
+        // PreviousRank er kun meningsfull dersom det finnes en tidligere kamp; dvs.
+        // det må eksistere minst én kamp med resultat utover den siste.
+        var hasPreviousMatch = latestMatchId != null
+            && await dbContext.MatchResults.CountAsync() > 1;
+
+        Dictionary<Guid, int> previousRanks;
+        if (hasPreviousMatch)
+        {
+            previousRanks = rawEntries
+                .Select(e => new { e.UserId, PrevPoints = e.TotalPoints - e.LastMatchPoints, e.Name })
+                .OrderByDescending(e => e.PrevPoints)
+                .ThenBy(e => e.Name)
+                .Select((e, idx) => new { e.UserId, Rank = idx + 1 })
+                .ToDictionary(x => x.UserId, x => x.Rank);
+        }
+        else
+        {
+            previousRanks = new Dictionary<Guid, int>();
+        }
+
+        var leaderboard = rawEntries
+            .OrderByDescending(e => e.TotalPoints)
+            .ThenBy(e => e.Name)
+            .Select(e => new LeaderboardEntry
+            {
+                Name = e.Name,
+                Picture = e.Picture,
+                TotalPoints = e.TotalPoints,
+                MatchCount = e.MatchCount,
+                PreviousRank = previousRanks.TryGetValue(e.UserId, out var r) ? r : (int?)null
+            })
+            .ToList();
 
         return Ok(leaderboard);
     }
