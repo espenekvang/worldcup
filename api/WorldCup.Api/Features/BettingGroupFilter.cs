@@ -19,26 +19,24 @@ namespace WorldCup.Api.Features;
 ///   }
 /// }
 ///
-/// The group id is taken from <see cref="BettingGroupFeatureContext"/> when the caller passes
-/// it explicitly (preferred), otherwise the filter falls back to reading the
-/// <c>X-Group-Id</c> request header through <see cref="IHttpContextAccessor"/>.
+/// The group id is supplied via <see cref="BettingGroupFeatureContext"/> by the caller
+/// (typically a controller that has already resolved the active group from the
+/// <c>X-Group-Id</c> request header).
 /// </summary>
+/// <remarks>
+/// This class deliberately implements only <see cref="IContextualFeatureFilter{T}"/>.
+/// Newer versions of Microsoft.FeatureManagement reject a single filter class that
+/// implements more than one feature filter interface, which previously crashed the
+/// app on startup with: "A single feature filter cannot implement more than one
+/// feature filter interface."
+/// </remarks>
 [FilterAlias("BettingGroup")]
-public sealed class BettingGroupFilter(IHttpContextAccessor httpContextAccessor)
-    : IContextualFeatureFilter<BettingGroupFeatureContext>, IFeatureFilter
+public sealed class BettingGroupFilter : IContextualFeatureFilter<BettingGroupFeatureContext>
 {
-    private const string GroupHeaderName = "X-Group-Id";
-
     public Task<bool> EvaluateAsync(FeatureFilterEvaluationContext context, BettingGroupFeatureContext appContext)
         => Task.FromResult(IsEnabled(context, appContext.GroupId));
 
-    public Task<bool> EvaluateAsync(FeatureFilterEvaluationContext context)
-    {
-        var groupId = ResolveGroupIdFromHttpContext();
-        return Task.FromResult(IsEnabled(context, groupId));
-    }
-
-    private bool IsEnabled(FeatureFilterEvaluationContext context, Guid? groupId)
+    private static bool IsEnabled(FeatureFilterEvaluationContext context, Guid? groupId)
     {
         if (groupId is null || groupId == Guid.Empty)
         {
@@ -61,20 +59,6 @@ public sealed class BettingGroupFilter(IHttpContextAccessor httpContextAccessor)
         }
 
         return false;
-    }
-
-    private Guid? ResolveGroupIdFromHttpContext()
-    {
-        var http = httpContextAccessor.HttpContext;
-        if (http is null) return null;
-
-        if (!http.Request.Headers.TryGetValue(GroupHeaderName, out var values))
-        {
-            return null;
-        }
-
-        var raw = values.ToString();
-        return Guid.TryParse(raw, out var parsed) ? parsed : null;
     }
 }
 
