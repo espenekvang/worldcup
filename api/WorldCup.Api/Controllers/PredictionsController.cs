@@ -20,11 +20,9 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
         var userId = GetAuthenticatedUserId();
         if (userId is null) return Unauthorized();
 
-        var (groupId, isValid) = await ValidateGroupMembership();
-        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
-
+        // Bettinger er nå globale per bruker (delt på tvers av alle ligaer brukeren er med i).
         var predictions = await dbContext.Predictions
-            .Where(prediction => prediction.UserId == userId.Value && prediction.BettingGroupId == groupId)
+            .Where(prediction => prediction.UserId == userId.Value)
             .OrderBy(prediction => prediction.MatchId)
             .Select(prediction => new PredictionResponse
             {
@@ -43,9 +41,6 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     {
         var userId = GetAuthenticatedUserId();
         if (userId is null) return Unauthorized();
-
-        var (groupId, isValid) = await ValidateGroupMembership();
-        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
         if (matchId <= 0 || request.MatchId <= 0 || request.HomeScore < 0 || request.AwayScore < 0)
         {
@@ -73,9 +68,10 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return BadRequest("Lagene er ikke avgjort ennå – betting er stengt for denne kampen.");
         }
 
+        // Bettinger er globale per (UserId, MatchId) – uavhengig av aktiv liga.
         var prediction = await dbContext.Predictions
             .SingleOrDefaultAsync(p =>
-                p.UserId == userId.Value && p.MatchId == matchId && p.BettingGroupId == groupId);
+                p.UserId == userId.Value && p.MatchId == matchId);
 
         var now = DateTime.UtcNow;
         var isNewPrediction = prediction is null;
@@ -87,7 +83,6 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
                 Id = Guid.NewGuid(),
                 UserId = userId.Value,
                 MatchId = matchId,
-                BettingGroupId = groupId,
                 HomeScore = request.HomeScore,
                 AwayScore = request.AwayScore,
                 UpdatedAt = now
@@ -118,6 +113,9 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
     [HttpGet("match/{matchId:int}")]
     public async Task<ActionResult<IEnumerable<MatchPredictionResponse>>> GetMatchPredictions(int matchId)
     {
+        // Bettinger er globale, men "andre brukeres tips" begrenses fortsatt til
+        // medlemmer av aktiv liga (X-Group-Id) – ellers ville vi lekket tips på
+        // tvers av ligaer.
         var (groupId, isValid) = await ValidateGroupMembership();
         if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
 
@@ -129,8 +127,12 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
 
         var locked = matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage);
 
+        var memberIds = dbContext.BettingGroupMembers
+            .Where(m => m.BettingGroupId == groupId)
+            .Select(m => m.UserId);
+
         var predictions = await dbContext.Predictions
-            .Where(p => p.MatchId == matchId && p.BettingGroupId == groupId)
+            .Where(p => p.MatchId == matchId && memberIds.Contains(p.UserId))
             .Select(p => new MatchPredictionResponse
             {
                 Name = p.User.Name,

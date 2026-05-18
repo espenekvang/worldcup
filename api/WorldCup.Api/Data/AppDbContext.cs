@@ -22,19 +22,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsUnique();
 
         modelBuilder.Entity<Prediction>()
-            .HasIndex(prediction => new { prediction.BettingGroupId, prediction.UserId, prediction.MatchId })
+            .HasIndex(prediction => new { prediction.UserId, prediction.MatchId })
             .IsUnique();
 
         modelBuilder.Entity<Prediction>()
             .HasOne(prediction => prediction.User)
             .WithMany()
             .HasForeignKey(prediction => prediction.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Prediction>()
-            .HasOne(prediction => prediction.BettingGroup)
-            .WithMany()
-            .HasForeignKey(prediction => prediction.BettingGroupId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<MatchResult>()

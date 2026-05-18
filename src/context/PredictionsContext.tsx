@@ -4,7 +4,6 @@ import { createContext, useContext } from 'react'
 import type { PredictionResponse } from '../api/client'
 import { getPredictions, putPrediction } from '../api/client'
 import { useAuth } from './AuthContext'
-import { useBettingGroup } from './BettingGroupContext'
 
 interface PredictionsContextValue {
   predictions: Map<number, PredictionResponse>
@@ -16,16 +15,17 @@ const PredictionsContext = createContext<PredictionsContextValue | null>(null)
 
 export function PredictionsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const { activeGroup } = useBettingGroup()
   const [predictions, setPredictions] = useState<Map<number, PredictionResponse>>(new Map())
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (!user || !activeGroup) {
+    if (!user) {
       setPredictions(new Map())
       return
     }
 
+    // Bettinger er globale per bruker – samme tips deles på tvers av alle ligaer.
+    // Vi laster derfor kun én gang per innlogget bruker, ikke ved bytte av aktiv liga.
     setIsLoading(true)
     getPredictions()
       .then((data) => {
@@ -39,7 +39,7 @@ export function PredictionsProvider({ children }: { children: ReactNode }) {
         setPredictions(new Map())
       })
       .finally(() => setIsLoading(false))
-  }, [user, activeGroup])
+  }, [user])
 
   const savePrediction = useCallback(async (matchId: number, homeScore: number, awayScore: number) => {
     const result = await putPrediction(matchId, { matchId, homeScore, awayScore })
