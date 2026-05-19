@@ -1,13 +1,33 @@
 import { GoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ThemeToggle from '../components/ThemeToggle'
+import { getInviteLinkInfo } from '../api/client'
+
+const PENDING_INVITE_KEY = 'pending_invite_token'
 
 export default function LoginPage() {
   const { loginWithGoogle, isLoading } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const [inviteGroupName, setInviteGroupName] = useState<string | null>(null)
+
+  // If a pending invite token is in localStorage, fetch the group name for display
+  useEffect(() => {
+    try {
+      const pending = localStorage.getItem(PENDING_INVITE_KEY)
+      if (!pending) return
+      getInviteLinkInfo(pending)
+        .then((info) => setInviteGroupName(info.groupName))
+        .catch(() => {
+          // Invalid/expired token — drop it silently
+          localStorage.removeItem(PENDING_INVITE_KEY)
+        })
+    } catch {
+      // ignore
+    }
+  }, [])
 
   async function handleGoogleSuccess(credentialResponse: { credential?: string }) {
     if (!credentialResponse.credential) {
@@ -15,9 +35,19 @@ export default function LoginPage() {
       return
     }
 
+    let pendingInvite: string | null = null
+    try {
+      pendingInvite = localStorage.getItem(PENDING_INVITE_KEY)
+    } catch {
+      // ignore
+    }
+
     try {
       setError(null)
-      await loginWithGoogle(credentialResponse.credential)
+      await loginWithGoogle(credentialResponse.credential, pendingInvite ?? undefined)
+      if (pendingInvite) {
+        try { localStorage.removeItem(PENDING_INVITE_KEY) } catch { /* ignore */ }
+      }
       navigate('/', { replace: true })
     } catch (err) {
       if (err instanceof Error && err.message.includes('403')) {
@@ -44,6 +74,14 @@ export default function LoginPage() {
           <p className="mt-2 text-sm sm:text-base" style={{ color: 'var(--color-text-muted)' }}>
             Logg inn for å bette på VM-kampene
           </p>
+          {inviteGroupName ? (
+            <p
+              className="mt-3 rounded-md p-2 text-sm"
+              style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}
+            >
+              Du er invitert til ligaen <strong>{inviteGroupName}</strong>. Logg inn for å bli med.
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-col items-center gap-4">

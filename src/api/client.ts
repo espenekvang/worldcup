@@ -93,10 +93,10 @@ export interface PredictionDto {
   awayScore: number
 }
 
-export function loginWithGoogle(idToken: string): Promise<AuthResponse> {
+export function loginWithGoogle(idToken: string, inviteToken?: string): Promise<AuthResponse> {
   return request<AuthResponse>('/api/auth/google', {
     method: 'POST',
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, inviteToken: inviteToken ?? null }),
   })
 }
 
@@ -142,6 +142,52 @@ export function createInvitation(email: string, bettingGroupId: string): Promise
 export function deleteInvitation(id: string): Promise<void> {
   return request<void>(`/api/invitations/${id}`, {
     method: 'DELETE',
+  })
+}
+
+export interface InviteLinkResponse {
+  id: string
+  bettingGroupId: string
+  groupName: string
+  token: string
+  createdAt: string
+  isRevoked: boolean
+}
+
+export interface InviteLinkInfoResponse {
+  bettingGroupId: string
+  groupName: string
+}
+
+export interface AcceptInviteLinkResponse {
+  bettingGroupId: string
+  groupName: string
+  alreadyMember: boolean
+}
+
+export function getInviteLinks(groupId: string): Promise<InviteLinkResponse[]> {
+  return request<InviteLinkResponse[]>(`/api/groups/${groupId}/invite-links`)
+}
+
+export function createInviteLink(groupId: string): Promise<InviteLinkResponse> {
+  return request<InviteLinkResponse>(`/api/groups/${groupId}/invite-links`, {
+    method: 'POST',
+  })
+}
+
+export function revokeInviteLink(id: string): Promise<void> {
+  return request<void>(`/api/invite-links/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+export function getInviteLinkInfo(token: string): Promise<InviteLinkInfoResponse> {
+  return request<InviteLinkInfoResponse>(`/api/invite-links/${encodeURIComponent(token)}`)
+}
+
+export function acceptInviteLink(token: string): Promise<AcceptInviteLinkResponse> {
+  return request<AcceptInviteLinkResponse>(`/api/invite-links/${encodeURIComponent(token)}/accept`, {
+    method: 'POST',
   })
 }
 

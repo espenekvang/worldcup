@@ -17,7 +17,7 @@ interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
-  loginWithGoogle: (idToken: string) => Promise<void>
+  loginWithGoogle: (idToken: string, inviteToken?: string) => Promise<void>
   logout: () => void
 }
 
@@ -80,10 +80,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [setGroups])
 
-  const loginWithGoogle = useCallback(async (idToken: string) => {
+  const loginWithGoogle = useCallback(async (idToken: string, inviteToken?: string) => {
     setIsLoading(true)
     try {
-      const response: AuthResponse = await apiLoginWithGoogle(idToken)
+      const response: AuthResponse = await apiLoginWithGoogle(idToken, inviteToken)
       safeSetItem(TOKEN_KEY, response.token)
 
       const authUser: AuthUser = {

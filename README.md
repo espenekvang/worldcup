@@ -51,9 +51,11 @@ A match prediction app for the FIFA World Cup 2026. Invite friends, predict full
 
 ```
 User → Google Sign-In → Google JWT → Backend validates →
-  ├─ Admin email? → Allow, issue app JWT
-  ├─ Invited to a league? → Allow, issue app JWT
-  └─ Neither?     → 403 Forbidden → Waiting page
+  ├─ Admin email?                → Allow, issue app JWT
+  ├─ Existing user?              → Allow, issue app JWT
+  ├─ Email invitation pending?   → Allow, auto-join league(s), issue app JWT
+  ├─ Valid invite-link token?    → Allow, auto-join league, issue app JWT
+  └─ None of the above           → 403 Forbidden → Waiting page
 ```
 
 ## Tech Stack
@@ -122,16 +124,16 @@ npm test
 - **Leaderboard** — Compete with friends based on prediction accuracy
 - **Ligaer** — Opprett og administrer separate ligaer med egne medlemmer og poengtavler
 - **Google Sign-In** — Secure authentication via Google accounts
-- **Invitation System** — Only invited users can access the app
-- **Admin Panel** — Invite/remove users, manage leagues, override knockout match teams, and manually set match results
+- **Invitation System** — Inviter brukere på e-post, eller del en revokerbar invitasjonslenke (`/invite/<token>`) som lar hvem som helst bli med i ligaen
+- **Admin Panel** — Inviter/fjern brukere, lag og revoker invitasjonslenker, administrer ligaer, overstyr sluttspillkamper og sett kampresultater manuelt
 
 ## Project Structure
 
 ```
 worldcup/
 ├── api/WorldCup.Api/        # .NET backend
-│   ├── Controllers/          #   Auth, Predictions, Results, Invitations, BettingGroups
-│   ├── Models/               #   User, Prediction, Invitation, MatchResult, BettingGroup, BettingGroupMember
+│   ├── Controllers/          #   Auth, Predictions, Results, Invitations, InviteLinks, BettingGroups, Chat
+│   ├── Models/               #   User, Prediction, Invitation, BettingGroupInviteLink, MatchResult, BettingGroup, BettingGroupMember
 │   ├── DTOs/                 #   Request/response objects
 │   ├── Services/             #   ResultFetcher, Scoring, MatchSchedule
 │   ├── Data/                 #   EF Core DbContext
@@ -141,7 +143,7 @@ worldcup/
 │   ├── components/           #   UI components
 │   ├── context/              #   Auth, Predictions, Results, Matches, BettingGroup state
 │   ├── data/                 #   Match/team/venue data
-│   ├── pages/                #   Login, GroupSelector, Waiting pages
+│   ├── pages/                #   Login, GroupSelector, Waiting, Invite, Chat pages
 │   └── types/                #   TypeScript types
 └── public/                   # Static assets
 ```

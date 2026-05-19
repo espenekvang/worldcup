@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage'
 import WaitingPage from './pages/WaitingPage'
 import GroupSelectorPage from './pages/GroupSelectorPage'
 import ChatPage from './pages/ChatPage'
+import InvitePage from './pages/InvitePage'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''
 
@@ -44,6 +45,7 @@ function AppRoutes() {
         path="/login"
         element={user ? <Navigate to="/" replace /> : <LoginPage />}
       />
+      <Route path="/invite/:token" element={<InvitePage />} />
       <Route
         path="/"
         element={

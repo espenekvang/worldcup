@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { InvitationResponse } from '../api/client'
+import type { InvitationResponse, InviteLinkResponse } from '../api/client'
 import {
   getInvitations, createInvitation, deleteInvitation,
+  getInviteLinks, createInviteLink, revokeInviteLink,
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
@@ -47,6 +48,13 @@ export default function AdminPanel() {
   const [inviteGroupId, setInviteGroupId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Invite link state
+  const [inviteLinkGroupId, setInviteLinkGroupId] = useState('')
+  const [inviteLinks, setInviteLinks] = useState<InviteLinkResponse[]>([])
+  const [inviteLinksLoading, setInviteLinksLoading] = useState(false)
+  const [inviteLinkError, setInviteLinkError] = useState<string | null>(null)
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
 
   // Match override state
   const { matches } = useMatches()
@@ -247,6 +255,69 @@ export default function AdminPanel() {
       setInvitations((prev) => prev.filter((i) => i.id !== id))
     } catch {
       setError('Kunne ikke fjerne invitasjon')
+    }
+  }
+
+  // Invite-link handlers
+  const loadInviteLinks = useCallback(async (groupId: string) => {
+    if (!groupId) {
+      setInviteLinks([])
+      return
+    }
+    setInviteLinksLoading(true)
+    setInviteLinkError(null)
+    try {
+      const links = await getInviteLinks(groupId)
+      setInviteLinks(links)
+    } catch (err) {
+      setInviteLinkError(err instanceof Error ? err.message : 'Kunne ikke laste invitasjonslenker')
+      setInviteLinks([])
+    } finally {
+      setInviteLinksLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadInviteLinks(inviteLinkGroupId)
+  }, [inviteLinkGroupId, loadInviteLinks])
+
+  async function handleCreateInviteLink() {
+    if (!inviteLinkGroupId) return
+    setInviteLinksLoading(true)
+    setInviteLinkError(null)
+    try {
+      const link = await createInviteLink(inviteLinkGroupId)
+      setInviteLinks((prev) => [link, ...prev])
+    } catch (err) {
+      setInviteLinkError(err instanceof Error ? err.message : 'Kunne ikke opprette lenke')
+    } finally {
+      setInviteLinksLoading(false)
+    }
+  }
+
+  async function handleRevokeInviteLink(id: string) {
+    try {
+      await revokeInviteLink(id)
+      setInviteLinks((prev) => prev.filter((l) => l.id !== id))
+    } catch (err) {
+      setInviteLinkError(err instanceof Error ? err.message : 'Kunne ikke fjerne lenke')
+    }
+  }
+
+  function buildInviteUrl(token: string): string {
+    return `${window.location.origin}/invite/${encodeURIComponent(token)}`
+  }
+
+  async function handleCopyInviteLink(link: InviteLinkResponse) {
+    const url = buildInviteUrl(link.token)
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopiedLinkId(link.id)
+      window.setTimeout(() => {
+        setCopiedLinkId((current) => (current === link.id ? null : current))
+      }, 2000)
+    } catch {
+      setInviteLinkError('Kunne ikke kopiere til utklippstavle. Marker og kopier manuelt.')
     }
   }
 
@@ -618,6 +689,101 @@ export default function AdminPanel() {
         ) : (
           <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen invitasjoner ennå.</p>
         )}
+      </div>
+
+      {/* Invitasjonslenker */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
+        <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Invitasjonslenker</h2>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Del en lenke som lar hvem som helst bli med i ligaen. Lenken er gyldig til den fjernes.
+        </p>
+
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <select
+            value={inviteLinkGroupId}
+            onChange={(e) => setInviteLinkGroupId(e.target.value)}
+            className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
+            style={{
+              backgroundColor: 'var(--color-surface-card)',
+              borderColor: 'var(--color-input-border)',
+              color: 'var(--color-text-primary)',
+            }}
+          >
+            <option value="">-- Velg liga --</option>
+            {groupList.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleCreateInviteLink}
+            disabled={!inviteLinkGroupId || inviteLinksLoading}
+            className="rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          >
+            {inviteLinksLoading ? 'Arbeider…' : 'Lag ny invitasjonslenke'}
+          </button>
+        </div>
+
+        {inviteLinkError ? (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{inviteLinkError}</p>
+        ) : null}
+
+        {inviteLinkGroupId && inviteLinks.length === 0 && !inviteLinksLoading ? (
+          <p className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Ingen invitasjonslenker for denne ligaen.
+          </p>
+        ) : null}
+
+        {inviteLinks.length > 0 ? (
+          <ul className="mt-4 divide-y" style={{ borderColor: 'var(--color-border-light)' }}>
+            {inviteLinks.map((link) => {
+              const url = buildInviteUrl(link.token)
+              return (
+                <li key={link.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col">
+                    <input
+                      type="text"
+                      readOnly
+                      value={url}
+                      onFocus={(e) => e.currentTarget.select()}
+                      className="w-full rounded border px-2 py-1 text-xs sm:w-96"
+                      style={{
+                        backgroundColor: 'var(--color-surface)',
+                        borderColor: 'var(--color-input-border)',
+                        color: 'var(--color-text-primary)',
+                      }}
+                    />
+                    <span className="mt-1 text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+                      Opprettet {new Date(link.createdAt).toLocaleString('no-NO')}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyInviteLink(link)}
+                      className="rounded-md px-3 py-1 text-xs font-medium"
+                      style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                    >
+                      {copiedLinkId === link.id ? 'Kopiert!' : 'Kopier'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRevokeInviteLink(link.id)}
+                      className="rounded-md px-3 py-1 text-xs font-medium"
+                      style={{ color: 'var(--color-danger)' }}
+                    >
+                      Fjern
+                    </button>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        ) : null}
       </div>
 
       {isGlobalAdmin && (
