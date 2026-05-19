@@ -6,11 +6,13 @@ import {
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
+  setMemberPaid,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
 import { useAuth } from '../context/AuthContext'
+import { useFeatureFlag } from '../context/FeatureFlagsContext'
 import { teams } from '../data'
 
 const stageNames: Record<string, string> = {
@@ -27,11 +29,14 @@ export default function AdminPanel() {
   const { user } = useAuth()
   const isGlobalAdmin = user?.isAdmin ?? false
   const groupAdminGroupIds = user?.groupAdminGroupIds ?? []
+  const paidLeaguesEnabled = useFeatureFlag('PaidLeagues')
 
   // Group management state
   const [groupList, setGroupList] = useState<BettingGroup[]>([])
   const [newGroupName, setNewGroupName] = useState('')
   const [joinGroup, setJoinGroup] = useState(true)
+  const [newGroupIsPaid, setNewGroupIsPaid] = useState(false)
+  const [newGroupEntryFee, setNewGroupEntryFee] = useState('')
   const [groupLoading, setGroupLoading] = useState(false)
   const [groupError, setGroupError] = useState<string | null>(null)
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null)
@@ -129,12 +134,23 @@ export default function AdminPanel() {
     e.preventDefault()
     if (!newGroupName.trim()) return
 
+    let entryFee = 0
+    if (paidLeaguesEnabled && newGroupIsPaid) {
+      entryFee = parseFloat(newGroupEntryFee.replace(',', '.'))
+      if (isNaN(entryFee) || entryFee <= 0) {
+        setGroupError('Avgift må være større enn 0 for en betalt liga.')
+        return
+      }
+    }
+
     setGroupLoading(true)
     setGroupError(null)
     try {
-      await createGroup(newGroupName.trim(), joinGroup)
+      await createGroup(newGroupName.trim(), joinGroup, paidLeaguesEnabled && newGroupIsPaid, entryFee)
       setNewGroupName('')
       setJoinGroup(true)
+      setNewGroupIsPaid(false)
+      setNewGroupEntryFee('')
       await loadGroups()
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke opprette liga')
@@ -167,6 +183,43 @@ export default function AdminPanel() {
       await loadGroups()
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre navn')
+    }
+  }
+
+  async function handleConvertToPaid(group: BettingGroup) {
+    const input = window.prompt(
+      `Konverter "${group.name}" til betalt liga.\n\nDeltakerne må registreres som betalt før de kan bette. Premiepott deles 70/20/10 mellom 1.–3. plass.\n\nOppgi avgift per deltaker (kr):`,
+    )
+    if (input === null) return
+    const fee = parseFloat(input.replace(',', '.'))
+    if (isNaN(fee) || fee <= 0) {
+      setGroupError('Avgift må være et tall større enn 0.')
+      return
+    }
+    try {
+      await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
+      await loadGroups()
+    } catch (err) {
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke konvertere liga')
+    }
+  }
+
+  async function handleChangeEntryFee(group: BettingGroup) {
+    const input = window.prompt(
+      `Endre avgift for "${group.name}". (Kan kun endres når ingen har betalt ennå.)\n\nNåværende avgift: ${group.entryFee} kr`,
+      String(group.entryFee),
+    )
+    if (input === null) return
+    const fee = parseFloat(input.replace(',', '.'))
+    if (isNaN(fee) || fee <= 0) {
+      setGroupError('Avgift må være et tall større enn 0.')
+      return
+    }
+    try {
+      await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
+      await loadGroups()
+    } catch (err) {
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre avgift')
     }
   }
 
@@ -209,6 +262,17 @@ export default function AdminPanel() {
       await loadMembers(expandedGroupId)
     } catch (err) {
       setMemberError(err instanceof Error ? err.message : 'Kunne ikke endre admin-status')
+    }
+  }
+
+  async function handleTogglePaid(userId: string, currentStatus: boolean) {
+    if (!expandedGroupId) return
+    try {
+      await setMemberPaid(expandedGroupId, userId, !currentStatus)
+      await loadMembers(expandedGroupId)
+      await loadGroups()
+    } catch (err) {
+      setMemberError(err instanceof Error ? err.message : 'Kunne ikke endre betalt-status')
     }
   }
 
@@ -389,7 +453,8 @@ export default function AdminPanel() {
         </p>
 
         {isGlobalAdmin && (
-          <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <form onSubmit={handleCreateGroup} className="mt-4 flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="text"
             value={newGroupName}
@@ -420,6 +485,51 @@ export default function AdminPanel() {
           >
             {groupLoading ? 'Oppretter...' : 'Opprett liga'}
           </button>
+          </div>
+          {paidLeaguesEnabled && (
+            <div
+              className="flex flex-col gap-2 rounded-lg border px-3 py-2 sm:flex-row sm:items-center"
+              style={{ borderColor: 'var(--color-border-light)', backgroundColor: 'var(--color-surface-elevated)' }}
+            >
+              <label className="flex items-center gap-1.5 text-sm whitespace-nowrap" style={{ color: 'var(--color-text-secondary)' }}>
+                <input
+                  type="checkbox"
+                  checked={newGroupIsPaid}
+                  onChange={(e) => setNewGroupIsPaid(e.target.checked)}
+                  className="rounded"
+                />
+                Betalt liga
+              </label>
+              {newGroupIsPaid && (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm whitespace-nowrap" style={{ color: 'var(--color-text-secondary)' }}>
+                    Avgift per deltaker:
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={newGroupEntryFee}
+                    onChange={(e) => setNewGroupEntryFee(e.target.value)}
+                    placeholder="kr"
+                    className="w-24 rounded border px-2 py-1 text-sm focus:outline-none focus:ring-2"
+                    style={{
+                      backgroundColor: 'var(--color-surface-card)',
+                      borderColor: 'var(--color-input-border)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                    required={newGroupIsPaid}
+                  />
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>kr</span>
+                </div>
+              )}
+              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                {newGroupIsPaid
+                  ? 'Deltakerne må betale før de kan bette. Premiepott deles 70/20/10 mellom 1.–3. plass.'
+                  : 'Slå på for å kreve avgift i ligaen.'}
+              </span>
+            </div>
+          )}
         </form>
         )}
 
@@ -478,6 +588,14 @@ export default function AdminPanel() {
                         <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                           {group.memberCount} {group.memberCount === 1 ? 'medlem' : 'medlemmer'}
                         </span>
+                        {group.isPaid && (
+                          <span
+                            className="ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                            style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                          >
+                            Betalt liga · {group.entryFee} kr · pott {group.prizePot} kr ({group.paidMemberCount}/{group.memberCount} betalt)
+                          </span>
+                        )}
                       </>
                     )}
                   </button>
@@ -491,6 +609,24 @@ export default function AdminPanel() {
                         >
                           Endre
                         </button>
+                        {paidLeaguesEnabled && !group.isPaid && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleConvertToPaid(group) }}
+                            className="text-xs"
+                            style={{ color: 'var(--color-primary)' }}
+                          >
+                            Gjør om til betalt liga
+                          </button>
+                        )}
+                        {paidLeaguesEnabled && group.isPaid && group.paidMemberCount === 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleChangeEntryFee(group) }}
+                            className="text-xs"
+                            style={{ color: 'var(--color-primary)' }}
+                          >
+                            Endre avgift
+                          </button>
+                        )}
                         <button
                           onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.id) }}
                           className="text-xs"
@@ -542,7 +678,9 @@ export default function AdminPanel() {
                       <p className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Laster...</p>
                     ) : (
                       <ul className="mt-2 space-y-1">
-                        {groupMembers.map((m) => (
+                        {groupMembers.map((m) => {
+                          const groupIsPaid = groupList.find((g) => g.id === expandedGroupId)?.isPaid ?? false
+                          return (
                           <li key={m.userId} className="flex items-center justify-between py-1">
                             <div className="flex items-center gap-2">
                               {m.picture ? (
@@ -562,8 +700,29 @@ export default function AdminPanel() {
                                   Liga-admin
                                 </span>
                               )}
+                              {groupIsPaid && (
+                                <span
+                                  className="rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                                  style={{
+                                    backgroundColor: m.hasPaid ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
+                                    color: m.hasPaid ? 'var(--color-success-text)' : 'var(--color-text-muted)',
+                                  }}
+                                  title={m.paidAt ? `Betalt ${new Date(m.paidAt).toLocaleString('no-NO')}` : 'Ikke betalt'}
+                                >
+                                  {m.hasPaid ? 'Betalt' : 'Ikke betalt'}
+                                </span>
+                              )}
                             </div>
                             <div className="flex items-center gap-2">
+                              {groupIsPaid && (
+                                <button
+                                  onClick={() => handleTogglePaid(m.userId, m.hasPaid)}
+                                  className="text-xs"
+                                  style={{ color: m.hasPaid ? 'var(--color-text-muted)' : 'var(--color-success-text)' }}
+                                >
+                                  {m.hasPaid ? 'Marker ubetalt' : 'Marker betalt'}
+                                </button>
+                              )}
                               {isGlobalAdmin && (
                                 <button
                                   onClick={() => handleToggleGroupAdmin(m.userId, m.isGroupAdmin)}
@@ -582,7 +741,8 @@ export default function AdminPanel() {
                               </button>
                             </div>
                           </li>
-                        ))}
+                          )
+                        })}
                       </ul>
                     )}
                   </div>

@@ -22,6 +22,9 @@ vi.mock('../api/client', async (importOriginal) => {
     getGroupMembers: vi.fn().mockResolvedValue([]),
     addGroupMember: vi.fn(),
     removeGroupMember: vi.fn(),
+    getInviteLinks: vi.fn().mockResolvedValue([]),
+    createInviteLink: vi.fn(),
+    revokeInviteLink: vi.fn(),
   }
 })
 
@@ -41,6 +44,11 @@ vi.mock('../context/ResultsContext', () => ({
     isLoading: false,
     refreshResults: vi.fn().mockResolvedValue(undefined),
   }),
+}))
+
+vi.mock('../context/FeatureFlagsContext', () => ({
+  useFeatureFlag: () => false,
+  useFeatureFlags: () => ({ flags: {}, isLoading: false, isEnabled: () => false }),
 }))
 
 import { updateMatchTeams } from '../api/client'
@@ -101,11 +109,12 @@ describe('AdminPanel match override', () => {
       expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
-    const matchSelect = screen.getAllByRole('combobox')[1]
+    // 0 = invitation group, 1 = invite-link group, 2 = match override select
+    const matchSelect = screen.getAllByRole('combobox')[2]
     fireEvent.change(matchSelect, { target: { value: String(knockoutMatch.id) } })
 
     const selects = screen.getAllByRole('combobox')
-    expect(selects.length).toBeGreaterThanOrEqual(4)
+    expect(selects.length).toBeGreaterThanOrEqual(5)
   })
 
   it('calls updateMatchTeams with correct args on form submit', async () => {
@@ -116,20 +125,20 @@ describe('AdminPanel match override', () => {
       expect(options.length).toBeGreaterThanOrEqual(1)
     })
 
-    // Index 0 = invitation group select, index 1 = match override select
-    const matchSelect = screen.getAllByRole('combobox')[1]
+    // 0 = invitation group, 1 = invite-link group, 2 = match override select
+    const matchSelect = screen.getAllByRole('combobox')[2]
     fireEvent.change(matchSelect, { target: { value: String(knockoutMatch.id) } })
 
     await waitFor(() => {
-      expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(4)
+      expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(5)
     })
 
     const selects = screen.getAllByRole('combobox')
-    // Index 0 = invitation group, 1 = match, 2 = home team, 3 = away team
-    fireEvent.change(selects[2], { target: { value: 'BRA' } })
-    fireEvent.change(selects[3], { target: { value: 'ARG' } })
+    // 0 = invitation group, 1 = invite-link group, 2 = match, 3 = home team, 4 = away team
+    fireEvent.change(selects[3], { target: { value: 'BRA' } })
+    fireEvent.change(selects[4], { target: { value: 'ARG' } })
 
-    const saveButton = screen.getByRole('button', { name: /lagre/i })
+    const saveButton = screen.getByRole('button', { name: /^lagre$/i })
     fireEvent.click(saveButton)
 
     await waitFor(() => {

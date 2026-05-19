@@ -68,6 +68,30 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return BadRequest("Lagene er ikke avgjort ennå – betting er stengt for denne kampen.");
         }
 
+        // Hvis brukeren bettsetter fra en betalt liga (X-Group-Id), må de ha betalt avgift.
+        // Bettinger er globale per (UserId, MatchId), så vi gater på aktiv liga.
+        var groupIdStr = Request.Headers["X-Group-Id"].FirstOrDefault();
+        if (Guid.TryParse(groupIdStr, out var activeGroupId) && activeGroupId != Guid.Empty)
+        {
+            var activeGroup = await dbContext.BettingGroups
+                .AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Id == activeGroupId);
+
+            if (activeGroup is { IsPaid: true })
+            {
+                var hasPaid = await dbContext.BettingGroupMembers
+                    .AnyAsync(m => m.BettingGroupId == activeGroupId
+                        && m.UserId == userId.Value
+                        && m.HasPaid);
+
+                if (!hasPaid)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        "Du må betale avgiften i denne ligaen før du kan bette.");
+                }
+            }
+        }
+
         // Bettinger er globale per (UserId, MatchId) – uavhengig av aktiv liga.
         var prediction = await dbContext.Predictions
             .SingleOrDefaultAsync(p =>

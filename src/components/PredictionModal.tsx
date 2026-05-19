@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Match, Team } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { usePredictions } from '../context/PredictionsContext'
+import { useBettingGroup } from '../context/BettingGroupContext'
 import { isStageLocked, areTeamsUndetermined } from '../utils/dateUtils'
 
 interface PredictionModalProps {
@@ -13,7 +14,9 @@ interface PredictionModalProps {
 export default function PredictionModal({ match, teams, onClose }: PredictionModalProps) {
   const { matches: allMatches } = useMatches()
   const { predictions, savePrediction } = usePredictions()
+  const { activeGroup } = useBettingGroup()
   const existing = predictions.get(match.id)
+  const paymentBlocked = activeGroup?.isPaid === true && activeGroup.currentUserHasPaid === false
 
   const [homeScore, setHomeScore] = useState<string>(existing ? String(existing.homeScore) : '0')
   const [awayScore, setAwayScore] = useState<string>(existing ? String(existing.awayScore) : '0')
@@ -29,6 +32,11 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (paymentBlocked) {
+      setError('Du må betale avgiften i denne ligaen før du kan bette. Kontakt liga-admin.')
+      return
+    }
 
     const home = homeScore.trim() === '' ? 0 : parseInt(homeScore, 10)
     const away = awayScore.trim() === '' ? 0 : parseInt(awayScore, 10)
@@ -86,6 +94,18 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
         </div>
 
         <form onSubmit={handleSubmit}>
+          {paymentBlocked && (
+            <div
+              className="mb-4 rounded-lg border px-3 py-2 text-sm"
+              style={{
+                borderColor: 'var(--color-danger)',
+                backgroundColor: 'var(--color-surface-elevated)',
+                color: 'var(--color-danger)',
+              }}
+            >
+              Denne ligaen krever {activeGroup?.entryFee} kr i avgift. Du må betale før du kan bette – kontakt liga-admin når du har betalt.
+            </div>
+          )}
           <div className="flex items-center justify-center gap-4">
             <div className="flex flex-1 flex-col items-center gap-2">
               <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
@@ -154,7 +174,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
             </button>
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || paymentBlocked}
               className="flex-1 rounded-lg px-4 py-3 text-sm font-medium text-white transition-colors disabled:opacity-50 sm:py-2.5"
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
