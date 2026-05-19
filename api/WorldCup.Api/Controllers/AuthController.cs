@@ -46,6 +46,14 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
         var adminEmail = configuration["Admin:Email"]?.ToLowerInvariant();
         var isAdmin = string.Equals(payload.Email, adminEmail, StringComparison.OrdinalIgnoreCase);
 
+        // Resolve optional invite-link token (allows new users to sign up via a shareable link)
+        BettingGroupInviteLink? inviteLink = null;
+        if (!string.IsNullOrWhiteSpace(request.InviteToken))
+        {
+            inviteLink = await dbContext.BettingGroupInviteLinks
+                .FirstOrDefaultAsync(l => l.Token == request.InviteToken && !l.IsRevoked);
+        }
+
         if (!isAdmin)
         {
             var existingUser = await dbContext.Users.AnyAsync(u => u.GoogleId == payload.Subject);
@@ -54,7 +62,7 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
                 var isInvited = await dbContext.Invitations
                     .AnyAsync(i => i.Email.ToLower() == payload.Email.ToLower());
 
-                if (!isInvited)
+                if (!isInvited && inviteLink is null)
                 {
                     return StatusCode(403, "Du er ikke invitert. Be administrator om en invitasjon.");
                 }
@@ -135,6 +143,24 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
         if (pendingInvitations.Count > 0)
         {
             await dbContext.SaveChangesAsync();
+        }
+
+        // Auto-join via invite link if provided
+        if (inviteLink is not null)
+        {
+            var alreadyMember = await dbContext.BettingGroupMembers
+                .AnyAsync(m => m.BettingGroupId == inviteLink.BettingGroupId && m.UserId == user.Id);
+
+            if (!alreadyMember)
+            {
+                dbContext.BettingGroupMembers.Add(new BettingGroupMember
+                {
+                    Id = Guid.NewGuid(),
+                    BettingGroupId = inviteLink.BettingGroupId,
+                    UserId = user.Id
+                });
+                await dbContext.SaveChangesAsync();
+            }
         }
 
         // Fetch user's groups for response
