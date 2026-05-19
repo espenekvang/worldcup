@@ -1,7 +1,63 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getLeaderboard, type LeaderboardEntry } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { firstName } from '../utils/nameUtils'
+
+/**
+ * Beregner premie per deltaker for en betalt liga.
+ *
+ * Regler:
+ *  - Plassering bestemmes av totalPoints (likt poeng = delt plassering).
+ *  - Pott fordeles 70 % / 20 % / 10 % til 1./2./3. plass.
+ *  - Ved delt plassering deles pengene i den/de aktuelle "kategoriene" likt mellom delte spillere.
+ *    Eks: 3 spillere deler 1. plass → de deler (70 + 20 + 10) % av potten likt.
+ *    Eks: 2 spillere deler 2. plass → de deler (20 + 10) % av potten likt; 3. plass utdeles ikke separat.
+ */
+function calculatePrizes(
+  entries: LeaderboardEntry[],
+  prizePot: number,
+): Map<string, number> {
+  const result = new Map<string, number>()
+  if (prizePot <= 0 || entries.length === 0) return result
+
+  // Grupper deltakere etter poengsum, i samme rekkefølge som leaderboard (sortert synkende).
+  const groupsByPoints: LeaderboardEntry[][] = []
+  for (const entry of entries) {
+    const last = groupsByPoints[groupsByPoints.length - 1]
+    if (last && last[0].totalPoints === entry.totalPoints) {
+      last.push(entry)
+    } else {
+      groupsByPoints.push([entry])
+    }
+  }
+
+  const shares = [0.7, 0.2, 0.1]
+  let slotIndex = 0 // hvilken premie-slot (0=1.plass, 1=2.plass, 2=3.plass) som er neste å dele ut
+
+  for (const tieGroup of groupsByPoints) {
+    if (slotIndex >= shares.length) break
+
+    // Hvor mange slots dekker denne tie-gruppen?
+    const slotsConsumed = Math.min(tieGroup.length, shares.length - slotIndex)
+    let combinedShare = 0
+    for (let i = 0; i < slotsConsumed; i++) {
+      combinedShare += shares[slotIndex + i]
+    }
+
+    const amountPerPerson = (prizePot * combinedShare) / tieGroup.length
+    for (const member of tieGroup) {
+      result.set(member.name, amountPerPerson)
+    }
+
+    slotIndex += tieGroup.length
+  }
+
+  return result
+}
+
+function formatCurrency(amount: number): string {
+  return `${Math.round(amount).toLocaleString('no-NO')} kr`
+}
 
 export default function Leaderboard() {
   const { activeGroup } = useBettingGroup()
@@ -28,6 +84,11 @@ export default function Leaderboard() {
 
     return () => { cancelled = true }
   }, [activeGroup])
+
+  const prizes = useMemo(() => {
+    if (!activeGroup?.isPaid) return new Map<string, number>()
+    return calculatePrizes(entries, activeGroup.prizePot)
+  }, [entries, activeGroup])
 
   if (loading) {
     return (
@@ -61,6 +122,28 @@ export default function Leaderboard() {
         <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{activeGroup.name}</p>
       ) : null}
       <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{entries.length} deltakere</p>
+      {activeGroup?.isPaid && (
+        <div
+          className="rounded-lg border px-3 py-2 text-xs"
+          style={{
+            borderColor: 'var(--color-border-light)',
+            backgroundColor: 'var(--color-surface-elevated)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+            Pott: {formatCurrency(activeGroup.prizePot)}
+          </div>
+          <div className="mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+            Avgift {activeGroup.entryFee} kr · {activeGroup.paidMemberCount}/{activeGroup.memberCount} har betalt · 1.&nbsp;plass 70 % · 2.&nbsp;plass 20 % · 3.&nbsp;plass 10 %
+            {!activeGroup.currentUserHasPaid && (
+              <span style={{ color: 'var(--color-danger)' }}>
+                {' '}· Du har ikke betalt – betting er stengt.
+              </span>
+            )}
+          </div>
+        </div>
+      )}
       <div
         className="overflow-hidden rounded-xl"
         style={{ backgroundColor: 'var(--color-surface-card)', border: '1px solid var(--color-border-light)' }}
@@ -100,6 +183,14 @@ export default function Leaderboard() {
                 <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   {entry.matchCount} {entry.matchCount === 1 ? 'kamp' : 'kamper'}
                 </span>
+                {prizes.get(entry.name) ? (
+                  <span
+                    className="ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                    style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                  >
+                    {formatCurrency(prizes.get(entry.name) ?? 0)}
+                  </span>
+                ) : null}
               </div>
             </div>
             <span

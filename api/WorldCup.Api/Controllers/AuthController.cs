@@ -172,12 +172,25 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
                 m.BettingGroup.Name,
                 MemberCount = m.BettingGroup.Members.Count,
                 m.BettingGroup.CreatedAt,
-                m.IsGroupAdmin
+                m.IsGroupAdmin,
+                m.BettingGroup.IsPaid,
+                m.BettingGroup.EntryFee,
+                PaidMemberCount = m.BettingGroup.Members.Count(x => x.HasPaid),
+                CurrentUserHasPaid = m.HasPaid
             })
             .ToListAsync();
 
         var groups = memberships
-            .Select(m => new BettingGroupResponse(m.BettingGroupId, m.Name, m.MemberCount, m.CreatedAt))
+            .Select(m => new BettingGroupResponse(
+                m.BettingGroupId,
+                m.Name,
+                m.MemberCount,
+                m.CreatedAt,
+                m.IsPaid,
+                m.EntryFee,
+                m.IsPaid ? m.EntryFee * m.PaidMemberCount : 0m,
+                m.PaidMemberCount,
+                m.CurrentUserHasPaid))
             .ToList();
 
         var groupAdminGroupIds = memberships

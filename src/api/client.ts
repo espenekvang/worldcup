@@ -243,17 +243,29 @@ export function getAllGroups(): Promise<BettingGroup[]> {
   return request<BettingGroup[]>('/api/admin/groups')
 }
 
-export function createGroup(name: string, joinGroup: boolean = true): Promise<BettingGroup> {
+export function createGroup(
+  name: string,
+  joinGroup: boolean = true,
+  isPaid: boolean = false,
+  entryFee: number = 0,
+): Promise<BettingGroup> {
   return request<BettingGroup>('/api/groups', {
     method: 'POST',
-    body: JSON.stringify({ name, joinGroup }),
+    body: JSON.stringify({ name, joinGroup, isPaid, entryFee }),
   })
 }
 
-export function updateGroup(id: string, name: string): Promise<BettingGroup> {
+export function updateGroup(
+  id: string,
+  name: string,
+  options?: { isPaid?: boolean; entryFee?: number },
+): Promise<BettingGroup> {
+  const body: Record<string, unknown> = { name }
+  if (options?.isPaid !== undefined) body.isPaid = options.isPaid
+  if (options?.entryFee !== undefined) body.entryFee = options.entryFee
   return request<BettingGroup>(`/api/groups/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(body),
   })
 }
 
@@ -284,6 +296,13 @@ export function toggleGroupAdmin(groupId: string, userId: string, isGroupAdmin: 
   return request<void>(`/api/groups/${groupId}/members/${userId}/admin`, {
     method: 'PUT',
     body: JSON.stringify({ isGroupAdmin }),
+  })
+}
+
+export function setMemberPaid(groupId: string, userId: string, hasPaid: boolean): Promise<void> {
+  return request<void>(`/api/groups/${groupId}/members/${userId}/payment`, {
+    method: 'PUT',
+    body: JSON.stringify({ hasPaid }),
   })
 }
 
