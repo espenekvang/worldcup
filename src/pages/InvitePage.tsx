@@ -50,6 +50,11 @@ export default function InvitePage() {
           name: result.groupName,
           memberCount: 0,
           createdAt: new Date().toISOString(),
+          isPaid: false,
+          entryFee: 0,
+          prizePot: 0,
+          paidMemberCount: 0,
+          currentUserHasPaid: false,
         }
         const merged = groups.some((g) => g.id === newGroup.id)
           ? groups
