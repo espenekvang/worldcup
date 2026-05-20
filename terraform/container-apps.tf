@@ -44,6 +44,11 @@ resource "azurerm_container_app" "main" {
     value = var.admin_email
   }
 
+  secret {
+    name  = "wc2026-api-key"
+    value = var.wc2026_api_key
+  }
+
   template {
     min_replicas = 1
     max_replicas = 1
@@ -91,8 +96,8 @@ resource "azurerm_container_app" "main" {
       }
 
       env {
-        name  = "APP_CONFIGURATION_ENDPOINT"
-        value = azurerm_app_configuration.main.endpoint
+        name        = "Wc2026Api__ApiKey"
+        secret_name = "wc2026-api-key"
       }
 
       volume_mounts {
