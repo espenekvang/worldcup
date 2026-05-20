@@ -37,33 +37,15 @@
   },
   {
     "id": 5,
-    "date": "2026-06-13T19:00:00Z",
-    "homeTeam": "QAT",
-    "awayTeam": "SUI",
-    "group": "B",
-    "stage": "group",
-    "venueId": "levis"
-  },
-  {
-    "id": 6,
-    "date": "2026-06-13T22:00:00Z",
-    "homeTeam": "BRA",
-    "awayTeam": "MAR",
-    "group": "C",
-    "stage": "group",
-    "venueId": "metlife"
-  },
-  {
-    "id": 7,
     "date": "2026-06-14T01:00:00Z",
     "homeTeam": "HAI",
     "awayTeam": "SCO",
     "group": "C",
     "stage": "group",
-    "venueId": "rosebowl"
+    "venueId": "gillette"
   },
   {
-    "id": 8,
+    "id": 6,
     "date": "2026-06-14T04:00:00Z",
     "homeTeam": "AUS",
     "awayTeam": "TUR",
@@ -72,7 +54,34 @@
     "venueId": "bcplace"
   },
   {
+    "id": 7,
+    "date": "2026-06-13T22:00:00Z",
+    "homeTeam": "BRA",
+    "awayTeam": "MAR",
+    "group": "C",
+    "stage": "group",
+    "venueId": "metlife"
+  },
+  {
+    "id": 8,
+    "date": "2026-06-13T19:00:00Z",
+    "homeTeam": "QAT",
+    "awayTeam": "SUI",
+    "group": "B",
+    "stage": "group",
+    "venueId": "levis"
+  },
+  {
     "id": 9,
+    "date": "2026-06-14T23:00:00Z",
+    "homeTeam": "CIV",
+    "awayTeam": "ECU",
+    "group": "E",
+    "stage": "group",
+    "venueId": "lincoln"
+  },
+  {
+    "id": 10,
     "date": "2026-06-14T17:00:00Z",
     "homeTeam": "GER",
     "awayTeam": "CUW",
@@ -81,7 +90,7 @@
     "venueId": "nrg"
   },
   {
-    "id": 10,
+    "id": 11,
     "date": "2026-06-14T20:00:00Z",
     "homeTeam": "NED",
     "awayTeam": "JPN",
@@ -90,25 +99,25 @@
     "venueId": "att"
   },
   {
-    "id": 11,
-    "date": "2026-06-14T23:00:00Z",
-    "homeTeam": "CIV",
-    "awayTeam": "ECU",
-    "group": "E",
-    "stage": "group",
-    "venueId": "sofi"
-  },
-  {
     "id": 12,
-    "date": "2026-06-15T04:00:00Z",
-    "homeTeam": "TUN",
-    "awayTeam": "SWE",
+    "date": "2026-06-15T02:00:00Z",
+    "homeTeam": "SWE",
+    "awayTeam": "TUN",
     "group": "F",
     "stage": "group",
-    "venueId": "lumen"
+    "venueId": "bbva"
   },
   {
     "id": 13,
+    "date": "2026-06-15T22:00:00Z",
+    "homeTeam": "KSA",
+    "awayTeam": "URU",
+    "group": "H",
+    "stage": "group",
+    "venueId": "hardrock"
+  },
+  {
+    "id": 14,
     "date": "2026-06-15T16:00:00Z",
     "homeTeam": "ESP",
     "awayTeam": "CPV",
@@ -117,31 +126,22 @@
     "venueId": "mercedesbenz"
   },
   {
-    "id": 14,
-    "date": "2026-06-15T19:00:00Z",
-    "homeTeam": "BEL",
-    "awayTeam": "EGY",
-    "group": "G",
-    "stage": "group",
-    "venueId": "lumen"
-  },
-  {
     "id": 15,
-    "date": "2026-06-15T22:00:00Z",
-    "homeTeam": "KSA",
-    "awayTeam": "URU",
-    "group": "H",
-    "stage": "group",
-    "venueId": "arrowhead"
-  },
-  {
-    "id": 16,
     "date": "2026-06-16T01:00:00Z",
     "homeTeam": "IRN",
     "awayTeam": "NZL",
     "group": "G",
     "stage": "group",
     "venueId": "sofi"
+  },
+  {
+    "id": 16,
+    "date": "2026-06-15T19:00:00Z",
+    "homeTeam": "BEL",
+    "awayTeam": "EGY",
+    "group": "G",
+    "stage": "group",
+    "venueId": "lumen"
   },
   {
     "id": 17,
@@ -159,7 +159,7 @@
     "awayTeam": "NOR",
     "group": "I",
     "stage": "group",
-    "venueId": "rosebowl"
+    "venueId": "gillette"
   },
   {
     "id": 19,
@@ -181,12 +181,12 @@
   },
   {
     "id": 21,
-    "date": "2026-06-17T17:00:00Z",
-    "homeTeam": "POR",
-    "awayTeam": "COD",
-    "group": "K",
+    "date": "2026-06-17T23:00:00Z",
+    "homeTeam": "GHA",
+    "awayTeam": "PAN",
+    "group": "L",
     "stage": "group",
-    "venueId": "nrg"
+    "venueId": "bmo"
   },
   {
     "id": 22,
@@ -199,21 +199,21 @@
   },
   {
     "id": 23,
-    "date": "2026-06-17T23:00:00Z",
-    "homeTeam": "GHA",
-    "awayTeam": "PAN",
-    "group": "L",
+    "date": "2026-06-17T17:00:00Z",
+    "homeTeam": "POR",
+    "awayTeam": "COD",
+    "group": "K",
     "stage": "group",
-    "venueId": "bmo"
+    "venueId": "nrg"
   },
   {
     "id": 24,
-    "date": "2026-06-18T04:00:00Z",
-    "homeTeam": "COL",
-    "awayTeam": "UZB",
+    "date": "2026-06-18T02:00:00Z",
+    "homeTeam": "UZB",
+    "awayTeam": "COL",
     "group": "K",
     "stage": "group",
-    "venueId": "lumen"
+    "venueId": "azteca"
   },
   {
     "id": 25,
@@ -226,15 +226,6 @@
   },
   {
     "id": 26,
-    "date": "2026-06-19T01:00:00Z",
-    "homeTeam": "MEX",
-    "awayTeam": "KOR",
-    "group": "A",
-    "stage": "group",
-    "venueId": "akron"
-  },
-  {
-    "id": 27,
     "date": "2026-06-18T19:00:00Z",
     "homeTeam": "SUI",
     "awayTeam": "BIH",
@@ -243,7 +234,7 @@
     "venueId": "sofi"
   },
   {
-    "id": 28,
+    "id": 27,
     "date": "2026-06-18T22:00:00Z",
     "homeTeam": "CAN",
     "awayTeam": "QAT",
@@ -252,143 +243,152 @@
     "venueId": "bcplace"
   },
   {
+    "id": 28,
+    "date": "2026-06-19T01:00:00Z",
+    "homeTeam": "MEX",
+    "awayTeam": "KOR",
+    "group": "A",
+    "stage": "group",
+    "venueId": "akron"
+  },
+  {
     "id": 29,
-    "date": "2026-06-19T17:00:00Z",
-    "homeTeam": "MAR",
-    "awayTeam": "SCO",
+    "date": "2026-06-20T01:00:00Z",
+    "homeTeam": "BRA",
+    "awayTeam": "HAI",
     "group": "C",
     "stage": "group",
     "venueId": "lincoln"
   },
   {
     "id": 30,
-    "date": "2026-06-19T20:00:00Z",
-    "homeTeam": "BRA",
-    "awayTeam": "HAI",
+    "date": "2026-06-19T22:00:00Z",
+    "homeTeam": "SCO",
+    "awayTeam": "MAR",
     "group": "C",
+    "stage": "group",
+    "venueId": "gillette"
+  },
+  {
+    "id": 31,
+    "date": "2026-06-20T04:00:00Z",
+    "homeTeam": "TUR",
+    "awayTeam": "PAR",
+    "group": "D",
     "stage": "group",
     "venueId": "levis"
   },
   {
-    "id": 31,
-    "date": "2026-06-19T23:00:00Z",
+    "id": 32,
+    "date": "2026-06-19T19:00:00Z",
     "homeTeam": "USA",
     "awayTeam": "AUS",
     "group": "D",
     "stage": "group",
-    "venueId": "arrowhead"
-  },
-  {
-    "id": 32,
-    "date": "2026-06-20T02:00:00Z",
-    "homeTeam": "PAR",
-    "awayTeam": "TUR",
-    "group": "D",
-    "stage": "group",
-    "venueId": "mercedesbenz"
+    "venueId": "lumen"
   },
   {
     "id": 33,
-    "date": "2026-06-20T17:00:00Z",
-    "homeTeam": "GER",
-    "awayTeam": "ECU",
-    "group": "E",
-    "stage": "group",
-    "venueId": "metlife"
-  },
-  {
-    "id": 34,
     "date": "2026-06-20T20:00:00Z",
-    "homeTeam": "CIV",
-    "awayTeam": "CUW",
+    "homeTeam": "GER",
+    "awayTeam": "CIV",
     "group": "E",
     "stage": "group",
     "venueId": "bmo"
   },
   {
-    "id": 35,
-    "date": "2026-06-20T23:00:00Z",
-    "homeTeam": "NED",
-    "awayTeam": "TUN",
-    "group": "F",
+    "id": 34,
+    "date": "2026-06-21T00:00:00Z",
+    "homeTeam": "ECU",
+    "awayTeam": "CUW",
+    "group": "E",
     "stage": "group",
-    "venueId": "lincoln"
+    "venueId": "arrowhead"
   },
   {
-    "id": 36,
-    "date": "2026-06-21T02:00:00Z",
-    "homeTeam": "JPN",
+    "id": 35,
+    "date": "2026-06-20T17:00:00Z",
+    "homeTeam": "NED",
     "awayTeam": "SWE",
     "group": "F",
     "stage": "group",
-    "venueId": "bcplace"
+    "venueId": "nrg"
+  },
+  {
+    "id": 36,
+    "date": "2026-06-21T04:00:00Z",
+    "homeTeam": "TUN",
+    "awayTeam": "JPN",
+    "group": "F",
+    "stage": "group",
+    "venueId": "bbva"
   },
   {
     "id": 37,
-    "date": "2026-06-21T17:00:00Z",
-    "homeTeam": "BEL",
-    "awayTeam": "IRN",
-    "group": "G",
+    "date": "2026-06-21T22:00:00Z",
+    "homeTeam": "URU",
+    "awayTeam": "CPV",
+    "group": "H",
     "stage": "group",
     "venueId": "hardrock"
   },
   {
     "id": 38,
-    "date": "2026-06-21T20:00:00Z",
-    "homeTeam": "EGY",
-    "awayTeam": "NZL",
-    "group": "G",
+    "date": "2026-06-21T16:00:00Z",
+    "homeTeam": "ESP",
+    "awayTeam": "KSA",
+    "group": "H",
     "stage": "group",
-    "venueId": "arrowhead"
+    "venueId": "mercedesbenz"
   },
   {
     "id": 39,
-    "date": "2026-06-21T23:00:00Z",
-    "homeTeam": "ESP",
-    "awayTeam": "URU",
-    "group": "H",
+    "date": "2026-06-21T19:00:00Z",
+    "homeTeam": "BEL",
+    "awayTeam": "IRN",
+    "group": "G",
     "stage": "group",
     "venueId": "sofi"
   },
   {
     "id": 40,
-    "date": "2026-06-22T02:00:00Z",
-    "homeTeam": "KSA",
-    "awayTeam": "CPV",
-    "group": "H",
+    "date": "2026-06-22T01:00:00Z",
+    "homeTeam": "NZL",
+    "awayTeam": "EGY",
+    "group": "G",
     "stage": "group",
-    "venueId": "nrg"
+    "venueId": "bcplace"
   },
   {
     "id": 41,
-    "date": "2026-06-22T17:00:00Z",
-    "homeTeam": "FRA",
-    "awayTeam": "NOR",
+    "date": "2026-06-23T00:00:00Z",
+    "homeTeam": "NOR",
+    "awayTeam": "SEN",
     "group": "I",
     "stage": "group",
-    "venueId": "lumen"
+    "venueId": "metlife"
   },
   {
     "id": 42,
-    "date": "2026-06-22T20:00:00Z",
-    "homeTeam": "SEN",
+    "date": "2026-06-22T21:00:00Z",
+    "homeTeam": "FRA",
     "awayTeam": "IRQ",
     "group": "I",
     "stage": "group",
-    "venueId": "att"
+    "venueId": "lincoln"
   },
   {
     "id": 43,
-    "date": "2026-06-22T23:00:00Z",
+    "date": "2026-06-22T17:00:00Z",
     "homeTeam": "ARG",
     "awayTeam": "AUT",
     "group": "J",
     "stage": "group",
-    "venueId": "mercedesbenz"
+    "venueId": "att"
   },
   {
     "id": 44,
-    "date": "2026-06-23T02:00:00Z",
+    "date": "2026-06-23T03:00:00Z",
     "homeTeam": "JOR",
     "awayTeam": "ALG",
     "group": "J",
@@ -397,52 +397,61 @@
   },
   {
     "id": 45,
-    "date": "2026-06-23T17:00:00Z",
-    "homeTeam": "POR",
-    "awayTeam": "COL",
-    "group": "K",
-    "stage": "group",
-    "venueId": "hardrock"
-  },
-  {
-    "id": 46,
-    "date": "2026-06-23T20:00:00Z",
-    "homeTeam": "UZB",
-    "awayTeam": "COD",
-    "group": "K",
-    "stage": "group",
-    "venueId": "rosebowl"
-  },
-  {
-    "id": 47,
     "date": "2026-06-23T20:00:00Z",
     "homeTeam": "ENG",
     "awayTeam": "GHA",
     "group": "L",
     "stage": "group",
-    "venueId": "rosebowl"
+    "venueId": "gillette"
   },
   {
-    "id": 48,
+    "id": 46,
     "date": "2026-06-23T23:00:00Z",
     "homeTeam": "PAN",
     "awayTeam": "CRO",
     "group": "L",
     "stage": "group",
-    "venueId": "metlife"
+    "venueId": "bmo"
+  },
+  {
+    "id": 47,
+    "date": "2026-06-23T17:00:00Z",
+    "homeTeam": "POR",
+    "awayTeam": "UZB",
+    "group": "K",
+    "stage": "group",
+    "venueId": "nrg"
+  },
+  {
+    "id": 48,
+    "date": "2026-06-24T02:00:00Z",
+    "homeTeam": "COL",
+    "awayTeam": "COD",
+    "group": "K",
+    "stage": "group",
+    "venueId": "akron"
   },
   {
     "id": 49,
     "date": "2026-06-24T22:00:00Z",
-    "homeTeam": "BIH",
-    "awayTeam": "QAT",
-    "group": "B",
+    "homeTeam": "SCO",
+    "awayTeam": "BRA",
+    "group": "C",
     "stage": "group",
-    "venueId": "bbva"
+    "venueId": "hardrock"
   },
   {
     "id": 50,
     "date": "2026-06-24T22:00:00Z",
+    "homeTeam": "MAR",
+    "awayTeam": "HAI",
+    "group": "C",
+    "stage": "group",
+    "venueId": "mercedesbenz"
+  },
+  {
+    "id": 51,
+    "date": "2026-06-24T19:00:00Z",
     "homeTeam": "SUI",
     "awayTeam": "CAN",
     "group": "B",
@@ -450,7 +459,16 @@
     "venueId": "bcplace"
   },
   {
-    "id": 51,
+    "id": 52,
+    "date": "2026-06-24T19:00:00Z",
+    "homeTeam": "BIH",
+    "awayTeam": "QAT",
+    "group": "B",
+    "stage": "group",
+    "venueId": "lumen"
+  },
+  {
+    "id": 53,
     "date": "2026-06-25T01:00:00Z",
     "homeTeam": "CZE",
     "awayTeam": "MEX",
@@ -459,7 +477,7 @@
     "venueId": "azteca"
   },
   {
-    "id": 52,
+    "id": 54,
     "date": "2026-06-25T01:00:00Z",
     "homeTeam": "RSA",
     "awayTeam": "KOR",
@@ -468,170 +486,116 @@
     "venueId": "bbva"
   },
   {
-    "id": 53,
-    "date": "2026-06-25T17:00:00Z",
-    "homeTeam": "SCO",
-    "awayTeam": "HAI",
-    "group": "C",
-    "stage": "group",
-    "venueId": "nrg"
-  },
-  {
-    "id": 54,
-    "date": "2026-06-25T17:00:00Z",
-    "homeTeam": "MAR",
-    "awayTeam": "BRA",
-    "group": "C",
+    "id": 55,
+    "date": "2026-06-25T20:00:00Z",
+    "homeTeam": "CUW",
+    "awayTeam": "CIV",
+    "group": "E",
     "stage": "group",
     "venueId": "lincoln"
   },
   {
-    "id": 55,
-    "date": "2026-06-25T22:00:00Z",
-    "homeTeam": "AUS",
-    "awayTeam": "PAR",
-    "group": "D",
+    "id": 56,
+    "date": "2026-06-25T20:00:00Z",
+    "homeTeam": "ECU",
+    "awayTeam": "GER",
+    "group": "E",
     "stage": "group",
-    "venueId": "lumen"
+    "venueId": "metlife"
   },
   {
-    "id": 56,
-    "date": "2026-06-25T22:00:00Z",
-    "homeTeam": "TUR",
-    "awayTeam": "USA",
-    "group": "D",
+    "id": 57,
+    "date": "2026-06-25T23:00:00Z",
+    "homeTeam": "JPN",
+    "awayTeam": "SWE",
+    "group": "F",
     "stage": "group",
     "venueId": "att"
   },
   {
-    "id": 57,
-    "date": "2026-06-26T17:00:00Z",
-    "homeTeam": "ECU",
-    "awayTeam": "CUW",
-    "group": "E",
-    "stage": "group",
-    "venueId": "hardrock"
-  },
-  {
     "id": 58,
-    "date": "2026-06-26T17:00:00Z",
-    "homeTeam": "GER",
-    "awayTeam": "CIV",
-    "group": "E",
-    "stage": "group",
-    "venueId": "sofi"
-  },
-  {
-    "id": 59,
-    "date": "2026-06-26T22:00:00Z",
-    "homeTeam": "SWE",
+    "date": "2026-06-25T23:00:00Z",
+    "homeTeam": "TUN",
     "awayTeam": "NED",
     "group": "F",
     "stage": "group",
     "venueId": "arrowhead"
   },
   {
+    "id": 59,
+    "date": "2026-06-26T02:00:00Z",
+    "homeTeam": "TUR",
+    "awayTeam": "USA",
+    "group": "D",
+    "stage": "group",
+    "venueId": "sofi"
+  },
+  {
     "id": 60,
-    "date": "2026-06-26T22:00:00Z",
-    "homeTeam": "JPN",
-    "awayTeam": "TUN",
-    "group": "F",
-    "stage": "group",
-    "venueId": "bbva"
-  },
-  {
-    "id": 61,
-    "date": "2026-06-27T00:00:00Z",
-    "homeTeam": "NZL",
-    "awayTeam": "BEL",
-    "group": "G",
-    "stage": "group",
-    "venueId": "bmo"
-  },
-  {
-    "id": 62,
-    "date": "2026-06-27T00:00:00Z",
-    "homeTeam": "EGY",
-    "awayTeam": "IRN",
-    "group": "G",
-    "stage": "group",
-    "venueId": "mercedesbenz"
-  },
-  {
-    "id": 63,
-    "date": "2026-06-27T16:00:00Z",
-    "homeTeam": "URU",
-    "awayTeam": "KSA",
-    "group": "H",
+    "date": "2026-06-26T02:00:00Z",
+    "homeTeam": "PAR",
+    "awayTeam": "AUS",
+    "group": "D",
     "stage": "group",
     "venueId": "levis"
   },
   {
-    "id": 64,
-    "date": "2026-06-27T16:00:00Z",
-    "homeTeam": "CPV",
-    "awayTeam": "ESP",
-    "group": "H",
-    "stage": "group",
-    "venueId": "metlife"
-  },
-  {
-    "id": 65,
-    "date": "2026-06-27T21:00:00Z",
+    "id": 61,
+    "date": "2026-06-26T19:00:00Z",
     "homeTeam": "NOR",
-    "awayTeam": "SEN",
-    "group": "I",
-    "stage": "group",
-    "venueId": "bcplace"
-  },
-  {
-    "id": 66,
-    "date": "2026-06-27T21:00:00Z",
-    "homeTeam": "IRQ",
     "awayTeam": "FRA",
     "group": "I",
     "stage": "group",
-    "venueId": "hardrock"
+    "venueId": "gillette"
   },
   {
-    "id": 67,
-    "date": "2026-06-27T22:00:00Z",
-    "homeTeam": "ALG",
-    "awayTeam": "ARG",
-    "group": "J",
+    "id": 62,
+    "date": "2026-06-26T19:00:00Z",
+    "homeTeam": "SEN",
+    "awayTeam": "IRQ",
+    "group": "I",
     "stage": "group",
-    "venueId": "nrg"
+    "venueId": "bmo"
   },
   {
-    "id": 68,
-    "date": "2026-06-27T22:00:00Z",
-    "homeTeam": "JOR",
-    "awayTeam": "AUT",
-    "group": "J",
-    "stage": "group",
-    "venueId": "att"
-  },
-  {
-    "id": 69,
-    "date": "2026-06-28T00:00:00Z",
-    "homeTeam": "COL",
-    "awayTeam": "POR",
-    "group": "K",
+    "id": 63,
+    "date": "2026-06-27T03:00:00Z",
+    "homeTeam": "EGY",
+    "awayTeam": "IRN",
+    "group": "G",
     "stage": "group",
     "venueId": "lumen"
   },
   {
-    "id": 70,
-    "date": "2026-06-28T00:00:00Z",
-    "homeTeam": "COD",
-    "awayTeam": "UZB",
-    "group": "K",
+    "id": 64,
+    "date": "2026-06-27T03:00:00Z",
+    "homeTeam": "NZL",
+    "awayTeam": "BEL",
+    "group": "G",
     "stage": "group",
-    "venueId": "rosebowl"
+    "venueId": "bcplace"
   },
   {
-    "id": 71,
-    "date": "2026-06-28T21:00:00Z",
+    "id": 65,
+    "date": "2026-06-27T00:00:00Z",
+    "homeTeam": "CPV",
+    "awayTeam": "KSA",
+    "group": "H",
+    "stage": "group",
+    "venueId": "nrg"
+  },
+  {
+    "id": 66,
+    "date": "2026-06-27T00:00:00Z",
+    "homeTeam": "URU",
+    "awayTeam": "ESP",
+    "group": "H",
+    "stage": "group",
+    "venueId": "akron"
+  },
+  {
+    "id": 67,
+    "date": "2026-06-27T21:00:00Z",
     "homeTeam": "PAN",
     "awayTeam": "ENG",
     "group": "L",
@@ -639,8 +603,8 @@
     "venueId": "metlife"
   },
   {
-    "id": 72,
-    "date": "2026-06-28T21:00:00Z",
+    "id": 68,
+    "date": "2026-06-27T21:00:00Z",
     "homeTeam": "CRO",
     "awayTeam": "GHA",
     "group": "L",
@@ -648,8 +612,44 @@
     "venueId": "lincoln"
   },
   {
+    "id": 69,
+    "date": "2026-06-28T02:00:00Z",
+    "homeTeam": "ALG",
+    "awayTeam": "AUT",
+    "group": "J",
+    "stage": "group",
+    "venueId": "arrowhead"
+  },
+  {
+    "id": 70,
+    "date": "2026-06-28T02:00:00Z",
+    "homeTeam": "JOR",
+    "awayTeam": "ARG",
+    "group": "J",
+    "stage": "group",
+    "venueId": "att"
+  },
+  {
+    "id": 71,
+    "date": "2026-06-27T23:30:00Z",
+    "homeTeam": "COL",
+    "awayTeam": "POR",
+    "group": "K",
+    "stage": "group",
+    "venueId": "hardrock"
+  },
+  {
+    "id": 72,
+    "date": "2026-06-27T23:30:00Z",
+    "homeTeam": "COD",
+    "awayTeam": "UZB",
+    "group": "K",
+    "stage": "group",
+    "venueId": "mercedesbenz"
+  },
+  {
     "id": 73,
-    "date": "2026-06-29T19:00:00Z",
+    "date": "2026-06-28T19:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "2. plass gruppe A",
@@ -659,17 +659,17 @@
   },
   {
     "id": 74,
-    "date": "2026-06-30T20:30:00Z",
+    "date": "2026-06-29T20:30:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe E",
     "awayPlaceholder": "3. plass gruppe A/B/C/D/F",
     "stage": "round-of-32",
-    "venueId": "rosebowl"
+    "venueId": "gillette"
   },
   {
     "id": 75,
-    "date": "2026-06-30T23:30:00Z",
+    "date": "2026-06-30T01:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe F",
@@ -679,7 +679,7 @@
   },
   {
     "id": 76,
-    "date": "2026-06-30T17:00:00Z",
+    "date": "2026-06-29T17:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe C",
@@ -689,7 +689,7 @@
   },
   {
     "id": 77,
-    "date": "2026-07-01T21:00:00Z",
+    "date": "2026-06-30T21:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe I",
@@ -699,7 +699,7 @@
   },
   {
     "id": 78,
-    "date": "2026-07-01T17:00:00Z",
+    "date": "2026-06-30T17:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "2. plass gruppe E",
@@ -709,7 +709,7 @@
   },
   {
     "id": 79,
-    "date": "2026-07-02T01:00:00Z",
+    "date": "2026-07-01T01:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe A",
@@ -719,7 +719,7 @@
   },
   {
     "id": 80,
-    "date": "2026-07-02T16:00:00Z",
+    "date": "2026-07-01T16:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe L",
@@ -729,27 +729,27 @@
   },
   {
     "id": 81,
-    "date": "2026-07-02T20:00:00Z",
+    "date": "2026-07-02T00:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe G",
     "awayPlaceholder": "3. plass gruppe A/E/H/I/J",
     "stage": "round-of-32",
-    "venueId": "lumen"
+    "venueId": "levis"
   },
   {
     "id": 82,
-    "date": "2026-07-03T00:00:00Z",
+    "date": "2026-07-01T20:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe D",
     "awayPlaceholder": "3. plass gruppe B/E/F/I/J",
     "stage": "round-of-32",
-    "venueId": "levis"
+    "venueId": "lumen"
   },
   {
     "id": 83,
-    "date": "2026-07-03T19:00:00Z",
+    "date": "2026-07-02T23:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "2. plass gruppe K",
@@ -759,37 +759,37 @@
   },
   {
     "id": 84,
-    "date": "2026-07-04T03:00:00Z",
+    "date": "2026-07-02T19:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe B",
     "awayPlaceholder": "3. plass gruppe E/F/G/I/J",
     "stage": "round-of-32",
-    "venueId": "bcplace"
+    "venueId": "sofi"
   },
   {
     "id": 85,
-    "date": "2026-07-03T23:00:00Z",
+    "date": "2026-07-03T03:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe H",
     "awayPlaceholder": "2. plass gruppe J",
     "stage": "round-of-32",
-    "venueId": "bmo"
+    "venueId": "bcplace"
   },
   {
     "id": 86,
-    "date": "2026-07-04T02:00:00Z",
+    "date": "2026-07-03T22:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "2. plass gruppe G",
     "awayPlaceholder": "2. plass gruppe H",
     "stage": "round-of-32",
-    "venueId": "arrowhead"
+    "venueId": "hardrock"
   },
   {
     "id": 87,
-    "date": "2026-07-04T23:00:00Z",
+    "date": "2026-07-04T01:30:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner gruppe K",
@@ -799,7 +799,7 @@
   },
   {
     "id": 88,
-    "date": "2026-07-04T22:00:00Z",
+    "date": "2026-07-03T18:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "2. plass gruppe D",
@@ -809,7 +809,7 @@
   },
   {
     "id": 89,
-    "date": "2026-07-05T17:00:00Z",
+    "date": "2026-07-04T21:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 74",
@@ -819,7 +819,7 @@
   },
   {
     "id": 90,
-    "date": "2026-07-05T17:00:00Z",
+    "date": "2026-07-04T17:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 73",
@@ -829,17 +829,17 @@
   },
   {
     "id": 91,
-    "date": "2026-07-05T21:00:00Z",
+    "date": "2026-07-05T20:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 76",
     "awayPlaceholder": "Vinner kamp 78",
     "stage": "round-of-16",
-    "venueId": "mercedesbenz"
+    "venueId": "metlife"
   },
   {
     "id": 92,
-    "date": "2026-07-06T21:00:00Z",
+    "date": "2026-07-06T00:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 79",
@@ -849,7 +849,7 @@
   },
   {
     "id": 93,
-    "date": "2026-07-07T17:00:00Z",
+    "date": "2026-07-06T19:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 83",
@@ -859,17 +859,17 @@
   },
   {
     "id": 94,
-    "date": "2026-07-06T17:00:00Z",
+    "date": "2026-07-07T00:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 81",
     "awayPlaceholder": "Vinner kamp 82",
     "stage": "round-of-16",
-    "venueId": "sofi"
+    "venueId": "lumen"
   },
   {
     "id": 95,
-    "date": "2026-07-07T21:00:00Z",
+    "date": "2026-07-07T16:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 86",
@@ -879,33 +879,33 @@
   },
   {
     "id": 96,
-    "date": "2026-07-08T21:00:00Z",
+    "date": "2026-07-07T20:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 85",
     "awayPlaceholder": "Vinner kamp 87",
     "stage": "round-of-16",
-    "venueId": "hardrock"
+    "venueId": "bcplace"
   },
   {
     "id": 97,
-    "date": "2026-07-10T17:00:00Z",
+    "date": "2026-07-09T20:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 89",
     "awayPlaceholder": "Vinner kamp 90",
     "stage": "quarter-final",
-    "venueId": "metlife"
+    "venueId": "gillette"
   },
   {
     "id": 98,
-    "date": "2026-07-10T21:00:00Z",
+    "date": "2026-07-10T19:00:00Z",
     "homeTeam": null,
     "awayTeam": null,
     "homePlaceholder": "Vinner kamp 91",
     "awayPlaceholder": "Vinner kamp 92",
     "stage": "quarter-final",
-    "venueId": "levis"
+    "venueId": "sofi"
   },
   {
     "id": 99,

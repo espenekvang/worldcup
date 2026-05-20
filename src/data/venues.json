@@ -110,5 +110,12 @@
     "city": "Santa Clara",
     "country": "USA",
     "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "gillette",
+    "name": "Gillette Stadium",
+    "city": "Foxborough",
+    "country": "USA",
+    "timezone": "America/New_York"
   }
 ]
