@@ -13,3 +13,5 @@ jwt_audience          = "worldcup"
 google_client_id      = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"  # SENSITIVE — do not commit actual values
 admin_email           = "your.email@gmail.com"
 vite_google_client_id = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+
+wc2026_api_key = "YOUR_WC2026_API_KEY"  # SENSITIVE — bearer token for https://api.wc2026api.com

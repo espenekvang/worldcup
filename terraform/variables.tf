@@ -55,6 +55,13 @@ variable "vite_google_client_id" {
   type        = string
 }
 
+variable "wc2026_api_key" {
+  description = "API key for the external WC2026 results/fixtures API"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "custom_domain" {
   description = "Custom domain for the Container App (e.g. vm.ekvang.no)"
   type        = string
