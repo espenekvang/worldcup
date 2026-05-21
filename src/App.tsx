@@ -14,6 +14,7 @@ import PredictionModal from './components/PredictionModal'
 import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
 import ChatPanel from './components/ChatPanel'
+import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
 import { isStageLocked, GROUP_ROUNDS } from './utils/dateUtils'
@@ -45,6 +46,7 @@ function AppContent() {
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
+  const [showRules, setShowRules] = useState(false)
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
@@ -117,7 +119,7 @@ function AppContent() {
                 <AdminPanel />
               </div>
             ) : null}
-            <Countdown matches={matches} teams={teams} venues={venues} />
+            <Countdown matches={matches} teams={teams} venues={venues} onShowRules={() => setShowRules(true)} />
             <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} />
             {activeSection !== 'leaderboard' ? (
               <>
@@ -169,6 +171,8 @@ function AppContent() {
           onClose={() => setViewingOthersMatch(null)}
         />
       ) : null}
+
+      {showRules ? <RulesModal onClose={() => setShowRules(false)} /> : null}
     </div>
   )
 }

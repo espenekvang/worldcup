@@ -6,9 +6,10 @@ interface CountdownProps {
   matches: Match[]
   teams: Record<string, Team>
   venues: Venue[]
+  onShowRules?: () => void
 }
 
-export default function Countdown({ matches, teams, venues }: CountdownProps) {
+export default function Countdown({ matches, teams, venues, onShowRules }: CountdownProps) {
   const firstMatchDate = useMemo(() => matches.map(match => match.date).sort()[0] ?? null, [matches])
 
   const [targetMatch, setTargetMatch] = useState<Match | null>(() => {
@@ -60,6 +61,11 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
     return (
       <div className="py-8 text-center">
         <p className="text-xl font-semibold" style={{ color: 'var(--color-text-secondary)' }}>{contextText}</p>
+        {onShowRules ? (
+          <div className="mt-3">
+            <RulesLink onClick={onShowRules} />
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -93,6 +99,25 @@ export default function Countdown({ matches, teams, venues }: CountdownProps) {
           {venue.name}, {venue.city}
         </p>
       ) : null}
+      {onShowRules ? (
+        <div className="mt-3">
+          <RulesLink onClick={onShowRules} />
+        </div>
+      ) : null}
     </div>
+  )
+}
+
+function RulesLink({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 text-xs underline-offset-4 transition-colors hover:underline sm:text-sm"
+      style={{ color: 'var(--color-text-muted)' }}
+    >
+      <span aria-hidden>ⓘ</span>
+      Hvordan funker bettingen?
+    </button>
   )
 }

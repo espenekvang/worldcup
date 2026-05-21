@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import Countdown from '../components/Countdown'
 import type { Match, Team, Venue } from '../types'
 
@@ -42,5 +42,31 @@ describe('Countdown', () => {
 
     expect(screen.getByText(/Til Mexico mot Tsjekkia/)).toBeInTheDocument()
     expect(screen.getByText(/Estadio Azteca, Mexico City/)).toBeInTheDocument()
+  })
+
+  it('renders the rules link and invokes onShowRules when clicked', () => {
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
+    const onShowRules = vi.fn()
+
+    render(
+      <Countdown
+        matches={mockMatches}
+        teams={mockTeams}
+        venues={mockVenues}
+        onShowRules={onShowRules}
+      />,
+    )
+
+    const link = screen.getByRole('button', { name: /Hvordan funker bettingen\?/ })
+    fireEvent.click(link)
+    expect(onShowRules).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not render the rules link when onShowRules is not provided', () => {
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
+
+    render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
+
+    expect(screen.queryByRole('button', { name: /Hvordan funker bettingen\?/ })).toBeNull()
   })
 })
