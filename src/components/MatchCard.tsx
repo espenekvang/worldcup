@@ -2,6 +2,8 @@ import type { Match, Team, Venue } from '../types'
 import { formatMatchTime, areTeamsUndetermined } from '../utils/dateUtils'
 import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
+import { useWeather } from '../hooks/useWeather'
+import WeatherBadge from './WeatherBadge'
 
 interface MatchCardProps {
   match: Match
@@ -33,6 +35,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
   const venue = venues.find(v => v.id === match.venueId)
   const isGroupStage = match.stage === 'group'
   const teamsUndetermined = areTeamsUndetermined(match)
+  const { forecast, loading: weatherLoading } = useWeather(venue?.id, match.date, venue?.timezone)
 
   let homeDisplay: string
   let awayDisplay: string
@@ -165,8 +168,9 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
             )}
           </div>
           {venue ? (
-            <p className="flex-1 text-center text-[11px] pt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-              {venue.name}, {venue.city}
+            <p className="flex-1 text-center text-[11px] pt-0.5 inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
+              <span>{venue.name}, {venue.city}</span>
+              <WeatherBadge forecast={forecast} loading={weatherLoading} />
             </p>
           ) : null}
         </div>
@@ -238,8 +242,9 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
       </div>
 
       {venue ? (
-        <p className="mt-0.5 hidden text-center text-[11px] sm:block" style={{ color: 'var(--color-text-muted)' }}>
-          {venue.name}, {venue.city}
+        <p className="mt-0.5 hidden text-center text-[11px] sm:inline-flex sm:w-full sm:items-center sm:justify-center sm:gap-1.5" style={{ color: 'var(--color-text-muted)' }}>
+          <span>{venue.name}, {venue.city}</span>
+          <WeatherBadge forecast={forecast} loading={weatherLoading} />
         </p>
       ) : null}
     </div>
