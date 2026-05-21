@@ -14,7 +14,7 @@ const mockVenues: Venue[] = [
 
 const mockMatches: Match[] = [
   { id: 1, date: '2026-06-11T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group-1', group: 'A', venueId: 'azteca' },
-  { id: 2, date: '2026-06-20T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group-1', group: 'B', venueId: 'azteca' },
+  { id: 2, date: '2026-06-20T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group-2', group: 'B', venueId: 'azteca' },
 ]
 
 describe('Countdown', () => {
@@ -31,17 +31,16 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Til VM 2026 starter/)).toBeInTheDocument()
+    expect(screen.getByText(/Til du må legge inn bets for Runde 1/)).toBeInTheDocument()
     expect(screen.getByText('dager')).toBeInTheDocument()
   })
 
-  it('shows the next match context and venue after the opener', () => {
+  it('shows the next betting deadline after the first round has started', () => {
     vi.setSystemTime(new Date('2026-06-12T00:00:00Z'))
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Til Mexico mot Tsjekkia/)).toBeInTheDocument()
-    expect(screen.getByText(/Estadio Azteca, Mexico City/)).toBeInTheDocument()
+    expect(screen.getByText(/Til du må legge inn bets for Runde 2/)).toBeInTheDocument()
   })
 
   it('renders the rules link and invokes onShowRules when clicked', () => {
