@@ -14,9 +14,7 @@ import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
 import ChatPanel from './components/ChatPanel'
 import { useAuth } from './context/AuthContext'
-import { ResultsProvider } from './context/ResultsContext'
-import { PredictionsProvider } from './context/PredictionsContext'
-import { MatchesProvider, useMatches } from './context/MatchesContext'
+import { useMatches } from './context/MatchesContext'
 
 type StageOnly = Exclude<Stage, 'leaderboard'>
 
@@ -128,13 +126,5 @@ function AppContent() {
 }
 
 export default function App() {
-  return (
-    <MatchesProvider>
-      <PredictionsProvider>
-        <ResultsProvider>
-          <AppContent />
-        </ResultsProvider>
-      </PredictionsProvider>
-    </MatchesProvider>
-  )
+  return <AppContent />
 }

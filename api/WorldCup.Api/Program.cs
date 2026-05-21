@@ -77,6 +77,14 @@ builder.Services.AddHostedService<ResultFetcherService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<WeatherService>();
 
+// Lag-statistikk og innbyrdes oppgjør (H2H) for matchdetalj-siden. Service'en
+// leser fra seed-fila data/teamStats.json. Hvis du senere ønsker å koble på et
+// betalt API: implementer IExternalTeamStatsClient og bytt registreringen under.
+// Merge-logikken i TeamStatsService håndterer både hel-overskriving og delvis
+// utfylling (ekstern data vinner per felt, seed fyller hull).
+builder.Services.AddSingleton<IExternalTeamStatsClient, NoopExternalTeamStatsClient>();
+builder.Services.AddSingleton<TeamStatsService>();
+
 var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Default database connection string is not configured.");
 

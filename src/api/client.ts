@@ -358,3 +358,82 @@ export function getFeatureFlags(groupId?: string): Promise<FeatureFlags> {
   const query = groupId ? `?groupId=${encodeURIComponent(groupId)}` : ''
   return request<FeatureFlags>(`/api/feature-flags${query}`)
 }
+
+// ─── Team stats & head-to-head (matchdetalj-siden) ──────────────────────
+
+export interface RecentMatchEntry {
+  date: string
+  opponent: string
+  /** "home" | "away" | "neutral" */
+  venue: string
+  goalsFor: number
+  goalsAgainst: number
+  /** "W" | "D" | "L" */
+  result: string
+  competition: string
+}
+
+export interface TeamStatsResponse {
+  teamCode: string
+  fifaRank: number | null
+  manager: string | null
+  starPlayer: string | null
+  preferredFormation: string | null
+  goalsScoredAvg: number | null
+  goalsConcededAvg: number | null
+  /** Form-streng, f.eks. "WWDWL" (eldste først). */
+  recentForm: string | null
+  recentMatches: RecentMatchEntry[]
+  keyAbsences: string[]
+  lastWorldCupResult: string | null
+}
+
+export interface HeadToHeadMatch {
+  date: string
+  homeTeam: string
+  awayTeam: string
+  homeScore: number
+  awayScore: number
+  competition: string
+  venue: string | null
+}
+
+export interface HeadToHeadResponse {
+  teamA: string
+  teamB: string
+  totalMatches: number
+  teamAWins: number
+  draws: number
+  teamBWins: number
+  teamAGoals: number
+  teamBGoals: number
+  recentMatches: HeadToHeadMatch[]
+}
+
+/**
+ * Henter lag-statistikk for én lagkode. Returnerer `null` når serveren svarer
+ * 404 — typisk hvis lagkoden ikke er bestemt ennå (knockout) eller mangler i seed-data.
+ */
+export async function getTeamStats(teamCode: string): Promise<TeamStatsResponse | null> {
+  try {
+    return await request<TeamStatsResponse>(`/api/team-stats/${encodeURIComponent(teamCode)}`)
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('404')) return null
+    throw err
+  }
+}
+
+/**
+ * Henter innbyrdes oppgjør for to lag. `teamA` blir alltid `teamA` i responsen —
+ * service'en speilvender tellerne. Returnerer `null` ved 404.
+ */
+export async function getHeadToHead(teamA: string, teamB: string): Promise<HeadToHeadResponse | null> {
+  try {
+    return await request<HeadToHeadResponse>(
+      `/api/team-stats/h2h/${encodeURIComponent(teamA)}/${encodeURIComponent(teamB)}`,
+    )
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('404')) return null
+    throw err
+  }
+}

@@ -3,6 +3,8 @@ import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { PredictionsProvider } from './context/PredictionsContext'
 import { BettingGroupProvider } from './context/BettingGroupContext'
+import { MatchesProvider } from './context/MatchesContext'
+import { ResultsProvider } from './context/ResultsContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -12,9 +14,13 @@ function Wrapper({ children }: { children: React.ReactNode }) {
       <MemoryRouter>
         <BettingGroupProvider>
           <AuthProvider>
-            <PredictionsProvider>
-              {children}
-            </PredictionsProvider>
+            <MatchesProvider>
+              <PredictionsProvider>
+                <ResultsProvider>
+                  {children}
+                </ResultsProvider>
+              </PredictionsProvider>
+            </MatchesProvider>
           </AuthProvider>
         </BettingGroupProvider>
       </MemoryRouter>
