@@ -47,7 +47,7 @@ export default function Countdown({ matches, onShowRules }: CountdownProps) {
   }
 
   const roundLabel = STAGE_LABELS[nextDeadline.stage]
-  const contextText = `Til du må legge inn bets for ${roundLabel}`
+  const contextText = `Til du må ha lagt inn bets for ${roundLabel}`
 
   return (
     <div className="py-6 text-center sm:py-8">
