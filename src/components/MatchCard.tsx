@@ -1,6 +1,6 @@
 import type { Match, Team, Venue } from '../types'
 import { useNavigate } from 'react-router-dom'
-import { formatMatchTime, areTeamsUndetermined } from '../utils/dateUtils'
+import { formatMatchTime, areTeamsUndetermined, isGroupStage as isGroupStageFn } from '../utils/dateUtils'
 import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 import { useWeather } from '../hooks/useWeather'
@@ -16,7 +16,9 @@ interface MatchCardProps {
 }
 
 const STAGE_LABELS: Record<string, string> = {
-  'group': 'Gruppespill',
+  'group-1': 'Gruppespill',
+  'group-2': 'Gruppespill',
+  'group-3': 'Gruppespill',
   'round-of-32': '32-delsfinale',
   'round-of-16': '8-delsfinale',
   'quarter-final': 'Kvartfinale',
@@ -35,7 +37,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
   const pts = points.get(match.id)
 
   const venue = venues.find(v => v.id === match.venueId)
-  const isGroupStage = match.stage === 'group'
+  const isGroupStage = isGroupStageFn(match.stage)
   const teamsUndetermined = areTeamsUndetermined(match)
   const { forecast, loading: weatherLoading } = useWeather(venue?.id, match.date, venue?.timezone)
 

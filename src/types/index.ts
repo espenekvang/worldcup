@@ -1,5 +1,7 @@
 export type Stage =
-  | "group"
+  | "group-1"
+  | "group-2"
+  | "group-3"
   | "round-of-32"
   | "round-of-16"
   | "quarter-final"
@@ -7,6 +9,9 @@ export type Stage =
   | "third-place"
   | "final"
   | "leaderboard"
+
+/** Top-level UI grouping: gruppespill, sluttspill eller The Boss. */
+export type Section = "group" | "knockout" | "leaderboard"
 
 export interface Team {
   code: string

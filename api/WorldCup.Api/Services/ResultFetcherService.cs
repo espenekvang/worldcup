@@ -41,6 +41,10 @@ public sealed class ResultFetcherService(
     private static readonly DateTime TournamentCutoffUtc = new(2026, 7, 20, 23, 59, 59, DateTimeKind.Utc);
     private static readonly StringComparer StageComparer = StringComparer.OrdinalIgnoreCase;
 
+    /// <summary>Group stage is split into three rounds (group-1/2/3) so each round can lock independently.</summary>
+    private static bool IsGroupStage(string? stage) =>
+        stage is not null && stage.StartsWith("group", StringComparison.OrdinalIgnoreCase);
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -195,7 +199,7 @@ public sealed class ResultFetcherService(
             foundMatchIds.Add(matchId.Value);
             newResults++;
 
-            if (localMatch is not null && !StageComparer.Equals(localMatch.Stage, "group"))
+            if (localMatch is not null && !IsGroupStage(localMatch.Stage))
             {
                 newKnockoutResult = true;
             }
@@ -284,7 +288,7 @@ public sealed class ResultFetcherService(
 
     private static TimeSpan GetBufferForStage(string stage) => stage?.ToLowerInvariant() switch
     {
-        "group" => GroupStageBuffer,
+        "group-1" or "group-2" or "group-3" => GroupStageBuffer,
         "final" => FinalBuffer,
         "round-of-32" or "round-of-16" or "quarter-final" or "semi-final" or "third-place" => KnockoutBuffer,
         _ => KnockoutBuffer
@@ -294,7 +298,7 @@ public sealed class ResultFetcherService(
         schedule.GetAllMatches().Any(m =>
             m.AreTeamsUndetermined
             && !m.ManualOverride
-            && !StageComparer.Equals(m.Stage, "group"));
+            && !IsGroupStage(m.Stage));
 
     private static async Task<bool> BudgetAllowsCallAsync(AppDbContext dbContext, DateTime now, CancellationToken ct)
     {
@@ -328,7 +332,7 @@ public sealed class ResultFetcherService(
             .Where(match =>
                 match.AreTeamsUndetermined
                 && !match.ManualOverride
-                && !StageComparer.Equals(match.Stage, "group"))
+                && !IsGroupStage(match.Stage))
             .ToDictionary(match => match.Id);
 
         if (undeterminedMatchesById.Count == 0)

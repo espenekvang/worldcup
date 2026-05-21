@@ -3,7 +3,7 @@ import venuesData from './venues.json'
 import teamsData from './teams.json'
 import matchesData from './matches.json'
 
-const STAGES = new Set<string>(['group', 'round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'third-place', 'final'])
+const STAGES = new Set<string>(['group-1', 'group-2', 'group-3', 'round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'third-place', 'final'])
 
 function isStage(value: string): value is Stage {
   return STAGES.has(value)

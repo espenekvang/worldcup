@@ -42,7 +42,7 @@ describe('MatchCard', () => {
   const onViewOthers = vi.fn()
 
   it('renders team names and venue for a group stage match', () => {
-    const match: Match = { id: 1, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
+    const match: Match = { id: 1, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group-1', group: 'C', venueId: 'metlife' }
 
     render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} onViewOthers={onViewOthers} />, { wrapper: Wrapper })
 
@@ -62,7 +62,7 @@ describe('MatchCard', () => {
   })
 
   it('navigerer til matchdetalj-siden når man klikker på kortet', () => {
-    const match: Match = { id: 42, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
+    const match: Match = { id: 42, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group-1', group: 'C', venueId: 'metlife' }
 
     function NavWrapper({ children }: { children: React.ReactNode }) {
       return (
@@ -96,7 +96,7 @@ describe('MatchCard', () => {
 
   it('klikk på "Bet"-knappen åpner modalen uten å navigere bort', () => {
     const tipClick = vi.fn()
-    const match: Match = { id: 5, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
+    const match: Match = { id: 5, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group-1', group: 'C', venueId: 'metlife' }
 
     function NavWrapper({ children }: { children: React.ReactNode }) {
       return (

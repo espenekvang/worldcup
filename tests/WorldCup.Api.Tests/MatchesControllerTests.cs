@@ -90,7 +90,7 @@ public class MatchesControllerTests : IDisposable
         {
             Id = 1,
             Date = new DateTime(2026, 6, 11, 18, 0, 0, DateTimeKind.Utc),
-            Stage = "group",
+            Stage = "group-1",
             HomeTeam = "BRA",
             AwayTeam = "GER",
             VenueId = "venue-1",
@@ -99,7 +99,7 @@ public class MatchesControllerTests : IDisposable
         {
             Id = 2,
             Date = new DateTime(2026, 6, 12, 18, 0, 0, DateTimeKind.Utc),
-            Stage = "group",
+            Stage = "group-1",
             HomeTeam = "ESP",
             AwayTeam = "FRA",
             VenueId = "venue-2",

@@ -44,7 +44,7 @@ public class MatchesController(
             return NotFound();
         }
 
-        if (string.Equals(match.Stage, "group", StringComparison.OrdinalIgnoreCase))
+        if (match.Stage.StartsWith("group", StringComparison.OrdinalIgnoreCase))
         {
             return BadRequest("Cannot override group stage matches");
         }

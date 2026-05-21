@@ -16,7 +16,9 @@ import { useFeatureFlag } from '../context/FeatureFlagsContext'
 import { teams } from '../data'
 
 const stageNames: Record<string, string> = {
-  'group': 'Gruppe',
+  'group-1': 'Gruppe R1',
+  'group-2': 'Gruppe R2',
+  'group-3': 'Gruppe R3',
   'round-of-32': 'R32',
   'round-of-16': 'R16',
   'quarter-final': 'QF',
@@ -79,7 +81,7 @@ export default function AdminPanel() {
   const [resultError, setResultError] = useState<string | null>(null)
   const [resultSuccess, setResultSuccess] = useState(false)
 
-  const knockoutMatches = matches.filter((m) => m.stage !== 'group')
+  const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
   const sortedTeams = Object.values(teams).sort((a, b) => a.name.localeCompare(b.name))
 
   // Load groups

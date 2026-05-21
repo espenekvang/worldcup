@@ -13,8 +13,8 @@ const mockVenues: Venue[] = [
 ]
 
 const mockMatches: Match[] = [
-  { id: 1, date: '2026-06-11T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group', group: 'A', venueId: 'azteca' },
-  { id: 2, date: '2026-06-20T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group', group: 'B', venueId: 'azteca' },
+  { id: 1, date: '2026-06-11T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group-1', group: 'A', venueId: 'azteca' },
+  { id: 2, date: '2026-06-20T20:00:00Z', homeTeam: 'MEX', awayTeam: 'CZE', stage: 'group-1', group: 'B', venueId: 'azteca' },
 ]
 
 describe('Countdown', () => {
