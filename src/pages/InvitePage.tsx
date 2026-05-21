@@ -28,14 +28,16 @@ export default function InvitePage() {
     let cancelled = false
 
     async function run() {
+      // Lagre alltid token-en først, så vi kan re-prøve å akseptere
+      // invitasjonen etter en eventuell ny innlogging (f.eks. utløpt JWT).
+      try { localStorage.setItem(PENDING_INVITE_KEY, token!) } catch { /* ignore */ }
+
       try {
         const info = await getInviteLinkInfo(token!)
         if (cancelled) return
         setGroupName(info.groupName)
 
         if (!user) {
-          // Persist the token so the login flow can pick it up
-          try { localStorage.setItem(PENDING_INVITE_KEY, token!) } catch { /* ignore */ }
           setStatus('needs-login')
           return
         }
@@ -72,7 +74,15 @@ export default function InvitePage() {
         }, 1200)
       } catch (err) {
         if (cancelled) return
-        setErrorMessage(err instanceof Error ? err.message : 'Noe gikk galt')
+        const msg = err instanceof Error ? err.message : 'Noe gikk galt'
+        // Utløpt/ugyldig JWT: send brukeren til login. API-klienten har allerede
+        // ryddet auth_token/auth_user, og pending_invite_token gjør at login-
+        // flyten auto-joiner gruppen via /api/auth/google.
+        if (msg.includes('API error 401')) {
+          navigate('/login', { replace: true })
+          return
+        }
+        setErrorMessage(msg)
         setStatus(user ? 'error' : 'invalid')
       }
     }
