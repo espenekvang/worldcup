@@ -72,6 +72,11 @@ builder.Services.AddScoped<ScoringService>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
 builder.Services.AddHostedService<ResultFetcherService>();
 
+// Værvarsel (Open-Meteo). MemoryCache holder svar i ~3t per stadion+dato slik at
+// klienten kan kalle endepunktet fritt uten å belaste tredjepart.
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<WeatherService>();
+
 var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Default database connection string is not configured.");
 

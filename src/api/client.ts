@@ -220,6 +220,25 @@ export function getMatches(): Promise<Match[]> {
   return request<Match[]>('/api/matches')
 }
 
+export interface WeatherForecast {
+  date: string
+  weatherCode: number
+  tempMaxC: number | null
+  tempMinC: number | null
+  precipitationMm: number | null
+  precipitationProbabilityPct: number | null
+}
+
+/**
+ * Henter daglig værvarsel for et stadion på en gitt dato (yyyy-MM-dd lokal stadion-tid).
+ * APIet returnerer 204 No Content når det ikke finnes prognose (> ~16 dager frem),
+ * og klienten oversetter det til `null`.
+ */
+export async function getWeatherForVenue(venueId: string, date: string): Promise<WeatherForecast | null> {
+  const result = await request<WeatherForecast | undefined>(`/api/weather/${encodeURIComponent(venueId)}/${date}`)
+  return result ?? null
+}
+
 export function updateMatchTeams(matchId: number, homeTeam?: string, awayTeam?: string): Promise<unknown> {
   return request<unknown>(`/api/admin/matches/${matchId}`, {
     method: 'PUT',
