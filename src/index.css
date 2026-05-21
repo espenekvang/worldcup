@@ -159,3 +159,38 @@ body {
     background-clip: content-box;
   }
 }
+
+/* ─── Rules modal content (markdown) ─── */
+.rules-content h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+.rules-content h2:first-child {
+  margin-top: 0;
+}
+.rules-content p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+}
+.rules-content strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.rules-content ul,
+.rules-content ol {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+  padding-left: 1.25rem;
+}
+.rules-content ul { list-style: disc; }
+.rules-content ol { list-style: decimal; }
+.rules-content li { margin-bottom: 0.25rem; }
+.rules-content a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
