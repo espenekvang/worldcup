@@ -14,6 +14,7 @@ public class ChatMessageResponse
     public string Content { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
+    public bool IsSystem { get; set; }
 }
 
 public class ChatDeletedEventDto

@@ -8,5 +8,6 @@ public class User
     public string Name { get; set; } = string.Empty;
     public string? Picture { get; set; }
     public bool IsAdmin { get; set; }
+    public bool IsSystem { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

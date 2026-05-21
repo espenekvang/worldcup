@@ -40,12 +40,21 @@ public sealed class TeamCodeMapper
 
     private readonly ILogger<TeamCodeMapper> _logger;
     private readonly Dictionary<string, string> _codesByTeamName;
+    private readonly Dictionary<string, string> _namesByCode;
 
     public TeamCodeMapper(IWebHostEnvironment environment, ILogger<TeamCodeMapper> logger)
     {
         _logger = logger;
         var teamsJsonPath = ResolveTeamsJsonPath(environment);
-        _codesByTeamName = LoadCodesByTeamName(teamsJsonPath);
+        var teamsByCode = LoadTeamsByCode(teamsJsonPath);
+
+        _codesByTeamName = teamsByCode.Values
+            .Where(team => !string.IsNullOrWhiteSpace(team.Name) && !string.IsNullOrWhiteSpace(team.Code))
+            .ToDictionary(team => team.Name!, team => team.Code!, StringComparer.OrdinalIgnoreCase);
+
+        _namesByCode = teamsByCode.Values
+            .Where(team => !string.IsNullOrWhiteSpace(team.Name) && !string.IsNullOrWhiteSpace(team.Code))
+            .ToDictionary(team => team.Code!, team => team.Name!, StringComparer.OrdinalIgnoreCase);
     }
 
     public string? GetCode(string? teamName)
@@ -80,11 +89,30 @@ public sealed class TeamCodeMapper
         return _codesByTeamName.Values.Contains(code, StringComparer.OrdinalIgnoreCase);
     }
 
-    private static Dictionary<string, string> LoadCodesByTeamName(string path)
+    /// <summary>
+    /// Returnerer det lesbare (norske) lagnavnet for en lagkode. Faller tilbake til
+    /// koden i versaler hvis ingen mapping finnes, og en generisk plassholder for tom input.
+    /// </summary>
+    public string GetDisplayName(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return "ukjent lag";
+        }
+
+        return _namesByCode.TryGetValue(code, out var name) ? name : code.ToUpperInvariant();
+    }
+
+    private static Dictionary<string, TeamDefinition> LoadTeamsByCode(string path)
     {
         var json = File.ReadAllText(path);
-        var teamsByCode = JsonSerializer.Deserialize<Dictionary<string, TeamDefinition>>(json)
+        return JsonSerializer.Deserialize<Dictionary<string, TeamDefinition>>(json)
             ?? throw new InvalidOperationException("Failed to parse teams.json");
+    }
+
+    private static Dictionary<string, string> LoadCodesByTeamName(string path)
+    {
+        var teamsByCode = LoadTeamsByCode(path);
 
         return teamsByCode.Values
             .Where(team => !string.IsNullOrWhiteSpace(team.Name) && !string.IsNullOrWhiteSpace(team.Code))

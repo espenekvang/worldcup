@@ -122,6 +122,13 @@ public sealed class Wc2026MatchDto
     public string Away { get; init; } = "";
     public DateTime KickoffAt { get; init; }
     public Wc2026ScoreDto? Score { get; init; }
+
+    /// <summary>
+    /// Dommer for kampen, hvis oppstr\u00f8ms-API returnerer det. Feltet er valgfritt
+    /// \u2014 hvis JSON ikke inneholder "referee" forblir det null og koden faller tilbake
+    /// til standardnavnet "Dommeren".
+    /// </summary>
+    public string? Referee { get; init; }
 }
 
 public sealed class Wc2026ScoreDto

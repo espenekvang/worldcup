@@ -44,11 +44,12 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
             {
                 Id = m.Id,
                 UserId = m.UserId,
-                UserName = m.User.Name,
+                UserName = m.SenderDisplayNameOverride ?? m.User.Name,
                 UserPicture = m.User.Picture,
                 Content = m.DeletedAt == null ? m.Content : string.Empty,
                 CreatedAt = m.CreatedAt,
-                IsDeleted = m.DeletedAt != null
+                IsDeleted = m.DeletedAt != null,
+                IsSystem = m.User.IsSystem
             })
             .AsNoTracking()
             .ToListAsync();
@@ -118,7 +119,8 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
             UserPicture = user.Picture,
             Content = message.Content,
             CreatedAt = message.CreatedAt,
-            IsDeleted = false
+            IsDeleted = false,
+            IsSystem = user.IsSystem
         };
 
         await chatHub.Clients.Group(GroupName(groupId)).MessagePosted(response);
@@ -159,6 +161,15 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
 
     private async Task<bool> CanDeleteMessage(Guid userId, ChatMessage message)
     {
+        // Systemmeldinger (f.eks. Resultatservice) kan kun slettes av globale admins.
+        var author = await dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == message.UserId);
+        if (author?.IsSystem == true)
+        {
+            return User.IsInRole("Admin");
+        }
+
         // Author can delete their own message
         if (message.UserId == userId) return true;
 

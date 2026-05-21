@@ -157,6 +157,7 @@ public sealed class ResultFetcherService(
         var foundMatchIds = new HashSet<int>();
         var newKnockoutResult = false;
         var newResults = 0;
+        var announcements = new List<(int MatchId, int HomeScore, int AwayScore, string? Referee)>();
 
         foreach (var dto in completedMatches)
         {
@@ -166,6 +167,7 @@ public sealed class ResultFetcherService(
             if (matchId is null || existingResults.Contains(matchId.Value)) continue;
 
             var localMatch = schedule.GetMatch(matchId.Value);
+            var refereeName = string.IsNullOrWhiteSpace(dto.Referee) ? null : dto.Referee.Trim();
 
             dbContext.MatchResults.Add(new MatchResult
             {
@@ -173,7 +175,8 @@ public sealed class ResultFetcherService(
                 MatchId = matchId.Value,
                 HomeScore = homeScore,
                 AwayScore = awayScore,
-                FetchedAt = DateTime.UtcNow
+                FetchedAt = DateTime.UtcNow,
+                Referee = refereeName
             });
 
             var predictions = await dbContext.Predictions
@@ -198,6 +201,7 @@ public sealed class ResultFetcherService(
             existingResults.Add(matchId.Value);
             foundMatchIds.Add(matchId.Value);
             newResults++;
+            announcements.Add((matchId.Value, homeScore, awayScore, refereeName));
 
             if (localMatch is not null && !IsGroupStage(localMatch.Stage))
             {
@@ -235,6 +239,25 @@ public sealed class ResultFetcherService(
         }
 
         await dbContext.SaveChangesAsync(ct);
+
+        if (announcements.Count > 0)
+        {
+            var announcer = scope.ServiceProvider.GetRequiredService<ResultAnnouncementService>();
+            foreach (var (annMatchId, annHome, annAway, annReferee) in announcements)
+            {
+                try
+                {
+                    await announcer.AnnounceResultAsync(annMatchId, annHome, annAway, annReferee, ct);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(
+                        ex,
+                        "Failed to post Dommeren chat announcement for match {MatchId}.",
+                        annMatchId);
+                }
+            }
+        }
 
         logger.LogInformation(
             "Result poll complete: {NewResults} new (of {Due} due). Knockout result: {Knockout}.",
