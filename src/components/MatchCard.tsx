@@ -1,4 +1,5 @@
 import type { Match, Team, Venue } from '../types'
+import { useNavigate } from 'react-router-dom'
 import { formatMatchTime, areTeamsUndetermined } from '../utils/dateUtils'
 import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
@@ -25,6 +26,7 @@ const STAGE_LABELS: Record<string, string> = {
 }
 
 export default function MatchCard({ match, teams, venues, locked, onTipClick, onViewOthers }: MatchCardProps) {
+  const navigate = useNavigate()
   const { predictions } = usePredictions()
   const { results, points } = useResults()
   
@@ -56,10 +58,33 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
 
   const stageLabel = isGroupStage ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage
 
+  function goToDetails() {
+    navigate(`/match/${match.id}`)
+  }
+
+  function handleCardKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      goToDetails()
+    }
+  }
+
+  // Stopper kortets onClick når brukeren trykker en knapp inni kortet.
+  function stop<E extends React.SyntheticEvent>(handler: () => void) {
+    return (e: E) => {
+      e.stopPropagation()
+      handler()
+    }
+  }
+
   return (
     <div
       data-testid="match-card"
-      className="rounded-lg border px-3 py-2 shadow-sm transition-colors sm:px-4 sm:py-2.5"
+      role="button"
+      tabIndex={0}
+      onClick={goToDetails}
+      onKeyDown={handleCardKeyDown}
+      className="cursor-pointer rounded-lg border px-3 py-2 shadow-sm transition-colors hover:shadow-md sm:px-4 sm:py-2.5"
       style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
     >
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
@@ -133,14 +158,14 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => onTipClick(match)}
+                    onClick={stop(() => onTipClick(match))}
                     className="rounded-md px-2 py-0.5 text-xs font-medium"
                     style={{ color: 'var(--color-primary)' }}
                   >
                     Endre
                   </button>
                   <button
-                    onClick={() => onViewOthers(match)}
+                    onClick={stop(() => onViewOthers(match))}
                     className="text-xs font-medium transition-colors"
                     style={{ color: 'var(--color-text-muted)' }}
                   >
@@ -151,14 +176,14 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
             ) : (
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => onTipClick(match)}
+                  onClick={stop(() => onTipClick(match))}
                   className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
                   style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
                 >
                   Bet
                 </button>
                 <button
-                  onClick={() => onViewOthers(match)}
+                  onClick={stop(() => onViewOthers(match))}
                   className="text-xs font-medium transition-colors"
                   style={{ color: 'var(--color-text-muted)' }}
                 >
@@ -215,7 +240,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
                 {prediction.homeScore}–{prediction.awayScore}
               </span>
               <button
-                onClick={() => onTipClick(match)}
+                onClick={stop(() => onTipClick(match))}
                 className="rounded-md px-2 py-0.5 text-xs font-medium"
                 style={{ color: 'var(--color-primary)' }}
               >
@@ -224,7 +249,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
             </>
           ) : (
             <button
-              onClick={() => onTipClick(match)}
+              onClick={stop(() => onTipClick(match))}
               className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
               style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
             >
@@ -232,7 +257,7 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
             </button>
           )}
           <button
-            onClick={() => onViewOthers(match)}
+            onClick={stop(() => onViewOthers(match))}
             className="text-xs font-medium transition-colors"
             style={{ color: 'var(--color-text-muted)' }}
           >

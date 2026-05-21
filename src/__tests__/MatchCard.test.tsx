@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Route, Routes } from 'react-router-dom'
 import MatchCard from '../components/MatchCard'
 import type { Match, Team, Venue } from '../types'
 import { AuthProvider } from '../context/AuthContext'
@@ -58,5 +59,74 @@ describe('MatchCard', () => {
     expect(screen.getByText(/1st Group A/)).toBeInTheDocument()
     expect(screen.getByText(/2nd Group B/)).toBeInTheDocument()
     expect(screen.getByText(/32-delsfinale/)).toBeInTheDocument()
+  })
+
+  it('navigerer til matchdetalj-siden når man klikker på kortet', () => {
+    const match: Match = { id: 42, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
+
+    function NavWrapper({ children }: { children: React.ReactNode }) {
+      return (
+        <GoogleOAuthProvider clientId="test">
+          <MemoryRouter initialEntries={['/']}>
+            <BettingGroupProvider>
+              <AuthProvider>
+                <ResultsProvider>
+                  <PredictionsProvider>
+                    <Routes>
+                      <Route path="/" element={children} />
+                      <Route path="/match/:matchId" element={<p>DETAIL PAGE</p>} />
+                    </Routes>
+                  </PredictionsProvider>
+                </ResultsProvider>
+              </AuthProvider>
+            </BettingGroupProvider>
+          </MemoryRouter>
+        </GoogleOAuthProvider>
+      )
+    }
+
+    render(
+      <MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} onViewOthers={onViewOthers} />,
+      { wrapper: NavWrapper },
+    )
+
+    fireEvent.click(screen.getByTestId('match-card'))
+    expect(screen.getByText('DETAIL PAGE')).toBeInTheDocument()
+  })
+
+  it('klikk på "Bet"-knappen åpner modalen uten å navigere bort', () => {
+    const tipClick = vi.fn()
+    const match: Match = { id: 5, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'C', venueId: 'metlife' }
+
+    function NavWrapper({ children }: { children: React.ReactNode }) {
+      return (
+        <GoogleOAuthProvider clientId="test">
+          <MemoryRouter initialEntries={['/']}>
+            <BettingGroupProvider>
+              <AuthProvider>
+                <ResultsProvider>
+                  <PredictionsProvider>
+                    <Routes>
+                      <Route path="/" element={children} />
+                      <Route path="/match/:matchId" element={<p>NAVIGATED</p>} />
+                    </Routes>
+                  </PredictionsProvider>
+                </ResultsProvider>
+              </AuthProvider>
+            </BettingGroupProvider>
+          </MemoryRouter>
+        </GoogleOAuthProvider>
+      )
+    }
+
+    render(
+      <MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={tipClick} onViewOthers={onViewOthers} />,
+      { wrapper: NavWrapper },
+    )
+
+    // Det er to "Bet"-knapper (mobile + desktop) — klikk den første.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Bet' })[0])
+    expect(tipClick).toHaveBeenCalledWith(match)
+    expect(screen.queryByText('NAVIGATED')).not.toBeInTheDocument()
   })
 })
