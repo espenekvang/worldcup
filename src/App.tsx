@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import type { Stage, Match } from './types'
+import type { Stage, Section, Match } from './types'
 import { teams, venues } from './data'
 import Header from './components/Header'
 import Countdown from './components/Countdown'
 import TabNav from './components/TabNav'
 import MobileStageNav from './components/MobileStageNav'
+import RoundPills from './components/RoundPills'
 import BottomNav from './components/BottomNav'
 import MatchList from './components/MatchList'
 import Leaderboard from './components/Leaderboard'
@@ -15,53 +16,92 @@ import AdminPanel from './components/AdminPanel'
 import ChatPanel from './components/ChatPanel'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
+import { isStageLocked, GROUP_ROUNDS } from './utils/dateUtils'
 
-type StageOnly = Exclude<Stage, 'leaderboard'>
+type MatchesSection = Exclude<Section, 'leaderboard'>
+
+/**
+ * Velg fornuftig default-runde når brukeren bytter til en seksjon.
+ * For gruppespill: første runde som ikke er låst, ellers siste runde.
+ * For sluttspill: alltid 32-delsfinale.
+ */
+function defaultStageFor(section: MatchesSection, matches: Match[]): Stage {
+  if (section === 'knockout') return 'round-of-32'
+  const firstOpen = GROUP_ROUNDS.find(s => !isStageLocked(s, matches))
+  return firstOpen ?? 'group-3'
+}
 
 function AppContent() {
   const { user } = useAuth()
   const { matches } = useMatches()
   const location = useLocation()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<Stage>('group')
-  const [lastStage, setLastStage] = useState<StageOnly>('group')
+  const [activeSection, setActiveSection] = useState<Section>('group')
+  const [activeStage, setActiveStage] = useState<Stage>(() => defaultStageFor('group', matches))
+  // Husk siste valgte stage per seksjon, slik at bytting frem/tilbake bevarer kontekst.
+  const [lastGroupStage, setLastGroupStage] = useState<Stage>('group-1')
+  const [lastKnockoutStage, setLastKnockoutStage] = useState<Stage>('round-of-32')
+  const [lastMatchesSection, setLastMatchesSection] = useState<MatchesSection>('group')
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
-  // Husk siste valgte stage så vi kan returnere dit fra The Boss/Chat.
+  // Når matches lastes inn, oppdater default-stage hvis vi fortsatt står på gruppespill-default.
   useEffect(() => {
-    if (activeTab !== 'leaderboard') {
-      setLastStage(activeTab as StageOnly)
+    if (activeSection === 'group') {
+      setActiveStage(prev => {
+        if (prev !== 'group-1') return prev
+        return defaultStageFor('group', matches)
+      })
     }
-  }, [activeTab])
+    // Vi vil kun reagere når matches faktisk er lastet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matches.length])
+
+  // Husk siste seksjon (utenom leaderboard) og siste stage per seksjon.
+  useEffect(() => {
+    if (activeSection !== 'leaderboard') {
+      setLastMatchesSection(activeSection)
+    }
+    if (activeSection === 'group') setLastGroupStage(activeStage)
+    if (activeSection === 'knockout') setLastKnockoutStage(activeStage)
+  }, [activeSection, activeStage])
 
   // Reager på navigasjons-state (f.eks. fra BottomNav på ChatPage).
   useEffect(() => {
     const view = (location.state as { mobileView?: 'matches' | 'leaderboard' } | null)?.mobileView
     if (view === 'leaderboard') {
-      setActiveTab('leaderboard')
+      setActiveSection('leaderboard')
       navigate(location.pathname, { replace: true, state: null })
     } else if (view === 'matches') {
-      setActiveTab(lastStage)
+      setActiveSection(lastMatchesSection)
       navigate(location.pathname, { replace: true, state: null })
     }
     // Vi vil kun reagere når location.state endres.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state])
 
+  function handleSectionChange(section: Section) {
+    setActiveSection(section)
+    if (section === 'group') {
+      setActiveStage(lastGroupStage)
+    } else if (section === 'knockout') {
+      setActiveStage(lastKnockoutStage)
+    }
+  }
+
   function handleMobileViewChange(view: 'matches' | 'leaderboard') {
     if (view === 'leaderboard') {
-      setActiveTab('leaderboard')
+      setActiveSection('leaderboard')
     } else {
-      setActiveTab(lastStage)
+      handleSectionChange(lastMatchesSection)
     }
   }
 
   const mobileView: 'matches' | 'leaderboard' =
-    activeTab === 'leaderboard' ? 'leaderboard' : 'matches'
+    activeSection === 'leaderboard' ? 'leaderboard' : 'matches'
 
   return (
     <div
@@ -78,21 +118,29 @@ function AppContent() {
               </div>
             ) : null}
             <Countdown matches={matches} teams={teams} venues={venues} />
-            <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-            {activeTab !== 'leaderboard' ? (
-              <MobileStageNav
-                activeStage={activeTab as StageOnly}
-                onStageChange={(s) => setActiveTab(s)}
-              />
+            <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} />
+            {activeSection !== 'leaderboard' ? (
+              <>
+                <MobileStageNav
+                  activeSection={activeSection}
+                  onSectionChange={handleSectionChange}
+                />
+                <RoundPills
+                  section={activeSection}
+                  activeStage={activeStage}
+                  onStageChange={setActiveStage}
+                  matches={matches}
+                />
+              </>
             ) : null}
-            {activeTab === 'leaderboard' ? (
+            {activeSection === 'leaderboard' ? (
               <Leaderboard />
             ) : (
               <MatchList
                 matches={matches}
                 teams={teams}
                 venues={venues}
-                activeStage={activeTab}
+                activeStage={activeStage}
                 onTipClick={setBettingMatch}
                 onViewOthers={setViewingOthersMatch}
               />

@@ -1,37 +1,35 @@
-import type { Stage } from '../types'
+import type { Section } from '../types'
 
-type StageOnly = Exclude<Stage, 'leaderboard'>
+type MatchesSection = Exclude<Section, 'leaderboard'>
 
-interface MobileStageNavProps {
-  activeStage: StageOnly
-  onStageChange: (stage: StageOnly) => void
+interface MobileSectionNavProps {
+  activeSection: MatchesSection
+  onSectionChange: (section: MatchesSection) => void
 }
 
-const STAGES: { stage: StageOnly; label: string; short: string }[] = [
-  { stage: 'group', label: 'Gruppespill', short: 'Gruppe' },
-  { stage: 'round-of-32', label: '32-delsfinale', short: '1/16' },
-  { stage: 'round-of-16', label: '8-delsfinale', short: '1/8' },
-  { stage: 'quarter-final', label: 'Kvartfinale', short: 'Kvart' },
-  { stage: 'semi-final', label: 'Semifinale', short: 'Semi' },
-  { stage: 'final', label: 'Finale', short: 'Finale' },
+const SECTIONS: { section: MatchesSection; label: string }[] = [
+  { section: 'group', label: 'Gruppespill' },
+  { section: 'knockout', label: 'Sluttspill' },
 ]
 
 /**
- * Kompakt horisontal pill-scroll for stage-valg på mobil. Brukes kun innenfor "Kamper"-fanen.
+ * Kompakt 2-pill seksjons-toggle på mobil. Brukes kun innenfor "Kamper"-vinduet
+ * for å bytte mellom gruppespill og sluttspill. Rundevalg vises i RoundPills
+ * under denne.
  */
-export default function MobileStageNav({ activeStage, onStageChange }: MobileStageNavProps) {
+export default function MobileStageNav({ activeSection, onSectionChange }: MobileSectionNavProps) {
   return (
     <nav
       className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 scrollbar-none lg:hidden"
-      aria-label="Velg turneringsfase"
+      aria-label="Velg turneringsdel"
     >
-      {STAGES.map(s => {
-        const isActive = activeStage === s.stage
+      {SECTIONS.map(s => {
+        const isActive = activeSection === s.section
         return (
           <button
-            key={s.stage}
-            onClick={() => onStageChange(s.stage)}
-            className="shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            key={s.section}
+            onClick={() => onSectionChange(s.section)}
+            className="shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors"
             style={{
               backgroundColor: isActive ? 'var(--color-tab-active)' : 'transparent',
               borderColor: isActive ? 'var(--color-tab-active)' : 'var(--color-border)',
@@ -39,8 +37,7 @@ export default function MobileStageNav({ activeStage, onStageChange }: MobileSta
             }}
             aria-current={isActive ? 'page' : undefined}
           >
-            <span className="sm:hidden">{s.short}</span>
-            <span className="hidden sm:inline">{s.label}</span>
+            {s.label}
           </button>
         )
       })}

@@ -5,7 +5,7 @@
     "homeTeam": "MEX",
     "awayTeam": "RSA",
     "group": "A",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "azteca"
   },
   {
@@ -14,7 +14,7 @@
     "homeTeam": "KOR",
     "awayTeam": "CZE",
     "group": "A",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "akron"
   },
   {
@@ -23,7 +23,7 @@
     "homeTeam": "CAN",
     "awayTeam": "BIH",
     "group": "B",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "bmo"
   },
   {
@@ -32,7 +32,7 @@
     "homeTeam": "USA",
     "awayTeam": "PAR",
     "group": "D",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "sofi"
   },
   {
@@ -41,7 +41,7 @@
     "homeTeam": "HAI",
     "awayTeam": "SCO",
     "group": "C",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "gillette"
   },
   {
@@ -50,7 +50,7 @@
     "homeTeam": "AUS",
     "awayTeam": "TUR",
     "group": "D",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "bcplace"
   },
   {
@@ -59,7 +59,7 @@
     "homeTeam": "BRA",
     "awayTeam": "MAR",
     "group": "C",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "metlife"
   },
   {
@@ -68,7 +68,7 @@
     "homeTeam": "QAT",
     "awayTeam": "SUI",
     "group": "B",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "levis"
   },
   {
@@ -77,7 +77,7 @@
     "homeTeam": "CIV",
     "awayTeam": "ECU",
     "group": "E",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "lincoln"
   },
   {
@@ -86,7 +86,7 @@
     "homeTeam": "GER",
     "awayTeam": "CUW",
     "group": "E",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "nrg"
   },
   {
@@ -95,7 +95,7 @@
     "homeTeam": "NED",
     "awayTeam": "JPN",
     "group": "F",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "att"
   },
   {
@@ -104,7 +104,7 @@
     "homeTeam": "SWE",
     "awayTeam": "TUN",
     "group": "F",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "bbva"
   },
   {
@@ -113,7 +113,7 @@
     "homeTeam": "KSA",
     "awayTeam": "URU",
     "group": "H",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "hardrock"
   },
   {
@@ -122,7 +122,7 @@
     "homeTeam": "ESP",
     "awayTeam": "CPV",
     "group": "H",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "mercedesbenz"
   },
   {
@@ -131,7 +131,7 @@
     "homeTeam": "IRN",
     "awayTeam": "NZL",
     "group": "G",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "sofi"
   },
   {
@@ -140,7 +140,7 @@
     "homeTeam": "BEL",
     "awayTeam": "EGY",
     "group": "G",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "lumen"
   },
   {
@@ -149,7 +149,7 @@
     "homeTeam": "FRA",
     "awayTeam": "SEN",
     "group": "I",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "metlife"
   },
   {
@@ -158,7 +158,7 @@
     "homeTeam": "IRQ",
     "awayTeam": "NOR",
     "group": "I",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "gillette"
   },
   {
@@ -167,7 +167,7 @@
     "homeTeam": "ARG",
     "awayTeam": "ALG",
     "group": "J",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "arrowhead"
   },
   {
@@ -176,7 +176,7 @@
     "homeTeam": "AUT",
     "awayTeam": "JOR",
     "group": "J",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "levis"
   },
   {
@@ -185,7 +185,7 @@
     "homeTeam": "GHA",
     "awayTeam": "PAN",
     "group": "L",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "bmo"
   },
   {
@@ -194,7 +194,7 @@
     "homeTeam": "ENG",
     "awayTeam": "CRO",
     "group": "L",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "att"
   },
   {
@@ -203,7 +203,7 @@
     "homeTeam": "POR",
     "awayTeam": "COD",
     "group": "K",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "nrg"
   },
   {
@@ -212,7 +212,7 @@
     "homeTeam": "UZB",
     "awayTeam": "COL",
     "group": "K",
-    "stage": "group",
+    "stage": "group-1",
     "venueId": "azteca"
   },
   {
@@ -221,7 +221,7 @@
     "homeTeam": "CZE",
     "awayTeam": "RSA",
     "group": "A",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "mercedesbenz"
   },
   {
@@ -230,7 +230,7 @@
     "homeTeam": "SUI",
     "awayTeam": "BIH",
     "group": "B",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "sofi"
   },
   {
@@ -239,7 +239,7 @@
     "homeTeam": "CAN",
     "awayTeam": "QAT",
     "group": "B",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "bcplace"
   },
   {
@@ -248,7 +248,7 @@
     "homeTeam": "MEX",
     "awayTeam": "KOR",
     "group": "A",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "akron"
   },
   {
@@ -257,7 +257,7 @@
     "homeTeam": "BRA",
     "awayTeam": "HAI",
     "group": "C",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "lincoln"
   },
   {
@@ -266,7 +266,7 @@
     "homeTeam": "SCO",
     "awayTeam": "MAR",
     "group": "C",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "gillette"
   },
   {
@@ -275,7 +275,7 @@
     "homeTeam": "TUR",
     "awayTeam": "PAR",
     "group": "D",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "levis"
   },
   {
@@ -284,7 +284,7 @@
     "homeTeam": "USA",
     "awayTeam": "AUS",
     "group": "D",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "lumen"
   },
   {
@@ -293,7 +293,7 @@
     "homeTeam": "GER",
     "awayTeam": "CIV",
     "group": "E",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "bmo"
   },
   {
@@ -302,7 +302,7 @@
     "homeTeam": "ECU",
     "awayTeam": "CUW",
     "group": "E",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "arrowhead"
   },
   {
@@ -311,7 +311,7 @@
     "homeTeam": "NED",
     "awayTeam": "SWE",
     "group": "F",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "nrg"
   },
   {
@@ -320,7 +320,7 @@
     "homeTeam": "TUN",
     "awayTeam": "JPN",
     "group": "F",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "bbva"
   },
   {
@@ -329,7 +329,7 @@
     "homeTeam": "URU",
     "awayTeam": "CPV",
     "group": "H",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "hardrock"
   },
   {
@@ -338,7 +338,7 @@
     "homeTeam": "ESP",
     "awayTeam": "KSA",
     "group": "H",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "mercedesbenz"
   },
   {
@@ -347,7 +347,7 @@
     "homeTeam": "BEL",
     "awayTeam": "IRN",
     "group": "G",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "sofi"
   },
   {
@@ -356,7 +356,7 @@
     "homeTeam": "NZL",
     "awayTeam": "EGY",
     "group": "G",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "bcplace"
   },
   {
@@ -365,7 +365,7 @@
     "homeTeam": "NOR",
     "awayTeam": "SEN",
     "group": "I",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "metlife"
   },
   {
@@ -374,7 +374,7 @@
     "homeTeam": "FRA",
     "awayTeam": "IRQ",
     "group": "I",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "lincoln"
   },
   {
@@ -383,7 +383,7 @@
     "homeTeam": "ARG",
     "awayTeam": "AUT",
     "group": "J",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "att"
   },
   {
@@ -392,7 +392,7 @@
     "homeTeam": "JOR",
     "awayTeam": "ALG",
     "group": "J",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "levis"
   },
   {
@@ -401,7 +401,7 @@
     "homeTeam": "ENG",
     "awayTeam": "GHA",
     "group": "L",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "gillette"
   },
   {
@@ -410,7 +410,7 @@
     "homeTeam": "PAN",
     "awayTeam": "CRO",
     "group": "L",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "bmo"
   },
   {
@@ -419,7 +419,7 @@
     "homeTeam": "POR",
     "awayTeam": "UZB",
     "group": "K",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "nrg"
   },
   {
@@ -428,7 +428,7 @@
     "homeTeam": "COL",
     "awayTeam": "COD",
     "group": "K",
-    "stage": "group",
+    "stage": "group-2",
     "venueId": "akron"
   },
   {
@@ -437,7 +437,7 @@
     "homeTeam": "SCO",
     "awayTeam": "BRA",
     "group": "C",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "hardrock"
   },
   {
@@ -446,7 +446,7 @@
     "homeTeam": "MAR",
     "awayTeam": "HAI",
     "group": "C",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "mercedesbenz"
   },
   {
@@ -455,7 +455,7 @@
     "homeTeam": "SUI",
     "awayTeam": "CAN",
     "group": "B",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "bcplace"
   },
   {
@@ -464,7 +464,7 @@
     "homeTeam": "BIH",
     "awayTeam": "QAT",
     "group": "B",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "lumen"
   },
   {
@@ -473,7 +473,7 @@
     "homeTeam": "CZE",
     "awayTeam": "MEX",
     "group": "A",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "azteca"
   },
   {
@@ -482,7 +482,7 @@
     "homeTeam": "RSA",
     "awayTeam": "KOR",
     "group": "A",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "bbva"
   },
   {
@@ -491,7 +491,7 @@
     "homeTeam": "CUW",
     "awayTeam": "CIV",
     "group": "E",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "lincoln"
   },
   {
@@ -500,7 +500,7 @@
     "homeTeam": "ECU",
     "awayTeam": "GER",
     "group": "E",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "metlife"
   },
   {
@@ -509,7 +509,7 @@
     "homeTeam": "JPN",
     "awayTeam": "SWE",
     "group": "F",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "att"
   },
   {
@@ -518,7 +518,7 @@
     "homeTeam": "TUN",
     "awayTeam": "NED",
     "group": "F",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "arrowhead"
   },
   {
@@ -527,7 +527,7 @@
     "homeTeam": "TUR",
     "awayTeam": "USA",
     "group": "D",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "sofi"
   },
   {
@@ -536,7 +536,7 @@
     "homeTeam": "PAR",
     "awayTeam": "AUS",
     "group": "D",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "levis"
   },
   {
@@ -545,7 +545,7 @@
     "homeTeam": "NOR",
     "awayTeam": "FRA",
     "group": "I",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "gillette"
   },
   {
@@ -554,7 +554,7 @@
     "homeTeam": "SEN",
     "awayTeam": "IRQ",
     "group": "I",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "bmo"
   },
   {
@@ -563,7 +563,7 @@
     "homeTeam": "EGY",
     "awayTeam": "IRN",
     "group": "G",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "lumen"
   },
   {
@@ -572,7 +572,7 @@
     "homeTeam": "NZL",
     "awayTeam": "BEL",
     "group": "G",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "bcplace"
   },
   {
@@ -581,7 +581,7 @@
     "homeTeam": "CPV",
     "awayTeam": "KSA",
     "group": "H",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "nrg"
   },
   {
@@ -590,7 +590,7 @@
     "homeTeam": "URU",
     "awayTeam": "ESP",
     "group": "H",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "akron"
   },
   {
@@ -599,7 +599,7 @@
     "homeTeam": "PAN",
     "awayTeam": "ENG",
     "group": "L",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "metlife"
   },
   {
@@ -608,7 +608,7 @@
     "homeTeam": "CRO",
     "awayTeam": "GHA",
     "group": "L",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "lincoln"
   },
   {
@@ -617,7 +617,7 @@
     "homeTeam": "ALG",
     "awayTeam": "AUT",
     "group": "J",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "arrowhead"
   },
   {
@@ -626,7 +626,7 @@
     "homeTeam": "JOR",
     "awayTeam": "ARG",
     "group": "J",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "att"
   },
   {
@@ -635,7 +635,7 @@
     "homeTeam": "COL",
     "awayTeam": "POR",
     "group": "K",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "hardrock"
   },
   {
@@ -644,7 +644,7 @@
     "homeTeam": "COD",
     "awayTeam": "UZB",
     "group": "K",
-    "stage": "group",
+    "stage": "group-3",
     "venueId": "mercedesbenz"
   },
   {

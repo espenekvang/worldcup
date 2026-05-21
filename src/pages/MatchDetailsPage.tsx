@@ -18,10 +18,12 @@ import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 import { useWeather } from '../hooks/useWeather'
 import { useAuth } from '../context/AuthContext'
-import { formatMatchDate, formatMatchTime, areTeamsUndetermined, isStageLocked } from '../utils/dateUtils'
+import { formatMatchDate, formatMatchTime, areTeamsUndetermined, isStageLocked, isGroupStage } from '../utils/dateUtils'
 
 const STAGE_LABELS: Record<string, string> = {
-  'group': 'Gruppespill',
+  'group-1': 'Gruppespill',
+  'group-2': 'Gruppespill',
+  'group-3': 'Gruppespill',
   'round-of-32': '32-delsfinale',
   'round-of-16': '8-delsfinale',
   'quarter-final': 'Kvartfinale',
@@ -82,7 +84,7 @@ export default function MatchDetailsPage() {
   const awayTeam = match.awayTeam ? teams[match.awayTeam] : null
   const homeDisplay = homeTeam?.name ?? match.homePlaceholder ?? 'Ikke avgjort'
   const awayDisplay = awayTeam?.name ?? match.awayPlaceholder ?? 'Ikke avgjort'
-  const stageLabel = match.stage === 'group' ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage
+  const stageLabel = isGroupStage(match.stage) ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage
 
   const prediction = predictions.get(match.id)
   const result = results.get(match.id)

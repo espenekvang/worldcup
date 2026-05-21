@@ -1,4 +1,4 @@
-import type { Match, Stage } from '../types'
+import type { Match, Stage, Section } from '../types'
 
 export function formatMatchDate(isoDate: string): string {
   return new Intl.DateTimeFormat('nb-NO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(isoDate))
@@ -54,3 +54,22 @@ export function isStageLocked(stage: Stage, matches: Match[], now: number = Date
 export function areTeamsUndetermined(match: Match): boolean {
   return !match.homeTeam || !match.awayTeam
 }
+
+/**
+ * Group stage consists of three rounds (`group-1`, `group-2`, `group-3`),
+ * each locked independently when its first kickoff starts.
+ */
+export function isGroupStage(stage: Stage): boolean {
+  return stage === 'group-1' || stage === 'group-2' || stage === 'group-3'
+}
+
+/** Toppnivå-seksjon for en gitt stage. Brukes for å gruppere faner i UI. */
+export function getSectionForStage(stage: Stage): Section {
+  if (stage === 'leaderboard') return 'leaderboard'
+  if (isGroupStage(stage)) return 'group'
+  return 'knockout'
+}
+
+/** Stages som vises som "runder" innenfor en seksjon (ekskl. leaderboard og third-place). */
+export const GROUP_ROUNDS: Stage[] = ['group-1', 'group-2', 'group-3']
+export const KNOCKOUT_ROUNDS: Stage[] = ['round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'final']

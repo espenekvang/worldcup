@@ -32,8 +32,8 @@ describe('dateUtils', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
 
-    const past: Match = { id: 1, date: '2020-01-01T00:00:00Z', homeTeam: 'USA', awayTeam: 'MEX', stage: 'group', group: 'A', venueId: 'metlife' }
-    const future: Match = { id: 2, date: '2099-12-31T00:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group', group: 'B', venueId: 'azteca' }
+    const past: Match = { id: 1, date: '2020-01-01T00:00:00Z', homeTeam: 'USA', awayTeam: 'MEX', stage: 'group-1', group: 'A', venueId: 'metlife' }
+    const future: Match = { id: 2, date: '2099-12-31T00:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group-1', group: 'B', venueId: 'azteca' }
 
     const result = getNextMatch([past, future])
 
