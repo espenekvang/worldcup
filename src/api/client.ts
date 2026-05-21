@@ -44,6 +44,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      // Token er utløpt/ugyldig – rydd lokal auth-state slik at UI ser brukeren
+      // som utlogget og kan sende dem gjennom innloggingsflyten på nytt.
+      try {
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('auth_user')
+      } catch {
+        // storage unavailable
+      }
+    }
     const errorText = await response.text().catch(() => 'Unknown error')
     throw new Error(`API error ${response.status}: ${errorText}`)
   }
