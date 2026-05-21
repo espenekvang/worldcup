@@ -12,8 +12,32 @@ public sealed class ResultFetcherService(
     MatchFileWriter matchFileWriter,
     ILogger<ResultFetcherService> logger) : BackgroundService
 {
-    private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(10);
-    private static readonly TimeSpan MatchCompletionBuffer = TimeSpan.FromHours(2.5);
+    // Stage-aware buffer: how long after kickoff we *expect* a result to be available.
+    // Group games: 90' + HT + ~15 min stoppage + API publish delay.
+    // Knockout: add 30' ET + ~15 min penalty buffer.
+    private static readonly TimeSpan GroupStageBuffer = TimeSpan.FromHours(2.25);
+    private static readonly TimeSpan KnockoutBuffer = TimeSpan.FromHours(3.25);
+    private static readonly TimeSpan FinalBuffer = TimeSpan.FromHours(3.5);
+
+    // Backoff between retry attempts when a poll returns no result for a due match.
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromMinutes(30);
+    private const int MaxFetchAttempts = 3;
+
+    // Safety caps. We always wake at least this often, even if no match is due,
+    // so config changes / schedule reloads are picked up. And we never sleep less
+    // than the minimum to avoid tight loops on edge cases.
+    private static readonly TimeSpan MaxSleep = TimeSpan.FromHours(6);
+    private static readonly TimeSpan MinSleep = TimeSpan.FromSeconds(30);
+
+    // Tolerance window — if a match is "due" within this window we'll poll now
+    // instead of going back to sleep for a few seconds.
+    private static readonly TimeSpan DueTolerance = TimeSpan.FromMinutes(2);
+
+    // Daily budget: upstream provider allows 100 calls / 24h. We leave headroom
+    // for ad-hoc/manual calls and to absorb retries triggered by failed deploys.
+    private const int DailyCallBudget = 90;
+    private static readonly TimeSpan BudgetWindow = TimeSpan.FromHours(24);
+
     private static readonly DateTime TournamentCutoffUtc = new(2026, 7, 20, 23, 59, 59, DateTimeKind.Utc);
     private static readonly StringComparer StageComparer = StringComparer.OrdinalIgnoreCase;
 
@@ -21,6 +45,8 @@ public sealed class ResultFetcherService(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
+            TimeSpan sleepFor = MaxSleep;
+
             try
             {
                 if (DateTime.UtcNow > TournamentCutoffUtc)
@@ -29,8 +55,7 @@ public sealed class ResultFetcherService(
                     break;
                 }
 
-                await CheckForCompletedMatchesAsync(stoppingToken);
-                await CheckForFixtureUpdatesAsync(stoppingToken);
+                sleepFor = await RunCycleAsync(stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -41,9 +66,12 @@ public sealed class ResultFetcherService(
                 logger.LogError(ex, "Unhandled error while fetching results.");
             }
 
+            if (sleepFor < MinSleep) sleepFor = MinSleep;
+            if (sleepFor > MaxSleep) sleepFor = MaxSleep;
+
             try
             {
-                await Task.Delay(PollInterval, stoppingToken);
+                await Task.Delay(sleepFor, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -52,44 +80,88 @@ public sealed class ResultFetcherService(
         }
     }
 
-    private async Task CheckForCompletedMatchesAsync(CancellationToken stoppingToken)
+    /// <summary>
+    /// Runs one polling cycle. Returns the duration to sleep before the next cycle,
+    /// computed from the schedule + pending retries so we wake only when needed.
+    /// </summary>
+    private async Task<TimeSpan> RunCycleAsync(CancellationToken ct)
     {
-        logger.LogInformation("Checking for completed matches");
+        var now = DateTime.UtcNow;
 
         using var scope = scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var scoringService = scope.ServiceProvider.GetRequiredService<ScoringService>();
 
-        var existingMatchIds = await dbContext.MatchResults
-            .Select(result => result.MatchId)
-            .ToListAsync(stoppingToken);
+        var existingResults = (await dbContext.MatchResults
+                .Select(r => r.MatchId)
+                .ToListAsync(ct))
+            .ToHashSet();
 
-        var existingMatchIdSet = existingMatchIds.ToHashSet();
-        var now = DateTime.UtcNow;
-        var hasDueMatches = scheduleProvider.Current.GetAllMatches()
-            .Any(match => match.Date + MatchCompletionBuffer < now && !existingMatchIdSet.Contains(match.Id));
+        var pendingFetches = await dbContext.PendingMatchFetches
+            .ToDictionaryAsync(p => p.MatchId, ct);
 
-        if (!hasDueMatches)
+        var schedule = scheduleProvider.Current;
+        var allMatches = schedule.GetAllMatches();
+
+        // Build the set of matches whose results we still owe ourselves.
+        // For each: compute the earliest time we should poll next.
+        var outstanding = new List<(MatchEntry Match, DateTime NextPollAt, PendingMatchFetch? Pending)>();
+        foreach (var match in allMatches)
         {
-            logger.LogInformation("Skipping poll — no matches expected");
-            return;
+            if (existingResults.Contains(match.Id)) continue;
+            if (match.AreTeamsUndetermined) continue; // can't fetch until fixture is locked
+
+            pendingFetches.TryGetValue(match.Id, out var pending);
+
+            var expectedReady = match.Date + GetBufferForStage(match.Stage);
+            var nextPollAt = pending?.NextAttemptAt ?? expectedReady;
+
+            // Already exhausted retries — leave it alone until manual intervention.
+            if (pending is not null && pending.AttemptCount >= MaxFetchAttempts)
+            {
+                continue;
+            }
+
+            outstanding.Add((match, nextPollAt, pending));
         }
 
-        var completedMatches = await apiClient.GetCompletedMatchesAsync(stoppingToken);
+        var dueMatches = outstanding
+            .Where(x => x.NextPollAt <= now.Add(DueTolerance))
+            .Select(x => x.Match)
+            .ToList();
+
+        if (dueMatches.Count == 0)
+        {
+            return ComputeSleep(outstanding, now);
+        }
+
+        // ---- Budget gate ----
+        if (!await BudgetAllowsCallAsync(dbContext, now, ct))
+        {
+            logger.LogWarning(
+                "Daily WC2026 API budget exhausted ({Budget}/24h). Deferring poll for {Match} matches.",
+                DailyCallBudget,
+                dueMatches.Count);
+            // Sleep ~1h and re-evaluate; the rolling window will free up by then.
+            return TimeSpan.FromHours(1);
+        }
+
+        // ---- One coalesced call covers all due matches ----
+        await LogApiCallAsync(dbContext, "/matches?status=completed", now, ct);
+        var completedMatches = await apiClient.GetCompletedMatchesAsync(ct);
+
+        var foundMatchIds = new HashSet<int>();
+        var newKnockoutResult = false;
         var newResults = 0;
 
         foreach (var dto in completedMatches)
         {
-            if (dto.Score?.Ft is not [var homeScore, var awayScore])
-            {
-                continue;
-            }
+            if (dto.Score?.Ft is not [var homeScore, var awayScore]) continue;
 
-            var matchId = apiClient.MapToLocalMatchId(dto.KickoffAt, scheduleProvider.Current);
-            if (matchId is null || existingMatchIdSet.Contains(matchId.Value))
-            {
-                continue;
-            }
+            var matchId = apiClient.MapToLocalMatchId(dto.KickoffAt, schedule);
+            if (matchId is null || existingResults.Contains(matchId.Value)) continue;
+
+            var localMatch = schedule.GetMatch(matchId.Value);
 
             dbContext.MatchResults.Add(new MatchResult
             {
@@ -102,7 +174,7 @@ public sealed class ResultFetcherService(
 
             var predictions = await dbContext.Predictions
                 .Where(prediction => prediction.MatchId == matchId.Value)
-                .ToListAsync(stoppingToken);
+                .ToListAsync(ct);
 
             foreach (var prediction in predictions)
             {
@@ -113,16 +185,141 @@ public sealed class ResultFetcherService(
                     awayScore);
             }
 
-            await dbContext.SaveChangesAsync(stoppingToken);
+            // Result obtained — drop any pending retry row.
+            if (pendingFetches.TryGetValue(matchId.Value, out var pendingToRemove))
+            {
+                dbContext.PendingMatchFetches.Remove(pendingToRemove);
+            }
 
-            existingMatchIdSet.Add(matchId.Value);
+            existingResults.Add(matchId.Value);
+            foundMatchIds.Add(matchId.Value);
             newResults++;
-            logger.LogInformation("Calculated points for match {MatchId}", matchId.Value);
+
+            if (localMatch is not null && !StageComparer.Equals(localMatch.Stage, "group"))
+            {
+                newKnockoutResult = true;
+            }
         }
 
-        logger.LogInformation("Found {Count} new results", newResults);
+        // For matches that were due but did NOT show up in this response, schedule a retry.
+        foreach (var match in dueMatches)
+        {
+            if (foundMatchIds.Contains(match.Id)) continue;
+
+            if (pendingFetches.TryGetValue(match.Id, out var pending))
+            {
+                pending.AttemptCount += 1;
+                pending.NextAttemptAt = now + RetryInterval;
+                if (pending.AttemptCount >= MaxFetchAttempts)
+                {
+                    logger.LogWarning(
+                        "Match {MatchId} exhausted {Attempts} fetch attempts without a result. Giving up; manual intervention required.",
+                        match.Id,
+                        pending.AttemptCount);
+                }
+            }
+            else
+            {
+                dbContext.PendingMatchFetches.Add(new PendingMatchFetch
+                {
+                    MatchId = match.Id,
+                    FirstScheduledAt = match.Date + GetBufferForStage(match.Stage),
+                    NextAttemptAt = now + RetryInterval,
+                    AttemptCount = 1
+                });
+            }
+        }
+
+        await dbContext.SaveChangesAsync(ct);
+
+        logger.LogInformation(
+            "Result poll complete: {NewResults} new (of {Due} due). Knockout result: {Knockout}.",
+            newResults,
+            dueMatches.Count,
+            newKnockoutResult);
+
+        // Only burn a second API call if we actually got a knockout result that may
+        // have unlocked the next round's fixtures.
+        if (newKnockoutResult && HasUndeterminedKnockoutMatches(schedule))
+        {
+            if (await BudgetAllowsCallAsync(dbContext, DateTime.UtcNow, ct))
+            {
+                await LogApiCallAsync(dbContext, "/matches?status=scheduled", DateTime.UtcNow, ct);
+                await dbContext.SaveChangesAsync(ct);
+                await CheckForFixtureUpdatesAsync(ct);
+            }
+            else
+            {
+                logger.LogWarning("Skipping fixture update — daily API budget exhausted.");
+            }
+        }
+
+        // Recompute outstanding (some may have been resolved) for next-sleep calc.
+        var stillOutstanding = outstanding
+            .Where(x => !foundMatchIds.Contains(x.Match.Id))
+            .Select(x =>
+            {
+                // Refresh next-poll for due-but-not-found matches with new retry time.
+                if (dueMatches.Any(d => d.Id == x.Match.Id))
+                {
+                    return (x.Match, now + RetryInterval, x.Pending);
+                }
+                return x;
+            })
+            .ToList();
+
+        return ComputeSleep(stillOutstanding, DateTime.UtcNow);
     }
 
+    private static TimeSpan ComputeSleep(
+        IReadOnlyList<(MatchEntry Match, DateTime NextPollAt, PendingMatchFetch? Pending)> outstanding,
+        DateTime now)
+    {
+        if (outstanding.Count == 0) return MaxSleep;
+
+        var nextWake = outstanding.Min(x => x.NextPollAt);
+        var delta = nextWake - now;
+        return delta <= TimeSpan.Zero ? MinSleep : delta;
+    }
+
+    private static TimeSpan GetBufferForStage(string stage) => stage?.ToLowerInvariant() switch
+    {
+        "group" => GroupStageBuffer,
+        "final" => FinalBuffer,
+        "round-of-32" or "round-of-16" or "quarter-final" or "semi-final" or "third-place" => KnockoutBuffer,
+        _ => KnockoutBuffer
+    };
+
+    private static bool HasUndeterminedKnockoutMatches(MatchSchedule schedule) =>
+        schedule.GetAllMatches().Any(m =>
+            m.AreTeamsUndetermined
+            && !m.ManualOverride
+            && !StageComparer.Equals(m.Stage, "group"));
+
+    private static async Task<bool> BudgetAllowsCallAsync(AppDbContext dbContext, DateTime now, CancellationToken ct)
+    {
+        var windowStart = now - BudgetWindow;
+        var callsInWindow = await dbContext.ApiCallLogs
+            .CountAsync(log => log.CalledAt >= windowStart, ct);
+        return callsInWindow < DailyCallBudget;
+    }
+
+    private static Task LogApiCallAsync(AppDbContext dbContext, string endpoint, DateTime calledAt, CancellationToken ct)
+    {
+        dbContext.ApiCallLogs.Add(new ApiCallLog
+        {
+            Id = Guid.NewGuid(),
+            CalledAt = calledAt,
+            Endpoint = endpoint
+        });
+        return dbContext.SaveChangesAsync(ct);
+    }
+
+    /// <summary>
+    /// Fetches scheduled matches from upstream and rewrites matches.json for any knockout
+    /// fixture whose teams have just been determined. Kept internal-accessible so existing
+    /// reflection-based tests continue to work.
+    /// </summary>
     private async Task CheckForFixtureUpdatesAsync(CancellationToken ct)
     {
         var currentSchedule = scheduleProvider.Current;

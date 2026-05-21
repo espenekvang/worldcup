@@ -13,6 +13,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<BettingGroupMember> BettingGroupMembers => Set<BettingGroupMember>();
     public DbSet<BettingGroupInviteLink> BettingGroupInviteLinks => Set<BettingGroupInviteLink>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<PendingMatchFetch> PendingMatchFetches => Set<PendingMatchFetch>();
+    public DbSet<ApiCallLog> ApiCallLogs => Set<ApiCallLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -109,5 +111,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(message => message.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PendingMatchFetch>()
+            .HasKey(pending => pending.MatchId);
+
+        modelBuilder.Entity<PendingMatchFetch>()
+            .Property(pending => pending.MatchId)
+            .ValueGeneratedNever();
+
+        modelBuilder.Entity<PendingMatchFetch>()
+            .HasIndex(pending => pending.NextAttemptAt);
+
+        modelBuilder.Entity<ApiCallLog>()
+            .HasIndex(log => log.CalledAt);
     }
 }
