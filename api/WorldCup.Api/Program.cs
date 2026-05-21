@@ -69,6 +69,7 @@ builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
     Options.Create(new MatchFileWriterOptions { JsonPath = matchesJsonPath }));
 builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
+builder.Services.AddScoped<ResultAnnouncementService>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
 builder.Services.AddHostedService<ResultFetcherService>();
 

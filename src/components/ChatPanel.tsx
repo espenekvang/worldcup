@@ -179,6 +179,8 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
 
   const canDeleteMessage = (m: ChatMessage): boolean => {
     if (m.isDeleted) return false
+    // Systemmeldinger (f.eks. Resultatservice) kan kun fjernes av admin via backend.
+    if (m.isSystem) return false
     if (currentUserId && m.userId === currentUserId) return true
     return isGroupAdmin
   }
@@ -275,7 +277,34 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                 const isOwn = currentUserId === m.userId
                 return (
                   <div key={m.id} className="group mb-2 flex items-start gap-2">
-                    {m.userPicture ? (
+                    {m.isSystem ? (
+                      <div
+                        className="flex h-7 w-7 shrink-0 items-center justify-center"
+                        aria-label={m.userName}
+                        title={m.userName}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="h-7 w-7"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          {/* snorring */}
+                          <circle cx="16" cy="5" r="1.5" />
+                          <line x1="16" y1="6.5" x2="16" y2="8" />
+                          {/* fløytekropp */}
+                          <circle cx="16" cy="14" r="6" />
+                          {/* slits på toppen */}
+                          <line x1="14" y1="9.5" x2="18" y2="9.5" />
+                          {/* munnstykke */}
+                          <path d="M10 11 H3.5 a1.5 1.5 0 0 0 -1.5 1.5 v3 a1.5 1.5 0 0 0 1.5 1.5 H10" />
+                        </svg>
+                      </div>
+                    ) : m.userPicture ? (
                       <img
                         src={m.userPicture}
                         alt={firstName(m.userName)}
@@ -301,7 +330,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                             color: isOwn ? 'var(--color-tab-active)' : 'var(--color-text-primary)',
                           }}
                         >
-                          {firstName(m.userName)}
+                          {m.isSystem ? m.userName : firstName(m.userName)}
                         </span>
                         <span
                           className="text-[10px]"

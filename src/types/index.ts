@@ -81,4 +81,5 @@ export interface ChatMessage {
   content: string
   createdAt: string
   isDeleted: boolean
+  isSystem: boolean
 }

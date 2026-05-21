@@ -10,6 +10,13 @@ public class ChatMessage
     public DateTime? DeletedAt { get; set; }
     public Guid? DeletedByUserId { get; set; }
 
+    /// <summary>
+    /// Valgfri overstyring av avsendernavn ved visning. Brukes for systemmeldinger
+    /// (f.eks. Dommeren) der vi vil vise et kampspesifikt navn i stedet for
+    /// brukerens lagrede navn.
+    /// </summary>
+    public string? SenderDisplayNameOverride { get; set; }
+
     public BettingGroup BettingGroup { get; set; } = null!;
     public User User { get; set; } = null!;
 }

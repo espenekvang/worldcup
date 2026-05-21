@@ -101,6 +101,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsRequired();
 
         modelBuilder.Entity<ChatMessage>()
+            .Property(message => message.SenderDisplayNameOverride)
+            .HasMaxLength(100);
+
+        modelBuilder.Entity<MatchResult>()
+            .Property(result => result.Referee)
+            .HasMaxLength(100);
+
+        modelBuilder.Entity<ChatMessage>()
             .HasOne(message => message.BettingGroup)
             .WithMany()
             .HasForeignKey(message => message.BettingGroupId)

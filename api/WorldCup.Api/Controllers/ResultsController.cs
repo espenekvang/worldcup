@@ -13,7 +13,8 @@ namespace WorldCup.Api.Controllers;
 public class ResultsController(
     AppDbContext dbContext,
     ScoringService scoringService,
-    MatchScheduleProvider scheduleProvider) : ControllerBase
+    MatchScheduleProvider scheduleProvider,
+    ResultAnnouncementService resultAnnouncer) : ControllerBase
 {
     [HttpPut("/api/admin/results/{matchId:int}")]
     [Authorize(Roles = "Admin")]
@@ -36,11 +37,18 @@ public class ResultsController(
         var existing = await dbContext.MatchResults
             .FirstOrDefaultAsync(r => r.MatchId == matchId, ct);
 
+        var isNewResult = existing is null;
+        var refereeName = string.IsNullOrWhiteSpace(request.Referee) ? null : request.Referee.Trim();
+
         if (existing is not null)
         {
             existing.HomeScore = request.HomeScore;
             existing.AwayScore = request.AwayScore;
             existing.FetchedAt = DateTime.UtcNow;
+            if (refereeName is not null)
+            {
+                existing.Referee = refereeName;
+            }
         }
         else
         {
@@ -50,7 +58,8 @@ public class ResultsController(
                 MatchId = matchId,
                 HomeScore = request.HomeScore,
                 AwayScore = request.AwayScore,
-                FetchedAt = DateTime.UtcNow
+                FetchedAt = DateTime.UtcNow,
+                Referee = refereeName
             });
         }
 
@@ -69,6 +78,19 @@ public class ResultsController(
         }
 
         await dbContext.SaveChangesAsync(ct);
+
+        if (isNewResult)
+        {
+            try
+            {
+                await resultAnnouncer.AnnounceResultAsync(matchId, request.HomeScore, request.AwayScore, refereeName, ct);
+            }
+            catch (Exception)
+            {
+                // Chat-melding er en bonus — la admin-endepunktet svare OK selv om
+                // kringkasting feiler. Logg-feilen kommer fra service'en selv.
+            }
+        }
 
         return Ok(new ResultResponse
         {
@@ -252,4 +274,4 @@ public class ResultsController(
     }
 }
 
-public sealed record AdminSetResultRequest(int HomeScore, int AwayScore);
+public sealed record AdminSetResultRequest(int HomeScore, int AwayScore, string? Referee = null);
