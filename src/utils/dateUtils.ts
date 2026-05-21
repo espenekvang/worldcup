@@ -51,6 +51,42 @@ export function isStageLocked(stage: Stage, matches: Match[], now: number = Date
   return now >= kickoff
 }
 
+/** Menneskelig navn for hver runde, brukt i UI. */
+export const STAGE_LABELS: Record<Stage, string> = {
+  'group-1': 'Runde 1',
+  'group-2': 'Runde 2',
+  'group-3': 'Runde 3',
+  'round-of-32': '32-delsfinale',
+  'round-of-16': '8-delsfinale',
+  'quarter-final': 'Kvartfinale',
+  'semi-final': 'Semifinale',
+  'third-place': 'Bronsefinale',
+  'final': 'Finale',
+  'leaderboard': 'Toppliste',
+}
+
+/**
+ * Returnerer neste runde som fortsatt kan bettes på og dens frist
+ * (= tidspunktet for første kamp i runden). Returnerer null hvis alle
+ * runder er låst / tournament er ferdig.
+ */
+export function getNextBettingDeadline(
+  matches: Match[],
+  now: number = Date.now(),
+): { stage: Stage; deadline: string } | null {
+  const earliest = getEarliestKickoffByStage(matches)
+  let bestStage: Stage | null = null
+  let bestTime = Number.POSITIVE_INFINITY
+  for (const [stage, time] of earliest) {
+    if (time > now && time < bestTime) {
+      bestTime = time
+      bestStage = stage
+    }
+  }
+  if (!bestStage) return null
+  return { stage: bestStage, deadline: new Date(bestTime).toISOString() }
+}
+
 export function areTeamsUndetermined(match: Match): boolean {
   return !match.homeTeam || !match.awayTeam
 }

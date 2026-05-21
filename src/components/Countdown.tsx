@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Match, Team, Venue } from '../types'
-import { getNextMatch, getTimeUntil, isBeforeTournament } from '../utils/dateUtils'
+import { STAGE_LABELS, getNextBettingDeadline, getTimeUntil } from '../utils/dateUtils'
 
 interface CountdownProps {
   matches: Match[]
@@ -9,19 +9,11 @@ interface CountdownProps {
   onShowRules?: () => void
 }
 
-export default function Countdown({ matches, teams, venues, onShowRules }: CountdownProps) {
-  const firstMatchDate = useMemo(() => matches.map(match => match.date).sort()[0] ?? null, [matches])
+export default function Countdown({ matches, onShowRules }: CountdownProps) {
+  const [nextDeadline, setNextDeadline] = useState(() => getNextBettingDeadline(matches))
 
-  const [targetMatch, setTargetMatch] = useState<Match | null>(() => {
-    if (!firstMatchDate || isBeforeTournament(firstMatchDate)) {
-      return null
-    }
-
-    return getNextMatch(matches)
-  })
-
-  const targetDate = targetMatch?.date ?? firstMatchDate
-  const isTournamentOver = firstMatchDate !== null && !isBeforeTournament(firstMatchDate) && !targetMatch
+  const targetDate = nextDeadline?.deadline ?? null
+  const isTournamentOver = nextDeadline === null
   const [timeLeft, setTimeLeft] = useState(() => getTimeUntil(targetDate ?? new Date().toISOString()))
 
   useEffect(() => {
@@ -34,33 +26,17 @@ export default function Countdown({ matches, teams, venues, onShowRules }: Count
       setTimeLeft(nextTime)
 
       if (nextTime.days === 0 && nextTime.hours === 0 && nextTime.minutes === 0 && nextTime.seconds === 0) {
-        setTargetMatch(getNextMatch(matches))
+        setNextDeadline(getNextBettingDeadline(matches))
       }
     }, 1000)
 
     return () => clearInterval(interval)
   }, [isTournamentOver, matches, targetDate])
 
-  let contextText: string
-
-  if (isTournamentOver) {
-    contextText = 'VM 2026 er avsluttet'
-  } else if (!targetMatch) {
-    contextText = 'Til VM 2026 starter'
-  } else if (targetMatch.homeTeam && targetMatch.awayTeam) {
-    const home = teams[targetMatch.homeTeam]
-    const away = teams[targetMatch.awayTeam]
-    contextText = `Til ${home?.name ?? targetMatch.homeTeam} mot ${away?.name ?? targetMatch.awayTeam}`
-  } else {
-    contextText = `Til ${targetMatch.homePlaceholder ?? 'Ikke avgjort'} mot ${targetMatch.awayPlaceholder ?? 'Ikke avgjort'}`
-  }
-
-  const venue = targetMatch ? venues.find(venueItem => venueItem.id === targetMatch.venueId) : null
-
   if (isTournamentOver) {
     return (
       <div className="py-8 text-center">
-        <p className="text-xl font-semibold" style={{ color: 'var(--color-text-secondary)' }}>{contextText}</p>
+        <p className="text-xl font-semibold" style={{ color: 'var(--color-text-secondary)' }}>VM 2026 er avsluttet</p>
         {onShowRules ? (
           <div className="mt-3">
             <RulesLink onClick={onShowRules} />
@@ -69,6 +45,9 @@ export default function Countdown({ matches, teams, venues, onShowRules }: Count
       </div>
     )
   }
+
+  const roundLabel = STAGE_LABELS[nextDeadline.stage]
+  const contextText = `Til du må legge inn bets for ${roundLabel}`
 
   return (
     <div className="py-6 text-center sm:py-8">
@@ -94,11 +73,6 @@ export default function Countdown({ matches, teams, venues, onShowRules }: Count
         </div>
       </div>
       <p className="mt-3 text-base font-medium sm:mt-4 sm:text-lg" style={{ color: 'var(--color-text-secondary)' }}>{contextText}</p>
-      {venue ? (
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          {venue.name}, {venue.city}
-        </p>
-      ) : null}
       {onShowRules ? (
         <div className="mt-3">
           <RulesLink onClick={onShowRules} />

@@ -17,7 +17,7 @@ import ChatPanel from './components/ChatPanel'
 import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
-import { isStageLocked, GROUP_ROUNDS } from './utils/dateUtils'
+import { isStageLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
 
 type MatchesSection = Exclude<Section, 'leaderboard'>
 
@@ -32,17 +32,38 @@ function defaultStageFor(section: MatchesSection, matches: Match[]): Stage {
   return firstOpen ?? 'group-3'
 }
 
+/**
+ * Neste runde brukeren skal bette på (første runde med kommende frist).
+ * Returnerer null hvis alle runder er låst.
+ */
+function nextBettingStage(matches: Match[]): { section: MatchesSection; stage: Stage } | null {
+  const next = getNextBettingDeadline(matches)
+  if (!next) return null
+  const section = getSectionForStage(next.stage)
+  if (section === 'leaderboard') return null
+  return { section, stage: next.stage }
+}
+
 function AppContent() {
   const { user } = useAuth()
   const { matches } = useMatches()
   const location = useLocation()
   const navigate = useNavigate()
-  const [activeSection, setActiveSection] = useState<Section>('group')
-  const [activeStage, setActiveStage] = useState<Stage>(() => defaultStageFor('group', matches))
+  const initialBetting = nextBettingStage(matches)
+  const [activeSection, setActiveSection] = useState<Section>(initialBetting?.section ?? 'group')
+  const [activeStage, setActiveStage] = useState<Stage>(
+    initialBetting?.stage ?? defaultStageFor('group', matches),
+  )
   // Husk siste valgte stage per seksjon, slik at bytting frem/tilbake bevarer kontekst.
-  const [lastGroupStage, setLastGroupStage] = useState<Stage>('group-1')
-  const [lastKnockoutStage, setLastKnockoutStage] = useState<Stage>('round-of-32')
-  const [lastMatchesSection, setLastMatchesSection] = useState<MatchesSection>('group')
+  const [lastGroupStage, setLastGroupStage] = useState<Stage>(
+    initialBetting?.section === 'group' ? initialBetting.stage : 'group-1',
+  )
+  const [lastKnockoutStage, setLastKnockoutStage] = useState<Stage>(
+    initialBetting?.section === 'knockout' ? initialBetting.stage : 'round-of-32',
+  )
+  const [lastMatchesSection, setLastMatchesSection] = useState<MatchesSection>(
+    initialBetting?.section ?? 'group',
+  )
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showAdmin, setShowAdmin] = useState(false)
@@ -50,17 +71,20 @@ function AppContent() {
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
-  // Når matches lastes inn, oppdater default-stage hvis vi fortsatt står på gruppespill-default.
+  // Når matches lastes inn (asynkront), hopp til neste runde brukeren kan bette på.
+  // Skjer kun ved første lasting, slik at vi ikke overstyrer brukerens egne valg senere.
+  const [hasAutoSelected, setHasAutoSelected] = useState(initialBetting !== null)
   useEffect(() => {
-    if (activeSection === 'group') {
-      setActiveStage(prev => {
-        if (prev !== 'group-1') return prev
-        return defaultStageFor('group', matches)
-      })
-    }
-    // Vi vil kun reagere når matches faktisk er lastet.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matches.length])
+    if (hasAutoSelected || matches.length === 0) return
+    const next = nextBettingStage(matches)
+    if (!next) return
+    setActiveSection(next.section)
+    setActiveStage(next.stage)
+    if (next.section === 'group') setLastGroupStage(next.stage)
+    if (next.section === 'knockout') setLastKnockoutStage(next.stage)
+    setLastMatchesSection(next.section)
+    setHasAutoSelected(true)
+  }, [matches, hasAutoSelected])
 
   // Husk siste seksjon (utenom leaderboard) og siste stage per seksjon.
   useEffect(() => {
