@@ -30,7 +30,7 @@
     <!-- Seed for lag-statistikk og H2H. TeamStatsService leter i ContentRoot
          først og deretter i BaseDirectory, så vi kopierer til output slik at
          også publiserte miljøer finner fila. -->
-    <None Update="data\teamStats.json">
+    <None Update="Data\teamStats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

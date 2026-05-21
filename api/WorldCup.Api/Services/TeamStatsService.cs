@@ -156,8 +156,8 @@ public sealed class TeamStatsService
     {
         var candidates = new[]
         {
-            Path.Combine(env.ContentRootPath, "data", "teamStats.json"),
-            Path.Combine(AppContext.BaseDirectory, "data", "teamStats.json"),
+            Path.Combine(env.ContentRootPath, "Data", "teamStats.json"),
+            Path.Combine(AppContext.BaseDirectory, "Data", "teamStats.json"),
         };
 
         foreach (var path in candidates)
