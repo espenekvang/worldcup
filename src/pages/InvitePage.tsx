@@ -12,7 +12,7 @@ type Status = 'loading' | 'invalid' | 'needs-login' | 'accepting' | 'success' | 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { groups, setGroups, setActiveGroup } = useBettingGroup()
 
   const [status, setStatus] = useState<Status>('loading')
@@ -79,6 +79,7 @@ export default function InvitePage() {
         // ryddet auth_token/auth_user, og pending_invite_token gjør at login-
         // flyten auto-joiner gruppen via /api/auth/google.
         if (msg.includes('API error 401')) {
+          logout()
           navigate('/login', { replace: true })
           return
         }
@@ -90,7 +91,7 @@ export default function InvitePage() {
     run()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, user])
+  }, [token, user, logout, navigate, groups, setGroups, setActiveGroup])
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4" style={{ backgroundColor: 'var(--color-surface)' }}>
