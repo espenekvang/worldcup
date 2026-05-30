@@ -12,6 +12,7 @@ import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
 import { useAuth } from '../context/AuthContext'
+import { useBettingGroup } from '../context/BettingGroupContext'
 import { useFeatureFlag } from '../context/FeatureFlagsContext'
 import { teams } from '../data'
 
@@ -29,6 +30,7 @@ const stageNames: Record<string, string> = {
 
 export default function AdminPanel() {
   const { user } = useAuth()
+  const { activeGroup, setActiveGroup } = useBettingGroup()
   const isGlobalAdmin = user?.isAdmin ?? false
   const groupAdminGroupIds = user?.groupAdminGroupIds ?? []
   const paidLeaguesEnabled = useFeatureFlag('PaidLeagues')
@@ -201,6 +203,9 @@ export default function AdminPanel() {
     try {
       await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
       await loadGroups()
+      if (activeGroup?.id === group.id) {
+        setActiveGroup({ ...activeGroup, isPaid: true, entryFee: fee })
+      }
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke konvertere liga')
     }
@@ -220,6 +225,10 @@ export default function AdminPanel() {
     try {
       await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
       await loadGroups()
+      // Sync activeGroup in context so other components (e.g. PredictionModal) see updated fee
+      if (activeGroup?.id === group.id) {
+        setActiveGroup({ ...activeGroup, entryFee: fee })
+      }
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre avgift')
     }
