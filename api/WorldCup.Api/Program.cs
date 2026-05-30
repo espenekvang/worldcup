@@ -90,7 +90,8 @@ var defaultConnectionString = builder.Configuration.GetConnectionString("Default
     ?? throw new InvalidOperationException("Default database connection string is not configured.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(defaultConnectionString));
+    options.UseSqlite(defaultConnectionString)
+           .AddInterceptors(new SqliteConnectionInterceptor()));
 
 var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() is { Length: > 0 } configuredOrigins
     ? configuredOrigins

@@ -233,7 +233,9 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                     return BadRequest("Avgift må være større enn 0 for en betalt liga.");
                 }
 
+                var oldFee = group.EntryFee;
                 group.EntryFee = request.EntryFee.Value;
+                Console.WriteLine($"[UpdateGroup] Changing EntryFee for group {group.Id} from {oldFee} to {group.EntryFee}");
             }
         }
 
