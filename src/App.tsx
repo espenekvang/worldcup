@@ -17,7 +17,7 @@ import ChatPanel from './components/ChatPanel'
 import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
-import { isStageLocked, isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
+import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
 
 type MatchesSection = Exclude<Section, 'leaderboard'>
 
