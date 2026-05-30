@@ -46,7 +46,9 @@ export default function Countdown({ matches, onShowRules }: CountdownProps) {
     )
   }
 
-  const contextText = 'Til første kamp starter i VM 2026'
+  const contextText = nextDeadline.isFirstMatch
+    ? 'Til første kamp starter i VM 2026'
+    : 'Til du må ha lagt inn bet på neste kamp'
 
   return (
     <div className="py-6 text-center sm:py-8">
