@@ -149,6 +149,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddHostedService<DatabaseMigrationService>();
+builder.Services.AddHostedService<DatabaseBackupService>();
 
 var app = builder.Build();
 
