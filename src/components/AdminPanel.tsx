@@ -30,7 +30,7 @@ const stageNames: Record<string, string> = {
 
 export default function AdminPanel() {
   const { user } = useAuth()
-  const { activeGroup, setActiveGroup } = useBettingGroup()
+  const { refreshGroups } = useBettingGroup()
   const isGlobalAdmin = user?.isAdmin ?? false
   const groupAdminGroupIds = user?.groupAdminGroupIds ?? []
   const paidLeaguesEnabled = useFeatureFlag('PaidLeagues')
@@ -203,9 +203,7 @@ export default function AdminPanel() {
     try {
       await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
       await loadGroups()
-      if (activeGroup?.id === group.id) {
-        setActiveGroup({ ...activeGroup, isPaid: true, entryFee: fee })
-      }
+      await refreshGroups()
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke konvertere liga')
     }
@@ -225,10 +223,7 @@ export default function AdminPanel() {
     try {
       await updateGroup(group.id, group.name, { isPaid: true, entryFee: fee })
       await loadGroups()
-      // Sync activeGroup in context so other components (e.g. PredictionModal) see updated fee
-      if (activeGroup?.id === group.id) {
-        setActiveGroup({ ...activeGroup, entryFee: fee })
-      }
+      await refreshGroups()
     } catch (err) {
       setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre avgift')
     }

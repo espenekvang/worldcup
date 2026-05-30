@@ -51,6 +51,13 @@ vi.mock('../context/FeatureFlagsContext', () => ({
   useFeatureFlags: () => ({ flags: {}, isLoading: false, isEnabled: () => false }),
 }))
 
+vi.mock('../context/BettingGroupContext', () => ({
+  useBettingGroup: () => ({
+    activeGroup: null,
+    refreshGroups: vi.fn(),
+  }),
+}))
+
 import { updateMatchTeams } from '../api/client'
 
 const knockoutMatch: Match = {

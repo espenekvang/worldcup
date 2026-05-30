@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { BettingGroup } from '../types'
+import { getMyGroups } from '../api/client'
 
 interface BettingGroupContextValue {
   groups: BettingGroup[]
@@ -8,6 +9,7 @@ interface BettingGroupContextValue {
   setActiveGroup: (group: BettingGroup) => void
   clearActiveGroup: () => void
   setGroups: (groups: BettingGroup[]) => void
+  refreshGroups: () => Promise<void>
   isLoading: boolean
 }
 
@@ -83,6 +85,21 @@ export function BettingGroupProvider({ children }: { children: ReactNode }) {
     safeRemoveItem(GROUP_KEY)
   }, [])
 
+  const refreshGroups = useCallback(async () => {
+    try {
+      const freshGroups = await getMyGroups()
+      setGroupsState(freshGroups)
+      // Update activeGroup with fresh data if it still exists
+      const storedId = safeGetItem(GROUP_KEY)
+      if (storedId) {
+        const updated = freshGroups.find(g => g.id === storedId)
+        if (updated) setActiveGroupState(updated)
+      }
+    } catch {
+      // silently fail – stale data is acceptable as fallback
+    }
+  }, [])
+
   // On mount, mark as not loading if no groups are set yet
   useEffect(() => {
     // Initial load state will be resolved when setGroups is called from AuthContext
@@ -91,8 +108,8 @@ export function BettingGroupProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, isLoading }),
-    [groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, isLoading],
+    () => ({ groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, refreshGroups, isLoading }),
+    [groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, refreshGroups, isLoading],
   )
 
   return <BettingGroupContext value={value}>{children}</BettingGroupContext>
