@@ -4,6 +4,12 @@ resource "azurerm_storage_account" "main" {
   location                 = azurerm_resource_group.main.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+
+  share_properties {
+    retention_policy {
+      days = 7
+    }
+  }
 }
 
 resource "azurerm_storage_share" "backup" {
