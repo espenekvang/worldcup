@@ -11,6 +11,7 @@ interface MatchCardProps {
   teams: Record<string, Team>
   venues: Venue[]
   locked: boolean
+  isNext?: boolean
   onTipClick: (match: Match) => void
   onViewOthers: (match: Match) => void
 }
@@ -27,7 +28,7 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
-export default function MatchCard({ match, teams, venues, locked, onTipClick, onViewOthers }: MatchCardProps) {
+export default function MatchCard({ match, teams, venues, locked, isNext, onTipClick, onViewOthers }: MatchCardProps) {
   const navigate = useNavigate()
   const { predictions } = usePredictions()
   const { results, points } = useResults()
@@ -86,8 +87,12 @@ export default function MatchCard({ match, teams, venues, locked, onTipClick, on
       tabIndex={0}
       onClick={goToDetails}
       onKeyDown={handleCardKeyDown}
-      className="cursor-pointer rounded-lg border px-3 py-2 shadow-sm transition-colors hover:shadow-md sm:px-4 sm:py-2.5"
-      style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      className={`cursor-pointer rounded-lg border px-3 py-2 shadow-sm transition-colors hover:shadow-md sm:px-4 sm:py-2.5 ${isNext ? 'ring-2' : ''}`}
+      style={{
+        backgroundColor: isNext ? 'var(--color-primary-light)' : 'var(--color-surface-card)',
+        borderColor: isNext ? 'var(--color-primary)' : 'var(--color-border)',
+        ...(isNext ? { '--tw-ring-color': 'var(--color-primary)' } as React.CSSProperties : {}),
+      }}
     >
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
         <div className="flex items-center gap-2 sm:contents">

@@ -21,8 +21,15 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const isLocked = (match: Match) => isMatchLocked(match) || areTeamsUndetermined(match)
 
+  // Find next upcoming unlocked match (the one to bet on)
+  const now = new Date()
+  const nextMatch = sorted.find(m => new Date(m.date) > now && !isLocked(m))
+
+  // Remove the pinned match from the regular list
+  const regularMatches = nextMatch ? sorted.filter(m => m.id !== nextMatch.id) : sorted
+
   const dayGroups = new Map<string, Match[]>()
-  for (const match of sorted) {
+  for (const match of regularMatches) {
     const dayKey = match.date.slice(0, 10)
     if (!dayGroups.has(dayKey)) dayGroups.set(dayKey, [])
     dayGroups.get(dayKey)!.push(match)
@@ -31,6 +38,27 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
   return (
     <div className="space-y-6 p-2 sm:p-4">
       <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
+
+      {nextMatch && (
+        <div>
+          <h3
+            className="mb-3 text-sm font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            ⚽ Neste kamp
+          </h3>
+          <MatchCard
+            match={nextMatch}
+            teams={teams}
+            venues={venues}
+            locked={isLocked(nextMatch)}
+            isNext
+            onTipClick={onTipClick}
+            onViewOthers={onViewOthers}
+          />
+        </div>
+      )}
+
       {[...dayGroups.entries()].map(([dayKey, dayMatches]) => (
         <div key={dayKey}>
           <h3
