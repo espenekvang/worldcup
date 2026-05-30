@@ -58,9 +58,9 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return NotFound("Match not found.");
         }
 
-        if (matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage))
+        if (matchScheduleProvider.Current.IsMatchLocked(matchId))
         {
-            return BadRequest("Betting er stengt for denne runden.");
+            return BadRequest("Betting er stengt for denne kampen.");
         }
 
         if (matchEntry.AreTeamsUndetermined)
@@ -149,7 +149,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return NotFound("Match not found.");
         }
 
-        var locked = matchScheduleProvider.Current.IsStageLocked(matchEntry.Stage);
+        var locked = matchScheduleProvider.Current.IsMatchLocked(matchId);
 
         var memberIds = dbContext.BettingGroupMembers
             .Where(m => m.BettingGroupId == groupId)

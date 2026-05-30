@@ -1,5 +1,5 @@
 import type { Match, Team, Venue, Stage } from '../types'
-import { formatMatchDate, isStageLocked, areTeamsUndetermined } from '../utils/dateUtils'
+import { formatMatchDate, isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
 import MatchCard from './MatchCard'
 
 interface MatchListProps {
@@ -19,7 +19,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const sorted = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
-  const isLocked = (match: Match) => isStageLocked(match.stage, matches) || areTeamsUndetermined(match)
+  const isLocked = (match: Match) => isMatchLocked(match) || areTeamsUndetermined(match)
 
   const dayGroups = new Map<string, Match[]>()
   for (const match of sorted) {

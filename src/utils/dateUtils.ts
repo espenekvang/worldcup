@@ -51,6 +51,10 @@ export function isStageLocked(stage: Stage, matches: Match[], now: number = Date
   return now >= kickoff
 }
 
+export function isMatchLocked(match: Match, now: number = Date.now()): boolean {
+  return now >= new Date(match.date).getTime()
+}
+
 /** Menneskelig navn for hver runde, brukt i UI. */
 export const STAGE_LABELS: Record<Stage, string> = {
   'group-1': 'Runde 1',

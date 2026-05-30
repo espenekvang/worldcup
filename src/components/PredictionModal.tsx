@@ -3,7 +3,7 @@ import type { Match, Team } from '../types'
 import { useMatches } from '../context/MatchesContext'
 import { usePredictions } from '../context/PredictionsContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
-import { isStageLocked, areTeamsUndetermined } from '../utils/dateUtils'
+import { isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
 
 interface PredictionModalProps {
   match: Match
@@ -51,8 +51,8 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
       return
     }
 
-    if (isStageLocked(match.stage, allMatches)) {
-      setError('Betting er stengt for denne runden')
+    if (isMatchLocked(match)) {
+      setError('Betting er stengt for denne kampen')
       return
     }
 

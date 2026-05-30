@@ -1,5 +1,5 @@
 import type { Match, Stage } from '../types'
-import { GROUP_ROUNDS, KNOCKOUT_ROUNDS, isStageLocked } from '../utils/dateUtils'
+import { GROUP_ROUNDS, KNOCKOUT_ROUNDS, isMatchLocked } from '../utils/dateUtils'
 
 interface RoundPillsProps {
   section: 'group' | 'knockout'
@@ -33,7 +33,7 @@ export default function RoundPills({ section, activeStage, onStageChange, matche
     >
       {stages.map(stage => {
         const isActive = activeStage === stage
-        const locked = isStageLocked(stage, matches)
+        const locked = matches.filter(m => m.stage === stage).every(m => isMatchLocked(m))
         const label = LABELS[stage]
         if (!label) return null
         return (

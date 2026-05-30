@@ -17,7 +17,7 @@ import ChatPanel from './components/ChatPanel'
 import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
-import { isStageLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
+import { isStageLocked, isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
 
 type MatchesSection = Exclude<Section, 'leaderboard'>
 
@@ -28,7 +28,7 @@ type MatchesSection = Exclude<Section, 'leaderboard'>
  */
 function defaultStageFor(section: MatchesSection, matches: Match[]): Stage {
   if (section === 'knockout') return 'round-of-32'
-  const firstOpen = GROUP_ROUNDS.find(s => !isStageLocked(s, matches))
+  const firstOpen = GROUP_ROUNDS.find(s => matches.filter(m => m.stage === s).some(m => !isMatchLocked(m)))
   return firstOpen ?? 'group-3'
 }
 
