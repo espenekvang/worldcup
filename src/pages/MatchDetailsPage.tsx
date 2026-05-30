@@ -18,7 +18,7 @@ import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 import { useWeather } from '../hooks/useWeather'
 import { useAuth } from '../context/AuthContext'
-import { formatMatchDate, formatMatchTime, areTeamsUndetermined, isStageLocked, isGroupStage } from '../utils/dateUtils'
+import { formatMatchDate, formatMatchTime, areTeamsUndetermined, isMatchLocked, isGroupStage } from '../utils/dateUtils'
 
 const STAGE_LABELS: Record<string, string> = {
   'group-1': 'Gruppespill',
@@ -89,7 +89,7 @@ export default function MatchDetailsPage() {
   const prediction = predictions.get(match.id)
   const result = results.get(match.id)
   const pts = points.get(match.id)
-  const locked = isStageLocked(match.stage, matches)
+  const locked = isMatchLocked(match)
   const canBet = !undetermined && !locked
 
   return (

@@ -51,6 +51,10 @@ export function isStageLocked(stage: Stage, matches: Match[], now: number = Date
   return now >= kickoff
 }
 
+export function isMatchLocked(match: Match, now: number = Date.now()): boolean {
+  return now >= new Date(match.date).getTime()
+}
+
 /** Menneskelig navn for hver runde, brukt i UI. */
 export const STAGE_LABELS: Record<Stage, string> = {
   'group-1': 'Runde 1',
@@ -73,18 +77,22 @@ export const STAGE_LABELS: Record<Stage, string> = {
 export function getNextBettingDeadline(
   matches: Match[],
   now: number = Date.now(),
-): { stage: Stage; deadline: string } | null {
-  const earliest = getEarliestKickoffByStage(matches)
-  let bestStage: Stage | null = null
+): { stage: Stage; deadline: string; isFirstMatch: boolean } | null {
+  // Find the next match that hasn't started yet
+  let bestMatch: Match | null = null
   let bestTime = Number.POSITIVE_INFINITY
-  for (const [stage, time] of earliest) {
-    if (time > now && time < bestTime) {
-      bestTime = time
-      bestStage = stage
+  for (const match of matches) {
+    const kickoff = new Date(match.date).getTime()
+    if (kickoff > now && kickoff < bestTime) {
+      bestTime = kickoff
+      bestMatch = match
     }
   }
-  if (!bestStage) return null
-  return { stage: bestStage, deadline: new Date(bestTime).toISOString() }
+  if (!bestMatch) return null
+  // Check if this is the very first match of the tournament
+  const earliestKickoff = Math.min(...matches.map(m => new Date(m.date).getTime()))
+  const isFirstMatch = bestTime === earliestKickoff
+  return { stage: bestMatch.stage, deadline: bestMatch.date, isFirstMatch }
 }
 
 export function areTeamsUndetermined(match: Match): boolean {

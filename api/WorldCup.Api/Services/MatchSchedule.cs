@@ -24,6 +24,9 @@ public sealed class MatchSchedule
     public bool IsStageLocked(string stage) =>
         _earliestKickoffByStage.TryGetValue(stage, out var earliest) && DateTime.UtcNow >= earliest;
 
+    public bool IsMatchLocked(int matchId) =>
+        _matchesById.TryGetValue(matchId, out var match) && DateTime.UtcNow >= match.Date;
+
     public static MatchSchedule LoadFromJson(string path)
     {
         var json = File.ReadAllText(path);

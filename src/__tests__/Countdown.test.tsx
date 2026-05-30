@@ -31,7 +31,7 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Til du må ha lagt inn bets for Runde 1/)).toBeInTheDocument()
+    expect(screen.getByText(/Til første kamp starter i VM 2026/)).toBeInTheDocument()
     expect(screen.getByText('dager')).toBeInTheDocument()
   })
 
@@ -40,7 +40,7 @@ describe('Countdown', () => {
 
     render(<Countdown matches={mockMatches} teams={mockTeams} venues={mockVenues} />)
 
-    expect(screen.getByText(/Til du må ha lagt inn bets for Runde 2/)).toBeInTheDocument()
+    expect(screen.getByText(/Til du må ha lagt inn bet på neste kamp/)).toBeInTheDocument()
   })
 
   it('renders the rules link and invokes onShowRules when clicked', () => {

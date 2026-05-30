@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team, Venue } from '../types'
-import { STAGE_LABELS, getNextBettingDeadline, getTimeUntil } from '../utils/dateUtils'
+import { getNextBettingDeadline, getTimeUntil } from '../utils/dateUtils'
 
 interface CountdownProps {
   matches: Match[]
@@ -46,8 +46,9 @@ export default function Countdown({ matches, onShowRules }: CountdownProps) {
     )
   }
 
-  const roundLabel = STAGE_LABELS[nextDeadline.stage]
-  const contextText = `Til du må ha lagt inn bets for ${roundLabel}`
+  const contextText = nextDeadline.isFirstMatch
+    ? 'Til første kamp starter i VM 2026'
+    : 'Til du må ha lagt inn bet på neste kamp'
 
   return (
     <div className="py-6 text-center sm:py-8">
