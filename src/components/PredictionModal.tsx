@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { Match, Team } from '../types'
-import { useMatches } from '../context/MatchesContext'
 import { usePredictions } from '../context/PredictionsContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
@@ -12,7 +11,6 @@ interface PredictionModalProps {
 }
 
 export default function PredictionModal({ match, teams, onClose }: PredictionModalProps) {
-  const { matches: allMatches } = useMatches()
   const { predictions, savePrediction } = usePredictions()
   const { activeGroup } = useBettingGroup()
   const existing = predictions.get(match.id)
