@@ -45,7 +45,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
             className="mb-3 text-sm font-semibold uppercase tracking-wide"
             style={{ color: 'var(--color-primary)' }}
           >
-            ⚽ Neste kamp
+            ⚽ Neste kamp &middot; {formatMatchDate(nextMatch.date)}
           </h3>
           <MatchCard
             match={nextMatch}
