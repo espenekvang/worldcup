@@ -4,9 +4,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace WorldCup.Api.Data;
 
 /// <summary>
-/// Sets SQLite PRAGMAs on every new database connection to ensure reliable writes
-/// on Azure Files (SMB). WAL mode is incompatible with SMB-mounted file systems
-/// because SMB does not support the shared-memory file (-shm) required for WAL readers.
+/// Sets SQLite PRAGMAs on every new database connection for optimal performance.
+/// The database now runs on local (ephemeral) disk, so WAL mode is safe to use.
 /// </summary>
 public class SqliteConnectionInterceptor : DbConnectionInterceptor
 {
@@ -25,7 +24,7 @@ public class SqliteConnectionInterceptor : DbConnectionInterceptor
     private static void SetPragmas(DbConnection connection)
     {
         using var cmd = connection.CreateCommand();
-        cmd.CommandText = "PRAGMA journal_mode = DELETE; PRAGMA synchronous = FULL;";
+        cmd.CommandText = "PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA busy_timeout = 5000;";
         cmd.ExecuteNonQuery();
     }
 }
