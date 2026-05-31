@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Match, Team } from '../types'
+import { getMatchPredictions } from '../api/client'
 import { usePredictions } from '../context/PredictionsContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
+import { calculateOdds, type MatchOdds } from '../utils/oddsUtils'
 
 interface PredictionModalProps {
   match: Match
@@ -20,6 +22,13 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
   const [awayScore, setAwayScore] = useState<string>(existing ? String(existing.awayScore) : '0')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [odds, setOdds] = useState<MatchOdds | null>(null)
+
+  useEffect(() => {
+    getMatchPredictions(match.id)
+      .then((preds) => setOdds(calculateOdds(preds)))
+      .catch(() => setOdds(null))
+  }, [match.id])
 
   const homeTeam = match.homeTeam ? teams[match.homeTeam] : null
   const awayTeam = match.awayTeam ? teams[match.awayTeam] : null
@@ -152,6 +161,25 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
               />
             </div>
           </div>
+
+          {odds && (
+            <div className="mt-4 text-center">
+              <div className="flex items-center justify-center gap-3 text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
+                  H {odds.home ?? '–'}
+                </span>
+                <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
+                  U {odds.draw ?? '–'}
+                </span>
+                <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
+                  B {odds.away ?? '–'}
+                </span>
+              </div>
+              <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Basert på {odds.totalPredictions} tips
+              </p>
+            </div>
+          )}
 
           {error ? (
             <p className="mt-4 text-center text-sm" style={{ color: 'var(--color-danger)' }}>{error}</p>
