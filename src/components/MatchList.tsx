@@ -21,9 +21,14 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const isLocked = (match: Match) => isMatchLocked(match) || areTeamsUndetermined(match)
 
-  // Find next upcoming unlocked match (the one to bet on)
+  // Find the globally next upcoming unlocked match (across all stages)
   const now = new Date()
-  const nextMatch = sorted.find(m => new Date(m.date) > now && !isLocked(m))
+  const globalNextMatch = [...matches]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .find(m => new Date(m.date) > now && !isLocked(m))
+
+  // Only show "Neste kamp" if it belongs to the currently active stage
+  const nextMatch = sorted.find(m => m.id === globalNextMatch?.id) || null
 
   // Remove the pinned match from the regular list
   const regularMatches = nextMatch ? sorted.filter(m => m.id !== nextMatch.id) : sorted
