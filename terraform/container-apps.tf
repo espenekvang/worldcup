@@ -5,15 +5,6 @@ resource "azurerm_container_app_environment" "main" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
 }
 
-resource "azurerm_container_app_environment_storage" "backup" {
-  name                         = "backup-storage"
-  container_app_environment_id = azurerm_container_app_environment.main.id
-  account_name                 = azurerm_storage_account.main.name
-  share_name                   = azurerm_storage_share.backup.name
-  access_key                   = azurerm_storage_account.main.primary_access_key
-  access_mode                  = "ReadWrite"
-}
-
 resource "azurerm_container_app" "main" {
   name                         = var.container_app_name
   container_app_environment_id = azurerm_container_app_environment.main.id
@@ -53,17 +44,6 @@ resource "azurerm_container_app" "main" {
     min_replicas = 1
     max_replicas = 1
 
-    volume {
-      name         = "backup-volume"
-      storage_type = "AzureFile"
-      storage_name = azurerm_container_app_environment_storage.backup.name
-    }
-
-    volume {
-      name         = "data-volume"
-      storage_type = "EmptyDir"
-    }
-
     container {
       name   = "worldcup"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
@@ -97,22 +77,12 @@ resource "azurerm_container_app" "main" {
 
       env {
         name  = "ConnectionStrings__DefaultConnection"
-        value = "Data Source=/data/worldcup.db"
+        value = "Server=tcp:${azurerm_mssql_server.main.fully_qualified_domain_name},1433;Database=${azurerm_mssql_database.main.name};Authentication=Active Directory Default;Encrypt=True;TrustServerCertificate=False;"
       }
 
       env {
         name        = "Wc2026Api__ApiKey"
         secret_name = "wc2026-api-key"
-      }
-
-      volume_mounts {
-        name = "backup-volume"
-        path = "/mnt/backup"
-      }
-
-      volume_mounts {
-        name = "data-volume"
-        path = "/data"
       }
     }
   }

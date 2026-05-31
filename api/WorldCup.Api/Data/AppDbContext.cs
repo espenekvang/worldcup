@@ -74,6 +74,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<BettingGroup>()
+            .Property(group => group.EntryFee)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<BettingGroup>()
             .HasOne(group => group.CreatedByUser)
             .WithMany()
             .HasForeignKey(group => group.CreatedByUserId)

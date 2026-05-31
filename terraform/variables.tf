@@ -67,3 +67,13 @@ variable "custom_domain" {
   type        = string
   default     = ""
 }
+
+variable "sql_admin_email" {
+  description = "Email/UPN of the Entra ID SQL admin"
+  type        = string
+}
+
+variable "sql_admin_object_id" {
+  description = "Object ID of the Entra ID SQL admin"
+  type        = string
+}
