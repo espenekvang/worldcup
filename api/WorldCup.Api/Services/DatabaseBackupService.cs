@@ -5,9 +5,11 @@ namespace WorldCup.Api.Services;
 public class DatabaseBackupService : BackgroundService
 {
     private static readonly TimeSpan BackupInterval = TimeSpan.FromHours(6);
+    private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(2);
     private const int MaxBackups = 7;
-    private const string DatabasePath = "/mnt/backup/worldcup.db";
-    private const string BackupDirectory = "/mnt/backup/backups";
+    private const string MountPath = "/mnt/backup";
+    private const string DatabasePath = $"{MountPath}/worldcup.db";
+    private const string BackupDirectory = $"{MountPath}/backups";
 
     private readonly ILogger<DatabaseBackupService> _logger;
 
@@ -18,14 +20,25 @@ public class DatabaseBackupService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Wait for app startup to complete before first backup
-        await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+        // Wait for app startup and file share mount to complete
+        await Task.Delay(StartupDelay, stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await PerformBackupAsync(stoppingToken);
+                if (!Directory.Exists(MountPath))
+                {
+                    _logger.LogWarning("Mount path {Path} does not exist, skipping backup cycle", MountPath);
+                }
+                else
+                {
+                    PerformBackup();
+                }
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
             }
             catch (Exception ex)
             {
@@ -36,14 +49,12 @@ public class DatabaseBackupService : BackgroundService
         }
     }
 
-    private Task PerformBackupAsync(CancellationToken ct)
+    private void PerformBackup()
     {
-        ct.ThrowIfCancellationRequested();
-
         if (!File.Exists(DatabasePath))
         {
             _logger.LogWarning("Database file not found at {Path}, skipping backup", DatabasePath);
-            return Task.CompletedTask;
+            return;
         }
 
         Directory.CreateDirectory(BackupDirectory);
@@ -62,8 +73,6 @@ public class DatabaseBackupService : BackgroundService
         _logger.LogInformation("Database backup created: {Path}", backupPath);
 
         CleanupOldBackups();
-
-        return Task.CompletedTask;
     }
 
     private void CleanupOldBackups()
