@@ -222,8 +222,21 @@ export function getMatchPredictions(matchId: number): Promise<MatchPredictionRes
   return request<MatchPredictionResponse[]>(`/api/predictions/match/${matchId}`)
 }
 
+export interface GlobalLeaderboardEntry {
+  name: string | null
+  picture: string | null
+  totalPoints: number
+  matchCount: number
+  isInCurrentGroup: boolean
+  groupName: string | null
+}
+
 export function getLeaderboard(): Promise<LeaderboardEntry[]> {
   return request<LeaderboardEntry[]>('/api/results/leaderboard')
+}
+
+export function getGlobalLeaderboard(): Promise<GlobalLeaderboardEntry[]> {
+  return request<GlobalLeaderboardEntry[]>('/api/results/leaderboard/global')
 }
 
 export function getMatches(): Promise<Match[]> {

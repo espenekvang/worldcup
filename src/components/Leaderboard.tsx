@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getLeaderboard, type LeaderboardEntry } from '../api/client'
+import { getLeaderboard, getGlobalLeaderboard, type LeaderboardEntry, type GlobalLeaderboardEntry } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { firstName } from '../utils/nameUtils'
 
@@ -62,6 +62,7 @@ function formatCurrency(amount: number): string {
 export default function Leaderboard() {
   const { activeGroup } = useBettingGroup()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
+  const [globalEntries, setGlobalEntries] = useState<GlobalLeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -71,9 +72,12 @@ export default function Leaderboard() {
     let cancelled = false
     setLoading(true)
 
-    getLeaderboard()
-      .then(data => {
-        if (!cancelled) setEntries(data)
+    Promise.all([getLeaderboard(), getGlobalLeaderboard()])
+      .then(([leaderboardData, globalData]) => {
+        if (!cancelled) {
+          setEntries(leaderboardData)
+          setGlobalEntries(globalData)
+        }
       })
       .catch(err => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Kunne ikke hente poengoversikt')
@@ -236,6 +240,79 @@ export default function Leaderboard() {
           </div>
         ))}
       </div>
+
+      {/* Global leaderboard – alle ligaer */}
+      {globalEntries.length > 0 && (
+        <>
+          <p className="text-sm font-medium mt-4" style={{ color: 'var(--color-text-primary)' }}>
+            The Boss over alle ligaer
+          </p>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{globalEntries.length} deltakere</p>
+          <div
+            className="overflow-hidden rounded-xl"
+            style={{ backgroundColor: 'var(--color-surface-card)', border: '1px solid var(--color-border-light)' }}
+          >
+            {globalEntries.map((entry, i) => (
+              <div
+                key={`global-${i}`}
+                className="flex items-center justify-between px-4 py-3"
+                style={{
+                  borderBottom: i < globalEntries.length - 1 ? '1px solid var(--color-border-light)' : undefined,
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
+                    style={{
+                      backgroundColor: i === 0 ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
+                      color: i === 0 ? 'var(--color-success-text)' : 'var(--color-text-muted)',
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  {entry.isInCurrentGroup ? (
+                    entry.picture ? (
+                      <img src={entry.picture} alt="" className="h-8 w-8 rounded-full" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
+                        style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
+                      >
+                        {entry.name ? firstName(entry.name).charAt(0) : '?'}
+                      </div>
+                    )
+                  ) : (
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-full"
+                      style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                      </svg>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {entry.isInCurrentGroup
+                        ? firstName(entry.name ?? '')
+                        : `Spiller fra ${entry.groupName ?? 'ukjent liga'}`}
+                    </span>
+                    <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      {entry.matchCount} {entry.matchCount === 1 ? 'kamp' : 'kamper'}
+                    </span>
+                  </div>
+                </div>
+                <span
+                  className="flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-bold"
+                  style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
+                >
+                  {entry.totalPoints}p
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
