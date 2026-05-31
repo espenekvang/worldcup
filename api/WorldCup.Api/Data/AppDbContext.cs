@@ -29,6 +29,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsUnique();
 
         modelBuilder.Entity<Prediction>()
+            .HasIndex(prediction => prediction.MatchId);
+
+        modelBuilder.Entity<Prediction>()
             .HasOne(prediction => prediction.User)
             .WithMany()
             .HasForeignKey(prediction => prediction.UserId)

@@ -59,6 +59,11 @@ resource "azurerm_container_app" "main" {
       storage_name = azurerm_container_app_environment_storage.backup.name
     }
 
+    volume {
+      name         = "data-volume"
+      storage_type = "EmptyDir"
+    }
+
     container {
       name   = "worldcup"
       image  = "mcr.microsoft.com/k8se/quickstart:latest"
@@ -92,7 +97,7 @@ resource "azurerm_container_app" "main" {
 
       env {
         name  = "ConnectionStrings__DefaultConnection"
-        value = "Data Source=/mnt/backup/worldcup.db"
+        value = "Data Source=/data/worldcup.db"
       }
 
       env {
@@ -103,6 +108,11 @@ resource "azurerm_container_app" "main" {
       volume_mounts {
         name = "backup-volume"
         path = "/mnt/backup"
+      }
+
+      volume_mounts {
+        name = "data-volume"
+        path = "/data"
       }
     }
   }
