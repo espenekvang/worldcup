@@ -9,9 +9,21 @@ using Microsoft.Extensions.Options;
 using WorldCup.Api.Data;
 using WorldCup.Api.Features;
 using WorldCup.Api.Hubs;
+using WorldCup.Api.Logging;
 using WorldCup.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Send Warning/Error/Critical logs to Slack when SLACK_WEBHOOK_URL is configured.
+var slackWebhookUrl = Environment.GetEnvironmentVariable("SLACK_WEBHOOK_URL");
+if (!string.IsNullOrWhiteSpace(slackWebhookUrl))
+{
+    builder.Logging.AddSlack(options =>
+    {
+        options.WebhookUrl = slackWebhookUrl;
+        options.MinimumLevel = LogLevel.Warning;
+    });
+}
 
 // Optionally pull configuration (including feature flags) from Azure App Configuration.
 // When APP_CONFIGURATION_ENDPOINT is set we authenticate with the workload's managed identity
