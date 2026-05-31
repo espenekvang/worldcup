@@ -230,6 +230,72 @@ public class ResultsController(
         return Ok(leaderboard);
     }
 
+    [HttpGet("leaderboard/global")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<GlobalLeaderboardEntry>>> GetGlobalLeaderboard()
+    {
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
+        // Hent alle brukere som har minst én scoret prediction
+        var allUsers = await dbContext.Predictions
+            .Where(p => p.Points != null)
+            .GroupBy(p => p.UserId)
+            .Select(g => new
+            {
+                UserId = g.Key,
+                TotalPoints = g.Sum(p => (int?)p.Points) ?? 0,
+                MatchCount = g.Count()
+            })
+            .ToListAsync();
+
+        // Hent medlemmer av gjeldende gruppe
+        var currentGroupMemberIds = await dbContext.BettingGroupMembers
+            .Where(m => m.BettingGroupId == groupId)
+            .Select(m => m.UserId)
+            .ToListAsync();
+        var currentGroupMemberSet = new HashSet<Guid>(currentGroupMemberIds);
+
+        // For anonyme brukere: hent ett liganavn per bruker
+        var userGroupNames = await dbContext.BettingGroupMembers
+            .Where(m => !currentGroupMemberSet.Contains(m.UserId))
+            .GroupBy(m => m.UserId)
+            .Select(g => new
+            {
+                UserId = g.Key,
+                GroupName = g.Select(m => m.BettingGroup.Name).FirstOrDefault()
+            })
+            .ToDictionaryAsync(x => x.UserId, x => x.GroupName);
+
+        // Hent brukerinfo for alle brukere (navn + bilde)
+        var userIds = allUsers.Select(u => u.UserId).ToList();
+        var userInfos = await dbContext.Users
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new { u.Id, u.Name, u.Picture })
+            .ToDictionaryAsync(u => u.Id);
+
+        var globalLeaderboard = allUsers
+            .OrderByDescending(u => u.TotalPoints)
+            .ThenBy(u => userInfos.GetValueOrDefault(u.UserId)?.Name ?? "")
+            .Select(u =>
+            {
+                var isInGroup = currentGroupMemberSet.Contains(u.UserId);
+                var info = userInfos.GetValueOrDefault(u.UserId);
+                return new GlobalLeaderboardEntry
+                {
+                    Name = isInGroup ? info?.Name : null,
+                    Picture = isInGroup ? info?.Picture : null,
+                    TotalPoints = u.TotalPoints,
+                    MatchCount = u.MatchCount,
+                    IsInCurrentGroup = isInGroup,
+                    GroupName = isInGroup ? null : userGroupNames.GetValueOrDefault(u.UserId)
+                };
+            })
+            .ToList();
+
+        return Ok(globalLeaderboard);
+    }
+
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
