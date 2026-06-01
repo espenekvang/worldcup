@@ -128,6 +128,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 step="1"
                 value={homeScore}
                 onChange={(e) => setHomeScore(e.target.value)}
+                onFocus={(e) => e.target.select()}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
@@ -153,6 +154,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 step="1"
                 value={awayScore}
                 onChange={(e) => setAwayScore(e.target.value)}
+                onFocus={(e) => e.target.select()}
                 className="w-20 rounded-lg border p-3 text-center text-2xl font-bold focus:outline-none focus:ring-2"
                 style={{
                   backgroundColor: 'var(--color-surface-card)',
