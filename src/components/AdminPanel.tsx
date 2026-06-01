@@ -30,7 +30,7 @@ const stageNames: Record<string, string> = {
 
 export default function AdminPanel() {
   const { user } = useAuth()
-  const { activeGroup, setActiveGroup } = useBettingGroup()
+  const { activeGroup, setActiveGroup, setGroups } = useBettingGroup()
   const isGlobalAdmin = user?.isAdmin ?? false
   const groupAdminGroupIds = user?.groupAdminGroupIds ?? []
   const paidLeaguesEnabled = useFeatureFlag('PaidLeagues')
@@ -282,6 +282,9 @@ export default function AdminPanel() {
       await setMemberPaid(expandedGroupId, userId, !currentStatus)
       await loadMembers(expandedGroupId)
       await loadGroups()
+      // Update the BettingGroupContext so payment status is reflected app-wide
+      const updatedGroups = await getMyGroups()
+      setGroups(updatedGroups)
     } catch (err) {
       setMemberError(err instanceof Error ? err.message : 'Kunne ikke endre betalt-status')
     }

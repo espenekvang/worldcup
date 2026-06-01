@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team } from '../types'
-import { getMatchPredictions } from '../api/client'
+import { getMatchPredictions, getMyGroups } from '../api/client'
 import { usePredictions } from '../context/PredictionsContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
@@ -14,7 +14,7 @@ interface PredictionModalProps {
 
 export default function PredictionModal({ match, teams, onClose }: PredictionModalProps) {
   const { predictions, savePrediction } = usePredictions()
-  const { activeGroup } = useBettingGroup()
+  const { activeGroup, setGroups } = useBettingGroup()
   const existing = predictions.get(match.id)
   const paymentBlocked = activeGroup?.isPaid === true && activeGroup.currentUserHasPaid === false
 
@@ -28,7 +28,9 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
     getMatchPredictions(match.id)
       .then((preds) => setOdds(calculateOdds(preds)))
       .catch(() => setOdds(null))
-  }, [match.id])
+    // Refresh groups to get latest payment status
+    getMyGroups().then(setGroups).catch(() => {})
+  }, [match.id, setGroups])
 
   const homeTeam = match.homeTeam ? teams[match.homeTeam] : null
   const awayTeam = match.awayTeam ? teams[match.awayTeam] : null
