@@ -55,6 +55,7 @@ jobs:
             --image worldcup:latest \
             --build-arg VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} \
             --build-arg VITE_APP_VERSION=${{ steps.gitversion.outputs.semver }} \
+            --build-arg VITE_SLACK_FEEDBACK_WEBHOOK=${{ secrets.VITE_SLACK_FEEDBACK_WEBHOOK }} \
             .
 
       - name: Deploy to Container App
