@@ -21,7 +21,7 @@ if (!string.IsNullOrWhiteSpace(slackWebhookUrl))
     builder.Logging.AddSlack(options =>
     {
         options.WebhookUrl = slackWebhookUrl;
-        options.MinimumLevel = LogLevel.Warning;
+        options.MinimumLevel = LogLevel.Error;
     });
 }
 
