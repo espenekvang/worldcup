@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useBettingGroup } from '../context/BettingGroupContext';
 
 interface FeedbackModalProps {
   onClose: () => void;
 }
 
 export default function FeedbackModal({ onClose }: FeedbackModalProps) {
+  const { user } = useAuth();
+  const { activeGroup } = useBettingGroup();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -19,9 +23,10 @@ export default function FeedbackModal({ onClose }: FeedbackModalProps) {
     try {
       const webhookUrl = import.meta.env.VITE_SLACK_FEEDBACK_WEBHOOK;
       if (!webhookUrl) throw new Error('Webhook not configured');
+      const slackText = `*${user?.name ?? 'Ukjent bruker'}* (liga: ${activeGroup?.name ?? 'ingen'})\n\n${message.trim()}`;
       await fetch(webhookUrl, {
         method: 'POST',
-        body: JSON.stringify({ text: message.trim() }),
+        body: JSON.stringify({ text: slackText }),
       });
       setSent(true);
       setTimeout(() => onClose(), 1500);

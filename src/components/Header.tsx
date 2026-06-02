@@ -77,7 +77,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
                 ) : (
                   <div
                     className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium sm:h-9 sm:w-9"
-                    style={{ backgroundColor: 'var(--color-header-btn)', color: 'var(--color-text-inverse)' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }}
                   >
                     {firstName(user.name).charAt(0).toUpperCase()}
                   </div>
