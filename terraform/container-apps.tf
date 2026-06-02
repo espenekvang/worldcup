@@ -40,6 +40,11 @@ resource "azurerm_container_app" "main" {
     value = var.wc2026_api_key
   }
 
+  secret {
+    name  = "slack-webhook-url"
+    value = var.slack_webhook_url
+  }
+
   template {
     min_replicas = 1
     max_replicas = 1
@@ -83,6 +88,11 @@ resource "azurerm_container_app" "main" {
       env {
         name        = "Wc2026Api__ApiKey"
         secret_name = "wc2026-api-key"
+      }
+
+      env {
+        name        = "SLACK_WEBHOOK_URL"
+        secret_name = "slack-webhook-url"
       }
     }
   }

@@ -4,6 +4,7 @@ import { useBettingGroup } from '../context/BettingGroupContext'
 import { useChat } from '../context/ChatContext'
 import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
+import FeedbackModal from './FeedbackModal'
 
 interface HeaderProps {
   onAdminClick?: () => void
@@ -15,6 +16,7 @@ export default function Header({ onAdminClick }: HeaderProps) {
   const { unreadCount } = useChat()
   const { theme, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -49,6 +51,15 @@ export default function Header({ onAdminClick }: HeaderProps) {
           </div>
 
           {user ? (
+            <div className="flex items-center">
+              <button
+                onClick={() => setFeedbackOpen(true)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-opacity hover:opacity-80 sm:h-9 sm:w-9"
+                style={{ backgroundColor: 'var(--color-header-btn)', color: 'var(--color-text-inverse)' }}
+                aria-label="Gi tilbakemelding"
+              >
+                ?
+              </button>
             <div className="relative ml-3 shrink-0" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen(prev => !prev)}
@@ -147,7 +158,9 @@ export default function Header({ onAdminClick }: HeaderProps) {
                 </div>
               )}
             </div>
+            </div>
           ) : null}
+          {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
         </div>
       </div>
     </header>

@@ -77,3 +77,10 @@ variable "sql_admin_object_id" {
   description = "Object ID of the Entra ID SQL admin"
   type        = string
 }
+
+variable "slack_webhook_url" {
+  description = "Slack incoming webhook URL for error/warning log notifications"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
