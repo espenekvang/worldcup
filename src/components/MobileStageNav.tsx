@@ -1,6 +1,6 @@
 import type { Section } from '../types'
 
-type MatchesSection = Exclude<Section, 'leaderboard'>
+type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
 
 interface MobileSectionNavProps {
   activeSection: MatchesSection

@@ -6,11 +6,7 @@ import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
 import FeedbackModal from './FeedbackModal'
 
-interface HeaderProps {
-  onAdminClick?: () => void
-}
-
-export default function Header({ onAdminClick }: HeaderProps) {
+export default function Header() {
   const { user, logout } = useAuth()
   const { groups, activeGroup, clearActiveGroup } = useBettingGroup()
   const { unreadCount } = useChat()
@@ -121,17 +117,6 @@ export default function Header({ onAdminClick }: HeaderProps) {
                       <span className="w-5 text-center">{theme === 'dark' ? '☀️' : '🌙'}</span>
                       {theme === 'dark' ? 'Lyst tema' : 'Mørkt tema'}
                     </button>
-
-                    {onAdminClick ? (
-                      <button
-                        onClick={() => { setMenuOpen(false); onAdminClick() }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
-                        style={{ color: 'var(--color-text-primary)' }}
-                      >
-                        <span className="w-5 text-center">⚙️</span>
-                        Admin
-                      </button>
-                    ) : null}
 
                     {groups.length > 1 ? (
                       <button

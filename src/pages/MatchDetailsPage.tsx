@@ -17,7 +17,6 @@ import { useMatches } from '../context/MatchesContext'
 import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 import { useWeather } from '../hooks/useWeather'
-import { useAuth } from '../context/AuthContext'
 import { formatMatchDate, formatMatchTime, areTeamsUndetermined, isMatchLocked, isGroupStage } from '../utils/dateUtils'
 
 const STAGE_LABELS: Record<string, string> = {
@@ -43,7 +42,6 @@ const STAGE_LABELS: Record<string, string> = {
 export default function MatchDetailsPage() {
   const { matchId } = useParams<{ matchId: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
   const { matches } = useMatches()
   const { predictions } = usePredictions()
   const { results, points } = useResults()
@@ -51,7 +49,6 @@ export default function MatchDetailsPage() {
 
   const id = Number(matchId)
   const match = matches.find(m => m.id === id) ?? null
-  const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
   const venue = match ? venues.find(v => v.id === match.venueId) : undefined
   const { forecast, loading: weatherLoading } = useWeather(venue?.id, match?.date ?? '', venue?.timezone)
@@ -64,7 +61,7 @@ export default function MatchDetailsPage() {
   if (!match) {
     return (
       <div className="flex min-h-screen flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
-        <Header onAdminClick={canAccessAdmin ? () => navigate('/?admin=1') : undefined} />
+        <Header />
         <main className="mx-auto w-full max-w-4xl flex-1 p-6 text-center">
           <p style={{ color: 'var(--color-text-muted)' }}>Fant ikke kampen.</p>
           <button
@@ -94,7 +91,7 @@ export default function MatchDetailsPage() {
 
   return (
     <div className="flex min-h-screen flex-col" style={{ backgroundColor: 'var(--color-surface)' }}>
-      <Header onAdminClick={canAccessAdmin ? () => navigate('/?admin=1') : undefined} />
+      <Header />
 
       <main className="mx-auto w-full max-w-4xl flex-1 p-4 pb-20 sm:p-6 lg:p-8 lg:pb-8">
         <button
