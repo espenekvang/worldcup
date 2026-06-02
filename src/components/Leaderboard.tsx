@@ -31,7 +31,10 @@ function calculatePrizes(
     }
   }
 
-  const shares = [0.7, 0.2, 0.1]
+  const baseShares = [0.7, 0.2, 0.1]
+  const activeSlots = baseShares.slice(0, Math.min(entries.length, 3))
+  const totalShare = activeSlots.reduce((a, b) => a + b, 0)
+  const shares = activeSlots.map(s => s / totalShare)
   let slotIndex = 0 // hvilken premie-slot (0=1.plass, 1=2.plass, 2=3.plass) som er neste å dele ut
 
   for (const tieGroup of groupsByPoints) {
