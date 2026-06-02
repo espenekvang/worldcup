@@ -43,7 +43,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
     e.preventDefault()
 
     if (paymentBlocked) {
-      setError('Du må betale avgiften i denne ligaen før du kan bette. Kontakt liga-admin.')
+      setError('Du må betale innsatsen i denne ligaen før du kan bette. Kontakt liga-admin.')
       return
     }
 
@@ -112,7 +112,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
                 color: 'var(--color-danger)',
               }}
             >
-              Denne ligaen krever {activeGroup?.entryFee} kr i avgift. Du må betale før du kan bette – kontakt liga-admin når du har betalt.
+              Denne ligaen krever {activeGroup?.entryFee} kr i innsats. Du må betale før du kan bette – kontakt liga-admin når du har betalt.
             </div>
           )}
           <div className="flex items-center justify-center gap-4">

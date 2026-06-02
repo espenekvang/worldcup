@@ -129,7 +129,7 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
 
             if (entryFee <= 0m)
             {
-                return BadRequest("Avgift må være større enn 0 for en betalt liga.");
+                return BadRequest("Innsats må være større enn 0 for en betalt liga.");
             }
         }
         else
@@ -214,7 +214,7 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 var newFee = request.EntryFee ?? 0m;
                 if (newFee <= 0m)
                 {
-                    return BadRequest("Avgift må være større enn 0 for en betalt liga.");
+                    return BadRequest("Innsats må være større enn 0 for en betalt liga.");
                 }
 
                 group.IsPaid = true;
@@ -222,15 +222,15 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
             }
             else if (group.IsPaid && desiredPaid && request.EntryFee.HasValue)
             {
-                // Endring av avgift kun tillatt så lenge ingen har betalt ennå.
+                // Endring av innsats kun tillatt så lenge ingen har betalt ennå.
                 if (group.Members.Any(m => m.HasPaid))
                 {
-                    return BadRequest("Avgiften kan ikke endres etter at noen har betalt.");
+                    return BadRequest("Innsatsen kan ikke endres etter at noen har betalt.");
                 }
 
                 if (request.EntryFee.Value <= 0m)
                 {
-                    return BadRequest("Avgift må være større enn 0 for en betalt liga.");
+                    return BadRequest("Innsats må være større enn 0 for en betalt liga.");
                 }
 
                 var oldFee = group.EntryFee;

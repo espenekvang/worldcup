@@ -8,7 +8,7 @@ public class BettingGroupMember
     public bool IsGroupAdmin { get; set; }
 
     /// <summary>
-    /// True når medlemmet har betalt avgift for å være med i en betalt liga.
+    /// True når medlemmet har betalt innsats for å være med i en betalt liga.
     /// Selve betalingen skjer utenfor løsningen; admin / liga-admin registrerer status her.
     /// </summary>
     public bool HasPaid { get; set; }

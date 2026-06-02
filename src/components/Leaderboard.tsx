@@ -139,7 +139,7 @@ export default function Leaderboard() {
             Pott: {formatCurrency(activeGroup.prizePot)}
           </div>
           <div className="mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-            Avgift {activeGroup.entryFee} kr · {activeGroup.paidMemberCount}/{activeGroup.memberCount} har betalt · 1.&nbsp;plass 70 % · 2.&nbsp;plass 20 % · 3.&nbsp;plass 10 %
+            Innsats {activeGroup.entryFee} kr · {activeGroup.paidMemberCount}/{activeGroup.memberCount} har betalt · 1.&nbsp;plass 70 % · 2.&nbsp;plass 20 % · 3.&nbsp;plass 10 %
             {!activeGroup.currentUserHasPaid && (
               <span style={{ color: 'var(--color-danger)' }}>
                 {' '}· Du har ikke betalt – betting er stengt.
