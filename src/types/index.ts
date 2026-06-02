@@ -11,7 +11,7 @@ export type Stage =
   | "leaderboard"
 
 /** Top-level UI grouping: gruppespill, sluttspill eller The Boss. */
-export type Section = "group" | "knockout" | "leaderboard"
+export type Section = "group" | "knockout" | "leaderboard" | "admin"
 
 export interface Team {
   code: string

@@ -19,7 +19,7 @@ import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
 import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
 
-type MatchesSection = Exclude<Section, 'leaderboard'>
+type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
 
 /**
  * Velg fornuftig default-runde når brukeren bytter til en seksjon.
@@ -40,7 +40,7 @@ function nextBettingStage(matches: Match[]): { section: MatchesSection; stage: S
   const next = getNextBettingDeadline(matches)
   if (!next) return null
   const section = getSectionForStage(next.stage)
-  if (section === 'leaderboard') return null
+  if (section === 'leaderboard' || section === 'admin') return null
   return { section, stage: next.stage }
 }
 
@@ -66,7 +66,6 @@ function AppContent() {
   )
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
-  const [showAdmin, setShowAdmin] = useState(false)
   const [showRules, setShowRules] = useState(false)
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
@@ -86,9 +85,9 @@ function AppContent() {
     setHasAutoSelected(true)
   }, [matches, hasAutoSelected])
 
-  // Husk siste seksjon (utenom leaderboard) og siste stage per seksjon.
+  // Husk siste seksjon (utenom leaderboard/admin) og siste stage per seksjon.
   useEffect(() => {
-    if (activeSection !== 'leaderboard') {
+    if (activeSection !== 'leaderboard' && activeSection !== 'admin') {
       setLastMatchesSection(activeSection)
     }
     if (activeSection === 'group') setLastGroupStage(activeStage)
@@ -97,9 +96,12 @@ function AppContent() {
 
   // Reager på navigasjons-state (f.eks. fra BottomNav på ChatPage).
   useEffect(() => {
-    const view = (location.state as { mobileView?: 'matches' | 'leaderboard' } | null)?.mobileView
+    const view = (location.state as { mobileView?: 'matches' | 'leaderboard' | 'admin' } | null)?.mobileView
     if (view === 'leaderboard') {
       setActiveSection('leaderboard')
+      navigate(location.pathname, { replace: true, state: null })
+    } else if (view === 'admin') {
+      setActiveSection('admin')
       navigate(location.pathname, { replace: true, state: null })
     } else if (view === 'matches') {
       setActiveSection(lastMatchesSection)
@@ -134,42 +136,37 @@ function AppContent() {
       className="min-h-screen lg:flex lg:h-screen lg:min-h-0 lg:flex-col"
       style={{ backgroundColor: 'var(--color-surface)' }}
     >
-      <Header onAdminClick={canAccessAdmin ? () => setShowAdmin((v) => !v) : undefined} />
+      <Header />
       <main className="pb-20 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:pb-0">
         <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:flex lg:min-h-0 lg:flex-1 lg:gap-6 lg:p-8">
           <div className="min-w-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:themed-scrollbar">
-            {showAdmin && canAccessAdmin ? (
-              <div className="mb-6">
-                <AdminPanel />
-              </div>
-            ) : null}
             <Countdown matches={matches} teams={teams} venues={venues} onShowRules={() => setShowRules(true)} />
-            <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} />
-            {activeSection !== 'leaderboard' ? (
+            <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} canAccessAdmin={canAccessAdmin} />
+            {activeSection === 'admin' && canAccessAdmin ? (
+              <AdminPanel />
+            ) : activeSection === 'leaderboard' ? (
+              <Leaderboard />
+            ) : (
               <>
                 <MobileStageNav
-                  activeSection={activeSection}
+                  activeSection={activeSection as 'group' | 'knockout'}
                   onSectionChange={handleSectionChange}
                 />
                 <RoundPills
-                  section={activeSection}
+                  section={activeSection as 'group' | 'knockout'}
                   activeStage={activeStage}
                   onStageChange={setActiveStage}
                   matches={matches}
                 />
+                <MatchList
+                  matches={matches}
+                  teams={teams}
+                  venues={venues}
+                  activeStage={activeStage}
+                  onTipClick={setBettingMatch}
+                  onViewOthers={setViewingOthersMatch}
+                />
               </>
-            ) : null}
-            {activeSection === 'leaderboard' ? (
-              <Leaderboard />
-            ) : (
-              <MatchList
-                matches={matches}
-                teams={teams}
-                venues={venues}
-                activeStage={activeStage}
-                onTipClick={setBettingMatch}
-                onViewOthers={setViewingOthersMatch}
-              />
             )}
           </div>
           <aside className="hidden lg:block lg:w-[360px] lg:shrink-0">
@@ -178,7 +175,13 @@ function AppContent() {
         </div>
       </main>
 
-      <BottomNav mobileView={mobileView} onSelectView={handleMobileViewChange} />
+      <BottomNav
+        mobileView={mobileView}
+        onSelectView={handleMobileViewChange}
+        canAccessAdmin={canAccessAdmin}
+        adminActive={activeSection === 'admin'}
+        onAdminClick={() => setActiveSection('admin')}
+      />
 
       {bettingMatch ? (
         <PredictionModal
