@@ -50,13 +50,13 @@ export interface BettingGroup {
   name: string
   memberCount: number
   createdAt: string
-  /** True når dette er en betalt liga som krever avgift før betting. */
+  /** True når dette er en betalt liga som krever innsats før betting. */
   isPaid: boolean
-  /** Avgift per deltaker i NOK. 0 når liga ikke er betalt. */
+  /** Innsats per deltaker i NOK. 0 når liga ikke er betalt. */
   entryFee: number
-  /** Total pott (sum av betalte avgifter) i NOK. */
+  /** Total pott (sum av betalte innsatser) i NOK. */
   prizePot: number
-  /** Antall medlemmer som har betalt avgift. */
+  /** Antall medlemmer som har betalt innsats. */
   paidMemberCount: number
   /** True hvis innlogget bruker selv har betalt i denne ligaen. */
   currentUserHasPaid: boolean

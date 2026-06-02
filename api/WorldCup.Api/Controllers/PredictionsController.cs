@@ -68,7 +68,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return BadRequest("Lagene er ikke avgjort ennå – betting er stengt for denne kampen.");
         }
 
-        // Hvis brukeren bettsetter fra en betalt liga (X-Group-Id), må de ha betalt avgift.
+        // Hvis brukeren bettsetter fra en betalt liga (X-Group-Id), må de ha betalt innsats.
         // Bettinger er globale per (UserId, MatchId), så vi gater på aktiv liga.
         var groupIdStr = Request.Headers["X-Group-Id"].FirstOrDefault();
         if (Guid.TryParse(groupIdStr, out var activeGroupId) && activeGroupId != Guid.Empty)
@@ -87,7 +87,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
                 if (!hasPaid)
                 {
                     return StatusCode(StatusCodes.Status403Forbidden,
-                        "Du må betale avgiften i denne ligaen før du kan bette.");
+                        "Du må betale innsatsen i denne ligaen før du kan bette.");
                 }
             }
         }

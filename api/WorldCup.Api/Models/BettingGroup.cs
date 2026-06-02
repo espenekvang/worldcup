@@ -8,13 +8,13 @@ public class BettingGroup
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// True når dette er en betalt liga (krever at hver deltaker har betalt avgift før de kan bette).
+    /// True når dette er en betalt liga (krever at hver deltaker har betalt innsats før de kan bette).
     /// Settes kun ved opprettelse, og kun når feature-flagget "PaidLeagues" er på (kontrolleres av global admin).
     /// </summary>
     public bool IsPaid { get; set; }
 
     /// <summary>
-    /// Avgift per deltaker i NOK. Kun relevant når <see cref="IsPaid"/> er true.
+    /// Innsats per deltaker i NOK. Kun relevant når <see cref="IsPaid"/> er true.
     /// </summary>
     public decimal EntryFee { get; set; }
 

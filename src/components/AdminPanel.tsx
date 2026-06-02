@@ -142,7 +142,7 @@ export default function AdminPanel() {
     if (paidLeaguesEnabled && newGroupIsPaid) {
       entryFee = parseFloat(newGroupEntryFee.replace(',', '.'))
       if (isNaN(entryFee) || entryFee <= 0) {
-        setGroupError('Avgift må være større enn 0 for en betalt liga.')
+        setGroupError('Innsats må være større enn 0 for en betalt liga.')
         return
       }
     }
@@ -192,12 +192,12 @@ export default function AdminPanel() {
 
   async function handleConvertToPaid(group: BettingGroup) {
     const input = window.prompt(
-      `Konverter "${group.name}" til betalt liga.\n\nDeltakerne må registreres som betalt før de kan bette. Premiepott deles 70/20/10 mellom 1.–3. plass.\n\nOppgi avgift per deltaker (kr):`,
+      `Konverter "${group.name}" til betalt liga.\n\nDeltakerne må registreres som betalt før de kan bette. Premiepott deles 70/20/10 mellom 1.–3. plass.\n\nOppgi innsats per deltaker (kr):`,
     )
     if (input === null) return
     const fee = parseFloat(input.replace(',', '.'))
     if (isNaN(fee) || fee <= 0) {
-      setGroupError('Avgift må være et tall større enn 0.')
+      setGroupError('Innsats må være et tall større enn 0.')
       return
     }
     try {
@@ -213,13 +213,13 @@ export default function AdminPanel() {
 
   async function handleChangeEntryFee(group: BettingGroup) {
     const input = window.prompt(
-      `Endre avgift for "${group.name}". (Kan kun endres når ingen har betalt ennå.)\n\nNåværende avgift: ${group.entryFee} kr`,
+      `Endre innsats for "${group.name}". (Kan kun endres når ingen har betalt ennå.)\n\nNåværende innsats: ${group.entryFee} kr`,
       String(group.entryFee),
     )
     if (input === null) return
     const fee = parseFloat(input.replace(',', '.'))
     if (isNaN(fee) || fee <= 0) {
-      setGroupError('Avgift må være et tall større enn 0.')
+      setGroupError('Innsats må være et tall større enn 0.')
       return
     }
     try {
@@ -230,7 +230,7 @@ export default function AdminPanel() {
         setActiveGroup({ ...activeGroup, entryFee: fee })
       }
     } catch (err) {
-      setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre avgift')
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre innsats')
     }
   }
 
@@ -517,7 +517,7 @@ export default function AdminPanel() {
               {newGroupIsPaid && (
                 <div className="flex items-center gap-2">
                   <label className="text-sm whitespace-nowrap" style={{ color: 'var(--color-text-secondary)' }}>
-                    Avgift per deltaker:
+                    Innsats per deltaker:
                   </label>
                   <input
                     type="number"
@@ -540,7 +540,7 @@ export default function AdminPanel() {
               <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                 {newGroupIsPaid
                   ? 'Deltakerne må betale før de kan bette. Premiepott deles 70/20/10 mellom 1.–3. plass.'
-                  : 'Slå på for å kreve avgift i ligaen.'}
+                  : 'Slå på for å kreve innsats i ligaen.'}
               </span>
             </div>
           )}
@@ -638,7 +638,7 @@ export default function AdminPanel() {
                             className="text-xs"
                             style={{ color: 'var(--color-primary)' }}
                           >
-                            Endre avgift
+                            Endre innsats
                           </button>
                         )}
                         <button
@@ -695,8 +695,8 @@ export default function AdminPanel() {
                         {groupMembers.map((m) => {
                           const groupIsPaid = groupList.find((g) => g.id === expandedGroupId)?.isPaid ?? false
                           return (
-                          <li key={m.userId} className="flex items-center justify-between py-1">
-                            <div className="flex items-center gap-2">
+                          <li key={m.userId} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 py-2 border-b border-[var(--color-border)]">
+                            <div className="flex items-center gap-2 flex-wrap">
                               {m.picture ? (
                                 <img src={m.picture} alt="" className="h-6 w-6 rounded-full" referrerPolicy="no-referrer" />
                               ) : (
@@ -708,7 +708,7 @@ export default function AdminPanel() {
                                 </div>
                               )}
                               <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{m.name}</span>
-                              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{m.email}</span>
+                              <span className="text-xs hidden sm:inline" style={{ color: 'var(--color-text-muted)' }}>{m.email}</span>
                               {m.isGroupAdmin && (
                                 <span className="rounded-full px-1.5 py-0.5 text-[10px] font-medium" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
                                   Liga-admin
@@ -727,7 +727,7 @@ export default function AdminPanel() {
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3 pl-8 sm:pl-0">
                               {groupIsPaid && (
                                 <button
                                   onClick={() => handleTogglePaid(m.userId, m.hasPaid)}
