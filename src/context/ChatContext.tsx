@@ -31,6 +31,7 @@ interface ChatContextValue {
   isConnected: boolean
   hasMore: boolean
   unreadCount: number
+  newMessagesMarkerId: string | null
   currentUserId: string | null
   sendMessage: (content: string) => Promise<void>
   deleteMessage: (id: string) => Promise<void>
@@ -95,6 +96,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
   const [hasMore, setHasMore] = useState(false)
   const [lastReadAt, setLastReadAt] = useState<string | null>(null)
+  const [newMessagesMarkerId, setNewMessagesMarkerId] = useState<string | null>(null)
 
   const connectionRef = useRef<HubConnection | null>(null)
   const currentGroupIdRef = useRef<string | null>(null)
@@ -121,12 +123,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     currentGroupIdRef.current = groupId
     let cancelled = false
 
+    setNewMessagesMarkerId(null)
     setIsLoading(true)
     getChatMessages(undefined, PAGE_SIZE)
       .then((data) => {
         if (cancelled || currentGroupIdRef.current !== groupId) return
         setMessages(data)
         setHasMore(data.length === PAGE_SIZE)
+
+        const lastRead = safeGet(lastReadKey(groupId))
+        if (lastRead) {
+          const userId = getCurrentUserIdFromToken()
+          const firstUnread = data.find(
+            (m) => !m.isDeleted && m.userId !== userId && m.createdAt > lastRead,
+          )
+          setNewMessagesMarkerId(firstUnread?.id ?? null)
+        }
       })
       .catch(() => {
         if (cancelled) return
@@ -262,6 +274,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       isConnected,
       hasMore,
       unreadCount,
+      newMessagesMarkerId,
       currentUserId,
       sendMessage,
       deleteMessage,
@@ -274,6 +287,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       isConnected,
       hasMore,
       unreadCount,
+      newMessagesMarkerId,
       currentUserId,
       sendMessage,
       deleteMessage,
@@ -291,6 +305,7 @@ const NOOP_CHAT: ChatContextValue = {
   isConnected: false,
   hasMore: false,
   unreadCount: 0,
+  newMessagesMarkerId: null,
   currentUserId: null,
   sendMessage: async () => undefined,
   deleteMessage: async () => undefined,
