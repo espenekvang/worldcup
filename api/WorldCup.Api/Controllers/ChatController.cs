@@ -18,6 +18,7 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
     private const int DefaultPageSize = 50;
     private const int MaxPageSize = 100;
     private const int MaxContentLength = 500;
+    private static readonly HashSet<string> AllowedEmojis = ["👍", "❤️", "😂", "😮", "😢"];
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ChatMessageResponse>>> GetMessages(
@@ -37,6 +38,8 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
             query = query.Where(m => m.CreatedAt < before.Value);
         }
 
+        var userId = GetAuthenticatedUserId()!.Value;
+
         var messages = await query
             .OrderByDescending(m => m.CreatedAt)
             .Take(limit)
@@ -49,7 +52,17 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
                 Content = m.DeletedAt == null ? m.Content : string.Empty,
                 CreatedAt = m.CreatedAt,
                 IsDeleted = m.DeletedAt != null,
-                IsSystem = m.User.IsSystem
+                IsSystem = m.User.IsSystem,
+                Reactions = dbContext.ChatMessageReactions
+                    .Where(r => r.ChatMessageId == m.Id)
+                    .GroupBy(r => r.Emoji)
+                    .Select(g => new ChatReactionSummary
+                    {
+                        Emoji = g.Key,
+                        Count = g.Count(),
+                        ReactedByMe = g.Any(r => r.UserId == userId)
+                    })
+                    .ToList()
             })
             .AsNoTracking()
             .ToListAsync();
@@ -126,6 +139,84 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
         await chatHub.Clients.Group(GroupName(groupId)).MessagePosted(response);
 
         return StatusCode(StatusCodes.Status201Created, response);
+    }
+
+    [HttpPost("{id:guid}/reactions/{emoji}")]
+    public async Task<ActionResult> AddReaction(Guid id, string emoji)
+    {
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
+        if (!AllowedEmojis.Contains(emoji))
+            return BadRequest("Ikke tillatt emoji.");
+
+        var message = await dbContext.ChatMessages
+            .FirstOrDefaultAsync(m => m.Id == id && m.BettingGroupId == groupId && m.DeletedAt == null);
+        if (message is null) return NotFound();
+
+        var existing = await dbContext.ChatMessageReactions
+            .FirstOrDefaultAsync(r => r.ChatMessageId == id && r.UserId == userId.Value && r.Emoji == emoji);
+
+        if (existing is null)
+        {
+            dbContext.ChatMessageReactions.Add(new ChatMessageReaction
+            {
+                Id = Guid.NewGuid(),
+                ChatMessageId = id,
+                UserId = userId.Value,
+                Emoji = emoji,
+                CreatedAt = DateTime.UtcNow
+            });
+            await dbContext.SaveChangesAsync();
+        }
+
+        var count = await dbContext.ChatMessageReactions
+            .CountAsync(r => r.ChatMessageId == id && r.Emoji == emoji);
+
+        await chatHub.Clients.Group(GroupName(groupId)).ReactionUpdated(new ChatReactionEventDto
+        {
+            MessageId = id,
+            BettingGroupId = groupId,
+            Emoji = emoji,
+            Count = count
+        });
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/reactions/{emoji}")]
+    public async Task<ActionResult> RemoveReaction(Guid id, string emoji)
+    {
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
+        var reaction = await dbContext.ChatMessageReactions
+            .FirstOrDefaultAsync(r => r.ChatMessageId == id && r.UserId == userId.Value && r.Emoji == emoji);
+
+        if (reaction is not null)
+        {
+            dbContext.ChatMessageReactions.Remove(reaction);
+            await dbContext.SaveChangesAsync();
+        }
+
+        var count = await dbContext.ChatMessageReactions
+            .CountAsync(r => r.ChatMessageId == id && r.Emoji == emoji);
+
+        await chatHub.Clients.Group(GroupName(groupId)).ReactionUpdated(new ChatReactionEventDto
+        {
+            MessageId = id,
+            BettingGroupId = groupId,
+            Emoji = emoji,
+            Count = count
+        });
+
+        return NoContent();
     }
 
     [HttpDelete("{id:guid}")]

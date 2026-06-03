@@ -17,10 +17,12 @@ import {
 import { jwtDecode } from 'jwt-decode'
 import type { ChatMessage } from '../types'
 import {
+  addChatReaction,
   deleteChatMessage,
   getApiBase,
   getChatMessages,
   postChatMessage,
+  removeChatReaction,
 } from '../api/client'
 import { useAuth } from './AuthContext'
 import { useBettingGroup } from './BettingGroupContext'
@@ -35,6 +37,7 @@ interface ChatContextValue {
   currentUserId: string | null
   sendMessage: (content: string) => Promise<void>
   deleteMessage: (id: string) => Promise<void>
+  toggleReaction: (messageId: string, emoji: string) => Promise<void>
   loadOlder: () => Promise<void>
   markAsRead: () => void
 }
@@ -177,6 +180,30 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       )
     })
 
+    connection.on(
+      'ReactionUpdated',
+      (evt: { messageId: string; bettingGroupId: string; emoji: string; count: number }) => {
+        if (currentGroupIdRef.current !== groupId) return
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id !== evt.messageId) return m
+            const existing = m.reactions.find((r) => r.emoji === evt.emoji)
+            let reactions
+            if (evt.count === 0) {
+              reactions = m.reactions.filter((r) => r.emoji !== evt.emoji)
+            } else if (existing) {
+              reactions = m.reactions.map((r) =>
+                r.emoji === evt.emoji ? { ...r, count: evt.count } : r,
+              )
+            } else {
+              reactions = [...m.reactions, { emoji: evt.emoji, count: evt.count, reactedByMe: false }]
+            }
+            return { ...m, reactions }
+          }),
+        )
+      },
+    )
+
     connection.onreconnected(() => {
       setIsConnected(true)
       connection.invoke('JoinGroup', groupId).catch(() => undefined)
@@ -231,6 +258,55 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const toggleReaction = useCallback(
+    async (messageId: string, emoji: string) => {
+      const message = messages.find((m) => m.id === messageId)
+      if (!message) return
+      const existing = message.reactions.find((r) => r.emoji === emoji)
+      const isOwn = existing?.reactedByMe ?? false
+
+      // Optimistic update
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.id !== messageId) return m
+          let reactions
+          if (isOwn) {
+            const newCount = (existing?.count ?? 1) - 1
+            reactions = newCount === 0
+              ? m.reactions.filter((r) => r.emoji !== emoji)
+              : m.reactions.map((r) =>
+                  r.emoji === emoji ? { ...r, count: newCount, reactedByMe: false } : r,
+                )
+          } else if (existing) {
+            reactions = m.reactions.map((r) =>
+              r.emoji === emoji ? { ...r, count: r.count + 1, reactedByMe: true } : r,
+            )
+          } else {
+            reactions = [...m.reactions, { emoji, count: 1, reactedByMe: true }]
+          }
+          return { ...m, reactions }
+        }),
+      )
+
+      try {
+        if (isOwn) {
+          await removeChatReaction(messageId, emoji)
+        } else {
+          await addChatReaction(messageId, emoji)
+        }
+      } catch {
+        // Roll back optimistic update on failure
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id !== messageId) return m
+            return { ...m, reactions: message.reactions }
+          }),
+        )
+      }
+    },
+    [messages],
+  )
+
   const loadOlder = useCallback(async () => {
     if (!hasMore || messages.length === 0) return
     const oldest = messages[0]
@@ -278,6 +354,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       currentUserId,
       sendMessage,
       deleteMessage,
+      toggleReaction,
       loadOlder,
       markAsRead,
     }),
@@ -291,6 +368,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       currentUserId,
       sendMessage,
       deleteMessage,
+      toggleReaction,
       loadOlder,
       markAsRead,
     ],
@@ -309,6 +387,7 @@ const NOOP_CHAT: ChatContextValue = {
   currentUserId: null,
   sendMessage: async () => undefined,
   deleteMessage: async () => undefined,
+  toggleReaction: async () => undefined,
   loadOlder: async () => undefined,
   markAsRead: () => undefined,
 }
