@@ -172,6 +172,35 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
         return Ok(predictions);
     }
 
+    [HttpGet("match/{matchId:int}/odds")]
+    public async Task<ActionResult<IEnumerable<MatchPredictionResponse>>> GetMatchOdds(int matchId)
+    {
+        // Returnerer alle globale predictions for odds-beregning – uten navn/bilde
+        // og med scores skjult inntil kampen er låst.
+        var userId = GetAuthenticatedUserId();
+        if (userId is null) return Unauthorized();
+
+        var matchEntry = matchScheduleProvider.Current.GetMatch(matchId);
+        if (matchEntry is null)
+        {
+            return NotFound("Match not found.");
+        }
+
+        var locked = matchScheduleProvider.Current.IsMatchLocked(matchId);
+
+        var predictions = await dbContext.Predictions
+            .Where(p => p.MatchId == matchId)
+            .Select(p => new MatchPredictionResponse
+            {
+                HomeScore = locked ? p.HomeScore : null,
+                AwayScore = locked ? p.AwayScore : null,
+            })
+            .AsNoTracking()
+            .ToListAsync();
+
+        return Ok(predictions);
+    }
+
     private Guid? GetAuthenticatedUserId()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
