@@ -140,6 +140,36 @@ namespace WorldCup.Api.Migrations
                     b.ToTable("BettingGroupMembers");
                 });
 
+            modelBuilder.Entity("WorldCup.Api.Models.ChatMessageReaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChatMessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Emoji")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ChatMessageId", "UserId", "Emoji")
+                        .IsUnique();
+
+                    b.ToTable("ChatMessageReactions");
+                });
+
             modelBuilder.Entity("WorldCup.Api.Models.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -397,6 +427,24 @@ namespace WorldCup.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("BettingGroup");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WorldCup.Api.Models.ChatMessageReaction", b =>
+                {
+                    b.HasOne("WorldCup.Api.Models.ChatMessage", "ChatMessage")
+                        .WithMany()
+                        .HasForeignKey("ChatMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorldCup.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .IsRequired();
+
+                    b.Navigation("ChatMessage");
 
                     b.Navigation("User");
                 });

@@ -73,6 +73,12 @@ export interface BettingGroupMember {
   paidAt: string | null
 }
 
+export interface ChatReaction {
+  emoji: string
+  count: number
+  reactedByMe: boolean
+}
+
 export interface ChatMessage {
   id: string
   userId: string
@@ -82,4 +88,5 @@ export interface ChatMessage {
   createdAt: string
   isDeleted: boolean
   isSystem: boolean
+  reactions: ChatReaction[]
 }

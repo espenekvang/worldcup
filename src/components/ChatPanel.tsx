@@ -73,6 +73,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
     newMessagesMarkerId,
     sendMessage,
     deleteMessage,
+    toggleReaction,
     loadOlder,
     markAsRead,
     currentUserId,
@@ -84,6 +85,9 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
   const [isSending, setIsSending] = useState(false)
   const [isLoadingOlder, setIsLoadingOlder] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reactionPickerFor, setReactionPickerFor] = useState<string | null>(null)
+
+  const EMOJI_OPTIONS = ['👍', '❤️', '😂', '😮', '😢']
 
   const listRef = useRef<HTMLDivElement>(null)
   const lastMessageIdRef = useRef<string | null>(null)
@@ -307,7 +311,10 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                         />
                       </div>
                     )}
-                  <div className="group mb-2 flex items-start gap-2">
+                  <div
+                    className="group relative mb-2 flex items-start gap-2"
+                    onMouseLeave={() => setReactionPickerFor(null)}
+                  >
                     {m.isSystem ? (
                       <div
                         className="flex h-7 w-7 shrink-0 items-center justify-center"
@@ -369,6 +376,17 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                         >
                           {formatTime(m.createdAt)}
                         </span>
+                        {!m.isDeleted && (
+                          <button
+                            onClick={() =>
+                              setReactionPickerFor((prev) => (prev === m.id ? null : m.id))
+                            }
+                            className="text-base opacity-0 transition-opacity group-hover:opacity-100"
+                            title="Reager"
+                          >
+                            😊
+                          </button>
+                        )}
                         {canDeleteMessage(m) && (
                           <button
                             onClick={() => handleDelete(m.id)}
@@ -392,6 +410,53 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                           style={{ color: 'var(--color-text-primary)', wordBreak: 'break-word' }}
                           dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }}
                         />
+                      )}
+                      {reactionPickerFor === m.id && (
+                        <div
+                          className="mt-1 flex gap-1 rounded-full border px-2 py-1 shadow-md"
+                          style={{
+                            backgroundColor: 'var(--color-surface-card)',
+                            borderColor: 'var(--color-border)',
+                          }}
+                        >
+                          {EMOJI_OPTIONS.map((emoji) => (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                void toggleReaction(m.id, emoji)
+                                setReactionPickerFor(null)
+                              }}
+                              className="rounded-full px-1 py-0.5 text-base transition-transform hover:scale-125"
+                              title={emoji}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {m.reactions.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {m.reactions.map((r) => (
+                            <button
+                              key={r.emoji}
+                              onClick={() => void toggleReaction(m.id, r.emoji)}
+                              className="flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-xs transition-colors"
+                              style={{
+                                backgroundColor: r.reactedByMe
+                                  ? 'color-mix(in srgb, var(--color-tab-active) 15%, transparent)'
+                                  : 'var(--color-surface)',
+                                borderColor: r.reactedByMe
+                                  ? 'var(--color-tab-active)'
+                                  : 'var(--color-border)',
+                                color: 'var(--color-text-primary)',
+                              }}
+                              title={r.reactedByMe ? 'Fjern reaksjon' : 'Legg til reaksjon'}
+                            >
+                              <span>{r.emoji}</span>
+                              <span>{r.count}</span>
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>

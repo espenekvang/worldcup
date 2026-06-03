@@ -380,6 +380,18 @@ export function broadcastMessage(content: string): Promise<{ groupCount: number 
   })
 }
 
+export function addChatReaction(messageId: string, emoji: string): Promise<void> {
+  return request<void>(`/api/chat/${messageId}/reactions/${encodeURIComponent(emoji)}`, {
+    method: 'POST',
+  })
+}
+
+export function removeChatReaction(messageId: string, emoji: string): Promise<void> {
+  return request<void>(`/api/chat/${messageId}/reactions/${encodeURIComponent(emoji)}`, {
+    method: 'DELETE',
+  })
+}
+
 export function getChatUnreadCount(since?: string): Promise<{ unreadCount: number }> {
   const params = new URLSearchParams()
   if (since) params.set('since', since)

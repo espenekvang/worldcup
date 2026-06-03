@@ -11,6 +11,7 @@ public interface IChatClient
 {
     Task MessagePosted(ChatMessageResponse message);
     Task MessageDeleted(ChatDeletedEventDto evt);
+    Task ReactionUpdated(ChatReactionEventDto evt);
 }
 
 [Authorize]

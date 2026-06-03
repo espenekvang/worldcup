@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<BettingGroupMember> BettingGroupMembers => Set<BettingGroupMember>();
     public DbSet<BettingGroupInviteLink> BettingGroupInviteLinks => Set<BettingGroupInviteLink>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<ChatMessageReaction> ChatMessageReactions => Set<ChatMessageReaction>();
     public DbSet<PendingMatchFetch> PendingMatchFetches => Set<PendingMatchFetch>();
     public DbSet<ApiCallLog> ApiCallLogs => Set<ApiCallLog>();
 
@@ -126,6 +127,27 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(message => message.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ChatMessageReaction>()
+            .HasIndex(r => new { r.ChatMessageId, r.UserId, r.Emoji })
+            .IsUnique();
+
+        modelBuilder.Entity<ChatMessageReaction>()
+            .Property(r => r.Emoji)
+            .HasMaxLength(10)
+            .IsRequired();
+
+        modelBuilder.Entity<ChatMessageReaction>()
+            .HasOne(r => r.ChatMessage)
+            .WithMany()
+            .HasForeignKey(r => r.ChatMessageId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ChatMessageReaction>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<PendingMatchFetch>()
             .HasKey(pending => pending.MatchId);
