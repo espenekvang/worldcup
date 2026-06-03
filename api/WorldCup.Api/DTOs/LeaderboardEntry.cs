@@ -12,4 +12,5 @@ public class LeaderboardEntry
     /// (dvs. dette er den første kampen med resultat).
     /// </summary>
     public int? PreviousRank { get; set; }
+    public bool HasPaid { get; set; }
 }
