@@ -40,7 +40,7 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
 
         var userId = GetAuthenticatedUserId()!.Value;
 
-        // Step 1: fetch messages
+        // Step 1: fetch messages (reactions fetched separately to avoid EF GroupBy-in-projection issues)
         var rawMessages = await query
             .OrderByDescending(m => m.CreatedAt)
             .Take(limit)
