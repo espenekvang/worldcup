@@ -169,7 +169,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setMessages((prev) => {
         // Skip duplicates (e.g. our own message that we already appended optimistically)
         if (prev.some((m) => m.id === msg.id)) return prev
-        return [...prev, msg]
+        return [...prev, { ...msg, reactions: msg.reactions ?? [] }]
       })
     })
 
@@ -187,16 +187,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setMessages((prev) =>
           prev.map((m) => {
             if (m.id !== evt.messageId) return m
-            const existing = m.reactions.find((r) => r.emoji === evt.emoji)
+            const currentReactions = m.reactions ?? []
+            const existing = currentReactions.find((r) => r.emoji === evt.emoji)
             let reactions
             if (evt.count === 0) {
-              reactions = m.reactions.filter((r) => r.emoji !== evt.emoji)
+              reactions = currentReactions.filter((r) => r.emoji !== evt.emoji)
             } else if (existing) {
-              reactions = m.reactions.map((r) =>
+              reactions = currentReactions.map((r) =>
                 r.emoji === evt.emoji ? { ...r, count: evt.count } : r,
               )
             } else {
-              reactions = [...m.reactions, { emoji: evt.emoji, count: evt.count, reactedByMe: false }]
+              reactions = [...currentReactions, { emoji: evt.emoji, count: evt.count, reactedByMe: false }]
             }
             return { ...m, reactions }
           }),
