@@ -15,7 +15,7 @@ namespace WorldCup.Api.Controllers;
 [Route("api/admin/broadcast")]
 public class BroadcastController(AppDbContext dbContext, IHubContext<ChatHub, IChatClient> chatHub) : ControllerBase
 {
-    private const string SenderName = "Bakrommet";
+    private const string SenderName = "📣 Bakrommet";
     private const int MaxContentLength = 500;
 
     [HttpPost]
