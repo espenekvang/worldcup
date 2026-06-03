@@ -67,7 +67,7 @@ public class DatabaseMigrationService(
                 CreatedAt = DateTime.UtcNow
             });
             await dbContext.SaveChangesAsync(ct);
-            _logger.LogInformation("Seeded Resultatservice system user.");
+            logger.LogInformation("Seeded Resultatservice system user.");
         }
         else
         {
@@ -90,7 +90,7 @@ public class DatabaseMigrationService(
             if (changed)
             {
                 await dbContext.SaveChangesAsync(ct);
-                _logger.LogInformation("Updated Dommeren system user metadata.");
+                logger.LogInformation("Updated Dommeren system user metadata.");
             }
         }
     }
