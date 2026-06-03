@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team } from '../types'
-import { getMatchPredictions, getMyGroups } from '../api/client'
+import { getMatchOdds, getMyGroups } from '../api/client'
 import { usePredictions } from '../context/PredictionsContext'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
@@ -25,7 +25,7 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
   const [odds, setOdds] = useState<MatchOdds | null>(null)
 
   useEffect(() => {
-    getMatchPredictions(match.id)
+    getMatchOdds(match.id)
       .then((preds) => setOdds(calculateOdds(preds)))
       .catch(() => setOdds(null))
     // Refresh groups to get latest payment status

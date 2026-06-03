@@ -63,10 +63,10 @@ export default function MatchPredictionsList({ matchId, variant = 'modal' }: Mat
                 className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                 style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
               >
-                {firstName(p.name).charAt(0)}
+                {firstName(p.name ?? '').charAt(0)}
               </div>
             )}
-            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{firstName(p.name)}</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{firstName(p.name ?? '')}</span>
           </div>
           {p.homeScore !== null && p.awayScore !== null ? (
             <div className="flex items-center gap-2">

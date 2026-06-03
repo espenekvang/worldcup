@@ -202,7 +202,7 @@ export function acceptInviteLink(token: string): Promise<AcceptInviteLinkRespons
 }
 
 export interface MatchPredictionResponse {
-  name: string
+  name: string | null
   picture: string | null
   homeScore: number | null
   awayScore: number | null
@@ -221,6 +221,10 @@ export interface LeaderboardEntry {
 
 export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {
   return request<MatchPredictionResponse[]>(`/api/predictions/match/${matchId}`)
+}
+
+export function getMatchOdds(matchId: number): Promise<MatchPredictionResponse[]> {
+  return request<MatchPredictionResponse[]>(`/api/predictions/match/${matchId}/odds`)
 }
 
 export interface GlobalLeaderboardEntry {
