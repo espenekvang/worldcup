@@ -369,6 +369,13 @@ export function deleteChatMessage(id: string): Promise<void> {
   return request<void>(`/api/chat/${id}`, { method: 'DELETE' })
 }
 
+export function broadcastMessage(content: string): Promise<{ groupCount: number }> {
+  return request<{ groupCount: number }>('/api/admin/broadcast', {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  })
+}
+
 export function getChatUnreadCount(since?: string): Promise<{ unreadCount: number }> {
   const params = new URLSearchParams()
   if (since) params.set('since', since)
