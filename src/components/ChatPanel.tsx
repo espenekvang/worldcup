@@ -381,7 +381,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                             onClick={() =>
                               setReactionPickerFor((prev) => (prev === m.id ? null : m.id))
                             }
-                            className="text-base opacity-0 transition-opacity group-hover:opacity-100"
+                            className="text-base opacity-0 transition-opacity group-hover:opacity-100 [@media(hover:none)]:opacity-60"
                             title="Reager"
                           >
                             😊
