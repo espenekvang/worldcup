@@ -5,6 +5,11 @@ public class ChatMessageDto
     public string Content { get; set; } = string.Empty;
 }
 
+public class BroadcastMessageDto
+{
+    public string Content { get; set; } = string.Empty;
+}
+
 public class ChatMessageResponse
 {
     public Guid Id { get; set; }

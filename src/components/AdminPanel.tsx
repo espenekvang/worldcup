@@ -6,7 +6,7 @@ import {
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
-  setMemberPaid,
+  setMemberPaid, broadcastMessage,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
@@ -82,6 +82,12 @@ export default function AdminPanel() {
   const [resultLoading, setResultLoading] = useState(false)
   const [resultError, setResultError] = useState<string | null>(null)
   const [resultSuccess, setResultSuccess] = useState(false)
+
+  // Broadcast state
+  const [broadcastContent, setBroadcastContent] = useState('')
+  const [broadcastLoading, setBroadcastLoading] = useState(false)
+  const [broadcastError, setBroadcastError] = useState<string | null>(null)
+  const [broadcastSuccess, setBroadcastSuccess] = useState<string | null>(null)
 
   const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
   const sortedTeams = Object.values(teams).sort((a, b) => a.name.localeCompare(b.name))
@@ -454,8 +460,73 @@ export default function AdminPanel() {
     }
   }
 
+  async function handleBroadcast(e: React.FormEvent) {
+    e.preventDefault()
+    if (!broadcastContent.trim()) return
+    setBroadcastLoading(true)
+    setBroadcastError(null)
+    setBroadcastSuccess(null)
+    try {
+      const result = await broadcastMessage(broadcastContent.trim())
+      setBroadcastSuccess(`Melding sendt til ${result.groupCount} liga${result.groupCount === 1 ? '' : 'er'}.`)
+      setBroadcastContent('')
+    } catch (err) {
+      setBroadcastError(err instanceof Error ? err.message : 'Kunne ikke sende melding')
+    } finally {
+      setBroadcastLoading(false)
+    }
+  }
+
   return (
     <>
+      {/* Broadcast to all chats */}
+      {isGlobalAdmin && (
+        <div
+          className="rounded-xl border p-4 sm:p-6"
+          style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+        >
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Send melding til alle chatter</h2>
+          <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Meldingen sendes inn i alle liga-chatter og vises som fra <strong>Bakrommet</strong>. Støtter markdown.
+          </p>
+          <form onSubmit={handleBroadcast} className="mt-4 flex flex-col gap-2">
+            <textarea
+              value={broadcastContent}
+              onChange={(e) => setBroadcastContent(e.target.value)}
+              placeholder="Skriv melding her... (markdown støttes)"
+              rows={4}
+              maxLength={500}
+              className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 resize-y"
+              style={{
+                backgroundColor: 'var(--color-surface-card)',
+                borderColor: 'var(--color-input-border)',
+                color: 'var(--color-text-primary)',
+              }}
+              required
+            />
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                {broadcastContent.length}/500 tegn
+              </span>
+              <button
+                type="submit"
+                disabled={broadcastLoading || !broadcastContent.trim()}
+                className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+              >
+                {broadcastLoading ? 'Sender...' : 'Send til alle ligaer'}
+              </button>
+            </div>
+            {broadcastError && (
+              <p className="text-sm" style={{ color: 'var(--color-error)' }}>{broadcastError}</p>
+            )}
+            {broadcastSuccess && (
+              <p className="text-sm" style={{ color: 'var(--color-success)' }}>{broadcastSuccess}</p>
+            )}
+          </form>
+        </div>
+      )}
+
       {/* Group Management */}
       <div
         className="rounded-xl border p-4 sm:p-6"
