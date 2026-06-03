@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getLeaderboard, getGlobalLeaderboard, type LeaderboardEntry, type GlobalLeaderboardEntry } from '../api/client'
+import { getLeaderboard, getGlobalLeaderboard, getMyGroups, type LeaderboardEntry, type GlobalLeaderboardEntry } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
 import { firstName } from '../utils/nameUtils'
 
@@ -63,7 +63,7 @@ function formatCurrency(amount: number): string {
 }
 
 export default function Leaderboard() {
-  const { activeGroup } = useBettingGroup()
+  const { activeGroup, setActiveGroup } = useBettingGroup()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [globalEntries, setGlobalEntries] = useState<GlobalLeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -75,11 +75,15 @@ export default function Leaderboard() {
     let cancelled = false
     setLoading(true)
 
-    Promise.all([getLeaderboard(), getGlobalLeaderboard()])
-      .then(([leaderboardData, globalData]) => {
+    Promise.all([getLeaderboard(), getGlobalLeaderboard(), getMyGroups()])
+      .then(([leaderboardData, globalData, freshGroups]) => {
         if (!cancelled) {
           setEntries(leaderboardData)
           setGlobalEntries(globalData)
+          const freshGroup = freshGroups.find(g => g.id === activeGroup.id)
+          if (freshGroup && freshGroup.currentUserHasPaid !== activeGroup.currentUserHasPaid) {
+            setActiveGroup(freshGroup)
+          }
         }
       })
       .catch(err => {
@@ -90,7 +94,7 @@ export default function Leaderboard() {
       })
 
     return () => { cancelled = true }
-  }, [activeGroup])
+  }, [activeGroup?.id])
 
   const prizes = useMemo(() => {
     if (!activeGroup?.isPaid) return new Map<string, number>()
