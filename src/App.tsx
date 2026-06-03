@@ -67,6 +67,13 @@ function AppContent() {
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
   const [showRules, setShowRules] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
@@ -170,7 +177,7 @@ function AppContent() {
             )}
           </div>
           <aside className="hidden lg:block lg:w-[360px] lg:shrink-0">
-            <ChatPanel visible className="h-full" />
+            <ChatPanel visible={isDesktop} className="h-full" />
           </aside>
         </div>
       </main>

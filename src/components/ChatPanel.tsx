@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -69,6 +70,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
     isLoading,
     isConnected,
     hasMore,
+    newMessagesMarkerId,
     sendMessage,
     deleteMessage,
     loadOlder,
@@ -86,6 +88,8 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
   const listRef = useRef<HTMLDivElement>(null)
   const lastMessageIdRef = useRef<string | null>(null)
   const previousScrollHeightRef = useRef<number | null>(null)
+  const newMessagesDividerRef = useRef<HTMLDivElement>(null)
+  const hasScrolledToUnreadRef = useRef(false)
 
   const isGroupAdmin = useMemo(() => {
     if (!user || !activeGroup) return false
@@ -93,7 +97,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
     return user.groupAdminGroupIds?.includes(activeGroup.id) ?? false
   }, [user, activeGroup])
 
-  // Auto-scroll to bottom when new messages arrive (when at bottom or first load)
+  // Auto-scroll: to "nye meldinger" divider on first load, otherwise to bottom
   useLayoutEffect(() => {
     const list = listRef.current
     if (!list) return
@@ -109,8 +113,12 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
     const newest = messages.length > 0 ? messages[messages.length - 1].id : null
     if (newest !== lastMessageIdRef.current) {
       lastMessageIdRef.current = newest
-      // Scroll to bottom
-      list.scrollTop = list.scrollHeight
+      if (!hasScrolledToUnreadRef.current && newMessagesDividerRef.current) {
+        hasScrolledToUnreadRef.current = true
+        newMessagesDividerRef.current.scrollIntoView({ behavior: 'instant', block: 'start' })
+      } else {
+        list.scrollTop = list.scrollHeight
+      }
     }
   }, [messages])
 
@@ -276,7 +284,30 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
               {group.messages.map((m) => {
                 const isOwn = currentUserId === m.userId
                 return (
-                  <div key={m.id} className="group mb-2 flex items-start gap-2">
+                  <Fragment key={m.id}>
+                    {m.id === newMessagesMarkerId && (
+                      <div
+                        ref={newMessagesDividerRef}
+                        className="my-3 flex items-center gap-2"
+                        aria-label="Nye meldinger"
+                      >
+                        <div
+                          className="h-px flex-1"
+                          style={{ backgroundColor: 'var(--color-tab-active)', opacity: 0.4 }}
+                        />
+                        <span
+                          className="text-xs font-medium"
+                          style={{ color: 'var(--color-tab-active)' }}
+                        >
+                          Nye meldinger
+                        </span>
+                        <div
+                          className="h-px flex-1"
+                          style={{ backgroundColor: 'var(--color-tab-active)', opacity: 0.4 }}
+                        />
+                      </div>
+                    )}
+                  <div className="group mb-2 flex items-start gap-2">
                     {m.isSystem ? (
                       <div
                         className="flex h-7 w-7 shrink-0 items-center justify-center"
@@ -364,6 +395,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                       )}
                     </div>
                   </div>
+                  </Fragment>
                 )
               })}
             </div>
