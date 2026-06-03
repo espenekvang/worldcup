@@ -4,18 +4,16 @@ using WorldCup.Api.Models;
 
 namespace WorldCup.Api.Services;
 
-public class DatabaseMigrationService : BackgroundService
+/// <summary>
+/// Runs EF Core migrations at startup and blocks the host from accepting HTTP requests
+/// until the database is ready. This prevents race conditions where API calls arrive
+/// before the schema is up to date.
+/// </summary>
+public class DatabaseMigrationService(
+    IServiceScopeFactory scopeFactory,
+    ILogger<DatabaseMigrationService> logger) : IHostedService
 {
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<DatabaseMigrationService> _logger;
-
-    public DatabaseMigrationService(IServiceScopeFactory scopeFactory, ILogger<DatabaseMigrationService> logger)
-    {
-        _scopeFactory = scopeFactory;
-        _logger = logger;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         const int maxRetries = 5;
 
@@ -23,30 +21,32 @@ public class DatabaseMigrationService : BackgroundService
         {
             try
             {
-                using var scope = _scopeFactory.CreateScope();
+                using var scope = scopeFactory.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await dbContext.Database.MigrateAsync(stoppingToken);
-                await SeedSystemUsersAsync(dbContext, stoppingToken);
-                _logger.LogInformation("Database migration completed successfully on attempt {Attempt}", attempt);
+                await dbContext.Database.MigrateAsync(cancellationToken);
+                await SeedSystemUsersAsync(dbContext, cancellationToken);
+                logger.LogInformation("Database migration completed successfully on attempt {Attempt}", attempt);
                 return;
             }
             catch (Exception ex) when (attempt < maxRetries)
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     ex,
                     "Database migration failed on attempt {Attempt}/{MaxRetries}, retrying in {Delay}s...",
                     attempt, maxRetries, attempt * 2);
-                await Task.Delay(TimeSpan.FromSeconds(attempt * 2), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(attempt * 2), cancellationToken);
             }
         }
 
-        // Final attempt — let it throw if it fails
-        using var finalScope = _scopeFactory.CreateScope();
+        // Final attempt — let it throw and abort startup if it fails
+        using var finalScope = scopeFactory.CreateScope();
         var finalDbContext = finalScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await finalDbContext.Database.MigrateAsync(stoppingToken);
-        await SeedSystemUsersAsync(finalDbContext, stoppingToken);
-        _logger.LogInformation("Database migration completed successfully on final attempt");
+        await finalDbContext.Database.MigrateAsync(cancellationToken);
+        await SeedSystemUsersAsync(finalDbContext, cancellationToken);
+        logger.LogInformation("Database migration completed successfully on final attempt");
     }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     private async Task SeedSystemUsersAsync(AppDbContext dbContext, CancellationToken ct)
     {

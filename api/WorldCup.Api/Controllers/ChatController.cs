@@ -60,23 +60,34 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
 
         // Step 2: fetch reactions for those messages (avoids GroupBy-in-projection EF translation issues)
         var messageIds = rawMessages.Select(m => m.Id).ToList();
-        var reactions = await dbContext.ChatMessageReactions
-            .Where(r => messageIds.Contains(r.ChatMessageId))
-            .AsNoTracking()
-            .ToListAsync();
+        Dictionary<Guid, List<ChatReactionSummary>> reactionsByMessage = [];
+        try
+        {
+            var reactions = await dbContext.ChatMessageReactions
+                .Where(r => messageIds.Contains(r.ChatMessageId))
+                .AsNoTracking()
+                .ToListAsync();
 
-        var reactionsByMessage = reactions
-            .GroupBy(r => r.ChatMessageId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.GroupBy(r => r.Emoji)
-                      .Select(eg => new ChatReactionSummary
-                      {
-                          Emoji = eg.Key,
-                          Count = eg.Count(),
-                          ReactedByMe = eg.Any(r => r.UserId == userId)
-                      })
-                      .ToList());
+            reactionsByMessage = reactions
+                .GroupBy(r => r.ChatMessageId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.GroupBy(r => r.Emoji)
+                          .Select(eg => new ChatReactionSummary
+                          {
+                              Emoji = eg.Key,
+                              Count = eg.Count(),
+                              ReactedByMe = eg.Any(r => r.UserId == userId)
+                          })
+                          .ToList());
+        }
+        catch (Exception ex)
+        {
+            // Reactions table may not exist yet (migration pending) — return messages without reactions.
+            HttpContext.RequestServices
+                .GetRequiredService<ILogger<ChatController>>()
+                .LogWarning(ex, "Could not load chat reactions; returning messages without reactions.");
+        }
 
         var messages = rawMessages.Select(m => new ChatMessageResponse
         {
