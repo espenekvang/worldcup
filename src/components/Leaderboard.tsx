@@ -94,7 +94,7 @@ export default function Leaderboard() {
 
   const prizes = useMemo(() => {
     if (!activeGroup?.isPaid) return new Map<string, number>()
-    return calculatePrizes(entries, activeGroup.prizePot)
+    return calculatePrizes(entries.filter(e => e.hasPaid), activeGroup.prizePot)
   }, [entries, activeGroup])
 
   if (loading) {

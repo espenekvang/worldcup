@@ -216,6 +216,7 @@ export interface LeaderboardEntry {
   matchCount: number
   /** Plassering før siste registrerte kamp. Null hvis ingen tidligere kamp finnes. */
   previousRank: number | null
+  hasPaid: boolean
 }
 
 export function getMatchPredictions(matchId: number): Promise<MatchPredictionResponse[]> {

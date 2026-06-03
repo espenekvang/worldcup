@@ -178,6 +178,7 @@ public class ResultsController(
                 m.UserId,
                 Name = m.User.Name,
                 Picture = m.User.Picture,
+                m.HasPaid,
                 TotalPoints = dbContext.Predictions
                     .Where(p => p.UserId == m.UserId && p.Points != null)
                     .Sum(p => (int?)p.Points) ?? 0,
@@ -223,7 +224,8 @@ public class ResultsController(
                 Picture = e.Picture,
                 TotalPoints = e.TotalPoints,
                 MatchCount = e.MatchCount,
-                PreviousRank = previousRanks.TryGetValue(e.UserId, out var r) ? r : (int?)null
+                PreviousRank = previousRanks.TryGetValue(e.UserId, out var r) ? r : (int?)null,
+                HasPaid = e.HasPaid
             })
             .ToList();
 
