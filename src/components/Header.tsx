@@ -51,7 +51,7 @@ export default function Header() {
               <button
                 onClick={() => setFeedbackOpen(true)}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-opacity hover:opacity-80 sm:h-9 sm:w-9"
-                style={{ backgroundColor: 'var(--color-header-btn)', color: 'var(--color-text-inverse)' }}
+                style={{ backgroundColor: 'var(--color-header-btn)', color: '#fff' }}
                 aria-label="Gi tilbakemelding"
               >
                 ?
