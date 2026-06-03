@@ -40,32 +40,56 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
 
         var userId = GetAuthenticatedUserId()!.Value;
 
-        var messages = await query
+        // Step 1: fetch messages
+        var rawMessages = await query
             .OrderByDescending(m => m.CreatedAt)
             .Take(limit)
-            .Select(m => new ChatMessageResponse
+            .Select(m => new
             {
-                Id = m.Id,
-                UserId = m.UserId,
+                m.Id,
+                m.UserId,
                 UserName = m.SenderDisplayNameOverride ?? m.User.Name,
                 UserPicture = m.User.Picture,
                 Content = m.DeletedAt == null ? m.Content : string.Empty,
-                CreatedAt = m.CreatedAt,
+                m.CreatedAt,
                 IsDeleted = m.DeletedAt != null,
-                IsSystem = m.User.IsSystem,
-                Reactions = dbContext.ChatMessageReactions
-                    .Where(r => r.ChatMessageId == m.Id)
-                    .GroupBy(r => r.Emoji)
-                    .Select(g => new ChatReactionSummary
-                    {
-                        Emoji = g.Key,
-                        Count = g.Count(),
-                        ReactedByMe = g.Any(r => r.UserId == userId)
-                    })
-                    .ToList()
+                IsSystem = m.User.IsSystem
             })
             .AsNoTracking()
             .ToListAsync();
+
+        // Step 2: fetch reactions for those messages (avoids GroupBy-in-projection EF translation issues)
+        var messageIds = rawMessages.Select(m => m.Id).ToList();
+        var reactions = await dbContext.ChatMessageReactions
+            .Where(r => messageIds.Contains(r.ChatMessageId))
+            .AsNoTracking()
+            .ToListAsync();
+
+        var reactionsByMessage = reactions
+            .GroupBy(r => r.ChatMessageId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.GroupBy(r => r.Emoji)
+                      .Select(eg => new ChatReactionSummary
+                      {
+                          Emoji = eg.Key,
+                          Count = eg.Count(),
+                          ReactedByMe = eg.Any(r => r.UserId == userId)
+                      })
+                      .ToList());
+
+        var messages = rawMessages.Select(m => new ChatMessageResponse
+        {
+            Id = m.Id,
+            UserId = m.UserId,
+            UserName = m.UserName,
+            UserPicture = m.UserPicture,
+            Content = m.Content,
+            CreatedAt = m.CreatedAt,
+            IsDeleted = m.IsDeleted,
+            IsSystem = m.IsSystem,
+            Reactions = reactionsByMessage.GetValueOrDefault(m.Id) ?? []
+        }).ToList();
 
         // Return chronological (oldest first) so the client can append
         messages.Reverse();
