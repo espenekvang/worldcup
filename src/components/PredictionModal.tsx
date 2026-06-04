@@ -170,17 +170,17 @@ export default function PredictionModal({ match, teams, onClose }: PredictionMod
             <div className="mt-4 text-center">
               <div className="flex items-center justify-center gap-3 text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                 <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
-                  H {odds.home ?? '–'}
+                  H {odds.home}
                 </span>
                 <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
-                  U {odds.draw ?? '–'}
+                  U {odds.draw}
                 </span>
                 <span className="rounded px-2 py-1" style={{ backgroundColor: 'var(--color-surface-elevated)' }}>
-                  B {odds.away ?? '–'}
+                  B {odds.away}
                 </span>
               </div>
               <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                Basert på {odds.totalPredictions} tips
+                Basert på {odds.totalPredictions} bets
               </p>
             </div>
           )}

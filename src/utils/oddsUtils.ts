@@ -1,9 +1,9 @@
 import type { MatchPredictionResponse } from '../api/client'
 
 export interface MatchOdds {
-  home: number | null
-  draw: number | null
-  away: number | null
+  home: number
+  draw: number
+  away: number
   totalPredictions: number
 }
 
@@ -29,10 +29,15 @@ export function calculateOdds(predictions: MatchPredictionResponse[]): MatchOdds
     else away++
   }
 
+  // Parimutuel-odds: total / antall som har valgt utfallet. Hvis ingen har valgt
+  // et utfall ville den som bettet det vunnet hele potten alene – altså høyest
+  // mulig odds (total + 1, inkludert sitt eget bet).
+  const oddsFor = (count: number) => (count > 0 ? +(total / count).toFixed(2) : total + 1)
+
   return {
-    home: home > 0 ? +(total / home).toFixed(2) : null,
-    draw: draw > 0 ? +(total / draw).toFixed(2) : null,
-    away: away > 0 ? +(total / away).toFixed(2) : null,
+    home: oddsFor(home),
+    draw: oddsFor(draw),
+    away: oddsFor(away),
     totalPredictions: total,
   }
 }
