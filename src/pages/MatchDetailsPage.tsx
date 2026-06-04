@@ -12,6 +12,7 @@ import {
   TeamStatsCompare,
   HeadToHeadSection,
   FormLegend,
+  SquadCard,
 } from '../components/match-details/StatsSections'
 import { useMatches } from '../context/MatchesContext'
 import { usePredictions } from '../context/PredictionsContext'
@@ -230,6 +231,20 @@ export default function MatchDetailsPage() {
                   homeName={homeDisplay}
                   awayName={awayDisplay}
                 />
+              )}
+            </section>
+
+            <section className="mt-4">
+              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
+                Tropp
+              </h2>
+              {statsLoading ? (
+                <p className="text-center text-xs" style={{ color: 'var(--color-text-muted)' }}>Laster tropp…</p>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <SquadCard squad={homeStats?.squad} team={homeTeam} fallbackName={homeDisplay} />
+                  <SquadCard squad={awayStats?.squad} team={awayTeam} fallbackName={awayDisplay} />
+                </div>
               )}
             </section>
 

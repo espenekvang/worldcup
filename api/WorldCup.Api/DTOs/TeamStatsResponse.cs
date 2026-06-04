@@ -22,7 +22,28 @@ public sealed record TeamStatsResponse(
     /// <summary>Viktige skader/suspensjoner som påvirker neste kamp.</summary>
     IReadOnlyList<string> KeyAbsences,
     /// <summary>Resultater fra forrige VM (kortform), eller null hvis ikke deltatt.</summary>
-    string? LastWorldCupResult);
+    string? LastWorldCupResult,
+    /// <summary>
+    /// VM-troppen: spillerne laget har meldt inn. Tom liste hvis troppen ikke
+    /// er publisert ennå. Fylles typisk fra Wikipedia-seed
+    /// (scripts/scrape-wc2026-squads.py).
+    /// </summary>
+    IReadOnlyList<PlayerEntry> Squad);
+
+/// <summary>
+/// Én spiller i en VM-tropp. Alder regnes per turneringsstart, og klubb er
+/// klubblaget spilleren tilhører til daglig (utenfor landslaget).
+/// </summary>
+public sealed record PlayerEntry(
+    string Name,
+    /// <summary>"GK", "DF", "MF" eller "FW" — null hvis ukjent.</summary>
+    string? Position,
+    /// <summary>Draktnummer, eller null hvis ikke tildelt.</summary>
+    int? ShirtNumber,
+    /// <summary>Alder i hele år per turneringsstart, eller null hvis ukjent.</summary>
+    int? Age,
+    /// <summary>Klubblaget spilleren spiller for til daglig, eller null.</summary>
+    string? Club);
 
 public sealed record RecentMatchEntry(
     string Date,

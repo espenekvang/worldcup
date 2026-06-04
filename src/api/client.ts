@@ -420,6 +420,17 @@ export interface RecentMatchEntry {
   competition: string
 }
 
+/** Én spiller i en VM-tropp. Alder er regnet per turneringsstart. */
+export interface PlayerEntry {
+  name: string
+  /** "GK" | "DF" | "MF" | "FW" */
+  position: string | null
+  shirtNumber: number | null
+  age: number | null
+  /** Klubblaget spilleren spiller for til daglig. */
+  club: string | null
+}
+
 export interface TeamStatsResponse {
   teamCode: string
   fifaRank: number | null
@@ -433,6 +444,8 @@ export interface TeamStatsResponse {
   recentMatches: RecentMatchEntry[]
   keyAbsences: string[]
   lastWorldCupResult: string | null
+  /** VM-troppen. Tom liste hvis ikke publisert ennå. */
+  squad: PlayerEntry[]
 }
 
 export interface HeadToHeadMatch {

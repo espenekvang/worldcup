@@ -147,7 +147,8 @@ public sealed class TeamStatsService
             RecentForm: NullIfEmpty(external.RecentForm) ?? seed.RecentForm,
             RecentMatches: external.RecentMatches is { Count: > 0 } ? external.RecentMatches : seed.RecentMatches,
             KeyAbsences: external.KeyAbsences is { Count: > 0 } ? external.KeyAbsences : seed.KeyAbsences,
-            LastWorldCupResult: NullIfEmpty(external.LastWorldCupResult) ?? seed.LastWorldCupResult);
+            LastWorldCupResult: NullIfEmpty(external.LastWorldCupResult) ?? seed.LastWorldCupResult,
+            Squad: external.Squad is { Count: > 0 } ? external.Squad : seed.Squad ?? []);
 
         static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
     }

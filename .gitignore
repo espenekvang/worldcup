@@ -24,3 +24,7 @@ api/**/appsettings.Development.json
 
 # AI agent working files
 .sisyphus/
+
+# Python
+__pycache__/
+*.pyc

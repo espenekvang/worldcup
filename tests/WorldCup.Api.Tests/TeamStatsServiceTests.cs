@@ -36,6 +36,10 @@ public class TeamStatsServiceTests : IDisposable
                     recentMatches = Array.Empty<object>(),
                     keyAbsences = Array.Empty<string>(),
                     lastWorldCupResult = "Kvartfinale 2022",
+                    squad = new[]
+                    {
+                        new { name = "Vinícius Júnior", position = "FW", shirtNumber = 7, age = 25, club = "Real Madrid" },
+                    },
                 },
             },
             headToHead = new Dictionary<string, object?>
@@ -89,6 +93,10 @@ public class TeamStatsServiceTests : IDisposable
         stats!.FifaRank.Should().Be(5);
         stats.Manager.Should().Be("Test Manager");
         stats.RecentForm.Should().Be("WWDWL");
+        stats.Squad.Should().ContainSingle();
+        stats.Squad[0].Name.Should().Be("Vinícius Júnior");
+        stats.Squad[0].Age.Should().Be(25);
+        stats.Squad[0].Club.Should().Be("Real Madrid");
     }
 
     [Fact]
@@ -184,7 +192,8 @@ public class TeamStatsServiceTests : IDisposable
                 RecentForm: null,
                 RecentMatches: Array.Empty<RecentMatchEntry>(),
                 KeyAbsences: Array.Empty<string>(),
-                LastWorldCupResult: null));
+                LastWorldCupResult: null,
+                Squad: Array.Empty<PlayerEntry>()));
 
         var env = Substitute.For<IWebHostEnvironment>();
         env.ContentRootPath.Returns(_tempContentRoot);
@@ -217,7 +226,8 @@ public class TeamStatsServiceTests : IDisposable
                     new RecentMatchEntry("2026-03-01", "FRA", "home", 3, 0, "W", "Vennskap"),
                 },
                 KeyAbsences: Array.Empty<string>(),
-                LastWorldCupResult: null));
+                LastWorldCupResult: null,
+                Squad: Array.Empty<PlayerEntry>()));
 
         var env = Substitute.For<IWebHostEnvironment>();
         env.ContentRootPath.Returns(_tempContentRoot);

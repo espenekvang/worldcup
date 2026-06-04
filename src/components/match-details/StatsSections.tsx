@@ -1,6 +1,6 @@
 import type { Team } from '../../types'
 import { useEffect, useState } from 'react'
-import { getTeamStats, getHeadToHead, type TeamStatsResponse, type HeadToHeadResponse } from '../../api/client'
+import { getTeamStats, getHeadToHead, type TeamStatsResponse, type HeadToHeadResponse, type PlayerEntry } from '../../api/client'
 
 /**
  * Henter team-stats for inntil to lag og H2H mellom dem i ett kall.
@@ -170,6 +170,101 @@ export function FormLegend() {
       </span>
       <span className="ml-2 hidden sm:inline">·</span>
       <span><strong>H</strong> hjemme · <strong>B</strong> borte · <strong>N</strong> nøytral bane</span>
+    </div>
+  )
+}
+
+// Posisjonsrekkefølge + norske gruppe-etiketter for tropp-visningen.
+const POSITION_ORDER = ['GK', 'DF', 'MF', 'FW'] as const
+const POSITION_LABELS: Record<string, string> = {
+  GK: 'Keepere',
+  DF: 'Forsvar',
+  MF: 'Midtbane',
+  FW: 'Angrep',
+  '?': 'Øvrige',
+}
+
+function positionGroup(pos: string | null): string {
+  const p = (pos ?? '').toUpperCase()
+  return POSITION_LABELS[p] ? p : '?'
+}
+
+interface SquadCardProps {
+  squad: PlayerEntry[] | undefined
+  team: Team | null
+  fallbackName: string
+}
+
+/**
+ * Viser ett lags VM-tropp gruppert på posisjon (keeper/forsvar/midtbane/
+ * angrep). Hver spiller vises med draktnummer, navn, alder og klubblag.
+ * Tom/uoppgitt tropp gir en "ikke publisert ennå"-melding.
+ */
+export function SquadCard({ squad, team, fallbackName }: SquadCardProps) {
+  const name = team?.name ?? fallbackName
+  const flag = team?.flag ?? ''
+  const players = squad ?? []
+
+  // Sorter innen hver gruppe på draktnummer (manglende nummer sist).
+  const groupKeys: string[] = [...POSITION_ORDER, '?']
+  const groups = groupKeys.map(group => ({
+    group,
+    label: POSITION_LABELS[group],
+    players: players
+      .filter(p => positionGroup(p.position) === group)
+      .sort((a, b) => (a.shirtNumber ?? 99) - (b.shirtNumber ?? 99)),
+  })).filter(g => g.players.length > 0)
+
+  return (
+    <div className="rounded-lg border p-3" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface-card)' }}>
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+          {flag} {name}
+        </p>
+        {players.length > 0 ? (
+          <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+            {players.length} spillere
+          </span>
+        ) : null}
+      </div>
+
+      {groups.length === 0 ? (
+        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          Troppen er ikke publisert ennå.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {groups.map(g => (
+            <div key={g.group}>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
+                {g.label}
+              </p>
+              <ul className="space-y-0.5 text-xs">
+                {g.players.map((p, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-2">
+                    <span className="flex min-w-0 items-baseline gap-1.5">
+                      <span className="w-5 shrink-0 text-right tabular-nums text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+                        {p.shirtNumber ?? ''}
+                      </span>
+                      <span className="truncate font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                        {p.name}
+                      </span>
+                      {p.age != null ? (
+                        <span className="shrink-0 text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+                          {p.age} år
+                        </span>
+                      ) : null}
+                    </span>
+                    <span className="shrink-0 truncate text-right text-[10px]" style={{ color: 'var(--color-text-secondary)' }} title={p.club ?? undefined}>
+                      {p.club ?? '—'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
