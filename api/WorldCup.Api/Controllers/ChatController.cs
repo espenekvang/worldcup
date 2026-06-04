@@ -53,7 +53,7 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
                 Content = m.DeletedAt == null ? m.Content : string.Empty,
                 m.CreatedAt,
                 IsDeleted = m.DeletedAt != null,
-                IsSystem = m.User.IsSystem
+                IsSystem = m.User.IsSystem || m.SenderDisplayNameOverride != null
             })
             .AsNoTracking()
             .ToListAsync();
