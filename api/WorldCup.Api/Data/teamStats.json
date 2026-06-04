@@ -6,59 +6,11 @@
       "manager": "Vladimir Petković",
       "starPlayer": "Riyad Mahrez",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WLDDD",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "GHA",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-22",
-          "opponent": "QAT",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "ARG",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "ARG",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-16",
-          "opponent": "JPN",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2014"
     },
     "ARG": {
@@ -67,56 +19,10 @@
       "manager": "Lionel Scaloni",
       "starPlayer": "Lionel Messi",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.4,
-      "goalsConcededAvg": 0.4,
-      "recentForm": "DWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-08",
-          "opponent": "FRA",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "USA",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "RSA",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "PAN",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "PAN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Vinner 2022"
     },
@@ -126,59 +32,11 @@
       "manager": "Tony Popovic",
       "starPlayer": "Mat Ryan",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WWDDD",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "CAN",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "ECU",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-09",
-          "opponent": "NED",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "GER",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "JPN",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-21"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
     "AUT": {
@@ -187,59 +45,11 @@
       "manager": "Ralf Rangnick",
       "starPlayer": "David Alaba",
       "preferredFormation": "4-2-2-2",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "WLWWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "PAN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "NOR",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "FRA",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "CRO",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "IRQ",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
     "BEL": {
@@ -248,56 +58,10 @@
       "manager": "Rudi Garcia",
       "starPlayer": "Youri Tielemans",
       "preferredFormation": "3-4-2-1",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 1.0,
-      "recentForm": "WDWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "RSA",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "CIV",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "ALG",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "UZB",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "URU",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -307,56 +71,10 @@
       "manager": "Sergej Barbarez",
       "starPlayer": "Edin Džeko",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 0.8,
-      "goalsConcededAvg": 2.0,
-      "recentForm": "LDLLL",
-      "recentMatches": [
-        {
-          "date": "2026-05-08",
-          "opponent": "GER",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "ALG",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "IRN",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "TUR",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "QAT",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "EM-kvalifisering"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
@@ -366,60 +84,11 @@
       "manager": "Carlo Ancelotti",
       "starPlayer": "Casemiro",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 0.4,
-      "recentForm": "WDWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-08",
-          "opponent": "ECU",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "CUW",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "SWE",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-25",
-          "opponent": "PAN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "ESP",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-12",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Kvartfinale 2022"
     },
     "CAN": {
@@ -428,59 +97,11 @@
       "manager": "Jesse Marsch",
       "starPlayer": "Alphonso Davies",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.4,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "DWDWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "NOR",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "GHA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "BRA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "SWE",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "IRN",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "EM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-23"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
     "CIV": {
@@ -489,56 +110,10 @@
       "manager": "Emerse Faé",
       "starPlayer": "Sébastien Haller",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 1.0,
-      "recentForm": "WWDWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "QAT",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "POR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "BRA",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "SUI",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "GHA",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
@@ -548,56 +123,10 @@
       "manager": "Sébastien Desabre",
       "starPlayer": "Cédric Bakambu",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 0.2,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "LLLDD",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "ENG",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "ARG",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "MEX",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "CZE",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "IRQ",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Ikke deltatt"
     },
@@ -607,56 +136,10 @@
       "manager": "Néstor Lorenzo",
       "starPlayer": "Luis Díaz",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 0.4,
-      "recentForm": "WWDDW",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "USA",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-04-26",
-          "opponent": "UZB",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "RSA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "CAN",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-03-16",
-          "opponent": "PAN",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
@@ -666,60 +149,11 @@
       "manager": "Bubista",
       "starPlayer": "Ryan Mendes",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "LLWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "JOR",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-22",
-          "opponent": "CIV",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "COD",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "ENG",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "CRO",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Copa América"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-27",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Debutant"
     },
     "CRO": {
@@ -728,56 +162,10 @@
       "manager": "Zlatko Dalić",
       "starPlayer": "Luka Modrić",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 0.6,
-      "recentForm": "WDWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-11",
-          "opponent": "NED",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "JPN",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "CUW",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "NED",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "KOR",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Bronse 2022"
     },
@@ -787,59 +175,11 @@
       "manager": "Dick Advocaat",
       "starPlayer": "Leandro Bacuna",
       "preferredFormation": "4-4-2",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.8,
-      "recentForm": "LLLWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "GER",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "PAR",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "JOR",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "COD",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "AUS",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-10"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Debutant"
     },
     "CZE": {
@@ -848,59 +188,11 @@
       "manager": "Ivan Hašek",
       "starPlayer": "Patrik Schick",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 0.8,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WLDLL",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "CRO",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "IRN",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "GHA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "TUN",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "GER",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-11"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
     "ECU": {
@@ -909,59 +201,11 @@
       "manager": "Sebastián Beccacece",
       "starPlayer": "Moisés Caicedo",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "WDDWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "UZB",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "CAN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "IRN",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "BEL",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "TUN",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Copa América"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-29"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
     "EGY": {
@@ -970,59 +214,11 @@
       "manager": "Hossam Hassan",
       "starPlayer": "Mohamed Salah",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 2.0,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "WWWLW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "NOR",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "URU",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "COD",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "ESP",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "MAR",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-5"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
     "ENG": {
@@ -1031,56 +227,10 @@
       "manager": "Thomas Tuchel",
       "starPlayer": "Jude Bellingham",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 2.0,
-      "goalsConcededAvg": 0.4,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "ESP",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "ARG",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "BRA",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "IRN",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "ESP",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Copa América"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Kvartfinale 2022"
     },
@@ -1090,59 +240,11 @@
       "manager": "Luis de la Fuente",
       "starPlayer": "Lamine Yamal",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 1.6,
-      "recentForm": "DWDWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "NED",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "CZE",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "CUW",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "POR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-16",
-          "opponent": "HAI",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
     "FRA": {
@@ -1151,56 +253,10 @@
       "manager": "Didier Deschamps",
       "starPlayer": "Kylian Mbappé",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 0.6,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "USA",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "ARG",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-10",
-          "opponent": "UZB",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "IRN",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "EGY",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Finale 2022"
     },
@@ -1210,56 +266,10 @@
       "manager": "Julian Nagelsmann",
       "starPlayer": "Florian Wirtz",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 2.4,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "DWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "MEX",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-26",
-          "opponent": "CUW",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "SEN",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "GHA",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "CPV",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "Nations League"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -1269,59 +279,11 @@
       "manager": "Otto Addo",
       "starPlayer": "Mohammed Kudus",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.0,
-      "goalsConcededAvg": 1.6,
-      "recentForm": "WLLLW",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "MEX",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "CUW",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "POR",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "SEN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "COD",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-10"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
     "HAI": {
@@ -1330,59 +292,11 @@
       "manager": "Sébastien Migné",
       "starPlayer": "Duckens Nazon",
       "preferredFormation": "4-4-2",
-      "goalsScoredAvg": 1.0,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "WLLLD",
-      "recentMatches": [
-        {
-          "date": "2026-05-11",
-          "opponent": "CIV",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "CPV",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "SWE",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "IRQ",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-16",
-          "opponent": "GER",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-4"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "1974"
     },
     "IRN": {
@@ -1391,56 +305,10 @@
       "manager": "Amir Ghalenoei",
       "starPlayer": "Alireza Jahanbakhsh",
       "preferredFormation": "3-5-2",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "WDWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "USA",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "NZL",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "COL",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "PAR",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "IRQ",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -1450,59 +318,11 @@
       "manager": "Graham Arnold",
       "starPlayer": "Jalal Hassan",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.8,
-      "recentForm": "DLDDL",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "BIH",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "BIH",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "SWE",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "SUI",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "ALG",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "Copa América"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Debutant"
     },
     "JOR": {
@@ -1511,59 +331,11 @@
       "manager": "Jamal Sellami",
       "starPlayer": "Ihsan Haddad",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 0.4,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "DLDLL",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "COD",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "SUI",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "MEX",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "BIH",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "BRA",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Debutant"
     },
     "JPN": {
@@ -1572,56 +344,10 @@
       "manager": "Hajime Moriyasu",
       "starPlayer": "Wataru Endo",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.0,
-      "goalsConcededAvg": 0.4,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-10",
-          "opponent": "CIV",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "EGY",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "SCO",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "NED",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-14",
-          "opponent": "ECU",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
@@ -1631,56 +357,10 @@
       "manager": "Hong Myung-bo",
       "starPlayer": "Son Heung-min",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.4,
-      "goalsConcededAvg": 1.0,
-      "recentForm": "WDDWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "CRO",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "PAN",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-10",
-          "opponent": "MEX",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "KSA",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "CAN",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
@@ -1690,60 +370,11 @@
       "manager": "Georgios Donis",
       "starPlayer": "Salem Al-Dawsari",
       "preferredFormation": "4-1-4-1",
-      "goalsScoredAvg": 1.0,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "LLWWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "CAN",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "CRO",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "BIH",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "POR",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "NZL",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-3",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
     "MAR": {
@@ -1752,60 +383,11 @@
       "manager": "Mohamed Ouahbi",
       "starPlayer": "Achraf Hakimi",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.6,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "ENG",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "EGY",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "AUT",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-28",
-          "opponent": "BIH",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "BIH",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-18",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "4. plass 2022"
     },
     "MEX": {
@@ -1814,56 +396,10 @@
       "manager": "Javier Aguirre",
       "starPlayer": "Edson Álvarez",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "WWDWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "GHA",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "HAI",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "NED",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "NOR",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "URU",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Copa América"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -1873,60 +409,11 @@
       "manager": "Ronald Koeman",
       "starPlayer": "Virgil van Dijk",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 1.0,
-      "recentForm": "WWDDW",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "TUR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "ECU",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-14",
-          "opponent": "GHA",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "BRA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "BEL",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-9",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Kvartfinale 2022"
     },
     "NOR": {
@@ -1935,59 +422,11 @@
       "manager": "Ståle Solbakken",
       "starPlayer": "Martin Ødegaard",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.4,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "DWDWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-08",
-          "opponent": "ESP",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "RSA",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "BEL",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-26",
-          "opponent": "FRA",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "GER",
-          "venue": "neutral",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-23"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "1998"
     },
     "NZL": {
@@ -1996,59 +435,11 @@
       "manager": "Darren Bazeley",
       "starPlayer": "Chris Wood",
       "preferredFormation": "4-4-2",
-      "goalsScoredAvg": 2.0,
-      "goalsConcededAvg": 1.8,
-      "recentForm": "LWLWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "JOR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "IRQ",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "SEN",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "KSA",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "SEN",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "2010"
     },
     "PAN": {
@@ -2057,56 +448,10 @@
       "manager": "Thomas Christiansen",
       "starPlayer": "Aníbal Godoy",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "WLWDW",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "SUI",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "AUS",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "JPN",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-25",
-          "opponent": "TUN",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "CZE",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "2018"
     },
@@ -2116,60 +461,11 @@
       "manager": "Gustavo Alfaro",
       "starPlayer": "Miguel Almirón",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 0.8,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "DLDWD",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "ECU",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "ECU",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "COL",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "BIH",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "MAR",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "EM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-29",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "2010"
     },
     "POR": {
@@ -2178,59 +474,11 @@
       "manager": "Roberto Martínez",
       "starPlayer": "Bruno Fernandes",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 0.2,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "GHA",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-28",
-          "opponent": "SWE",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-12",
-          "opponent": "SCO",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "KSA",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "CIV",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Kvartfinale 2022"
     },
     "QAT": {
@@ -2239,56 +487,10 @@
       "manager": "Bartolomé Márquez",
       "starPlayer": "Akram Afif",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 0.8,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "DLDWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-09",
-          "opponent": "HAI",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "SUI",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "BRA",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "SCO",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "CZE",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Nations League"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -2298,56 +500,10 @@
       "manager": "Hugo Broos",
       "starPlayer": "Themba Zwane",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.6,
-      "goalsConcededAvg": 1.6,
-      "recentForm": "WLWWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-10",
-          "opponent": "KOR",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "JPN",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-10",
-          "opponent": "MAR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "HAI",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "SCO",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Copa América"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "2010"
     },
@@ -2357,56 +513,10 @@
       "manager": "Steve Clarke",
       "starPlayer": "Scott McTominay",
       "preferredFormation": "3-4-2-1",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "LLWDD",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "CAN",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "MAR",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "TUR",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-29",
-          "opponent": "ALG",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "EGY",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 1,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "1998"
     },
@@ -2416,59 +526,11 @@
       "manager": "Pape Thiaw",
       "starPlayer": "Sadio Mané",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.4,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-06",
-          "opponent": "USA",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-22",
-          "opponent": "GHA",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-14",
-          "opponent": "CUW",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "USA",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "TUR",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-4"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
     "SUI": {
@@ -2477,56 +539,10 @@
       "manager": "Murat Yakin",
       "starPlayer": "Granit Xhaka",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 0.6,
-      "recentForm": "WWWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-11",
-          "opponent": "CAN",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-24",
-          "opponent": "UZB",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-08",
-          "opponent": "ESP",
-          "venue": "neutral",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "AUT",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-13",
-          "opponent": "JOR",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "AFC Asian Cup"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
@@ -2536,60 +552,11 @@
       "manager": "Jon Dahl Tomasson",
       "starPlayer": "Alexander Isak",
       "preferredFormation": "4-4-2",
-      "goalsScoredAvg": 1.8,
-      "goalsConcededAvg": 0.8,
-      "recentForm": "WWWWL",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "COD",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "CRO",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "GER",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-30",
-          "opponent": "MAR",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "ALG",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-9",
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
     "TUN": {
@@ -2598,56 +565,10 @@
       "manager": "Sami Trabelsi",
       "starPlayer": "Hannibal Mejbri",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.2,
-      "goalsConcededAvg": 1.2,
-      "recentForm": "WDWWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-08",
-          "opponent": "PAR",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "PAR",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "PAR",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "SUI",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "MEX",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -2657,59 +578,11 @@
       "manager": "Vincenzo Montella",
       "starPlayer": "Arda Güler",
       "preferredFormation": "4-2-3-1",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.0,
-      "recentForm": "WLDDW",
-      "recentMatches": [
-        {
-          "date": "2026-05-12",
-          "opponent": "PAR",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-25",
-          "opponent": "SEN",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "JOR",
-          "venue": "home",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "EGY",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-15",
-          "opponent": "ESP",
-          "venue": "home",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        }
-      ],
-      "keyAbsences": [
-        "Suspendert etter gult kort i kvalik"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "Ikke kvalifisert 2022"
     },
     "URU": {
@@ -2718,56 +591,10 @@
       "manager": "Marcelo Bielsa",
       "starPlayer": "Federico Valverde",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 2.4,
-      "goalsConcededAvg": 1.4,
-      "recentForm": "WDDWW",
-      "recentMatches": [
-        {
-          "date": "2026-05-11",
-          "opponent": "SUI",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Vennskapskamp"
-        },
-        {
-          "date": "2026-04-26",
-          "opponent": "CRO",
-          "venue": "home",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-11",
-          "opponent": "NZL",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 1,
-          "result": "D",
-          "competition": "EM-kvalifisering"
-        },
-        {
-          "date": "2026-03-31",
-          "opponent": "HAI",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 2,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-03-12",
-          "opponent": "KOR",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 1,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Gruppespill 2022"
     },
@@ -2777,59 +604,11 @@
       "manager": "Mauricio Pochettino",
       "starPlayer": "Christian Pulisic",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 0.0,
-      "recentForm": "WWWDW",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "NZL",
-          "venue": "neutral",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Nations League"
-        },
-        {
-          "date": "2026-04-23",
-          "opponent": "SUI",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 0,
-          "result": "D",
-          "competition": "CONCACAF Nations"
-        },
-        {
-          "date": "2026-04-09",
-          "opponent": "AUT",
-          "venue": "away",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "VM-kvalifisering"
-        },
-        {
-          "date": "2026-03-25",
-          "opponent": "SWE",
-          "venue": "neutral",
-          "goalsFor": 2,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-17",
-          "opponent": "EGY",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "EM-kvalifisering"
-        }
-      ],
-      "keyAbsences": [
-        "Skadet: spiller-7"
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
+      "keyAbsences": [],
       "lastWorldCupResult": "8-delsfinale 2022"
     },
     "UZB": {
@@ -2838,1827 +617,13 @@
       "manager": "Timur Kapadze",
       "starPlayer": "Eldor Shomurodov",
       "preferredFormation": "4-3-3",
-      "goalsScoredAvg": 1.2,
-      "goalsConcededAvg": 1.8,
-      "recentForm": "LWLLW",
-      "recentMatches": [
-        {
-          "date": "2026-05-07",
-          "opponent": "ALG",
-          "venue": "away",
-          "goalsFor": 3,
-          "goalsAgainst": 2,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-04-27",
-          "opponent": "JOR",
-          "venue": "home",
-          "goalsFor": 1,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "Africa Cup of Nations"
-        },
-        {
-          "date": "2026-04-13",
-          "opponent": "FRA",
-          "venue": "away",
-          "goalsFor": 0,
-          "goalsAgainst": 2,
-          "result": "L",
-          "competition": "AFC Asian Cup"
-        },
-        {
-          "date": "2026-03-27",
-          "opponent": "KOR",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 0,
-          "result": "W",
-          "competition": "Copa América"
-        },
-        {
-          "date": "2026-03-11",
-          "opponent": "CUW",
-          "venue": "away",
-          "goalsFor": 1,
-          "goalsAgainst": 3,
-          "result": "L",
-          "competition": "Copa América"
-        }
-      ],
+      "goalsScoredAvg": null,
+      "goalsConcededAvg": null,
+      "recentForm": null,
+      "recentMatches": [],
       "keyAbsences": [],
       "lastWorldCupResult": "Debutant"
     }
   },
-  "headToHead": {
-    "ARG-BRA": {
-      "teamA": "ARG",
-      "teamB": "BRA",
-      "totalMatches": 110,
-      "teamAWins": 41,
-      "draws": 26,
-      "teamBWins": 43,
-      "teamAGoals": 129,
-      "teamBGoals": 132,
-      "recentMatches": [
-        {
-          "date": "2025-09-06",
-          "homeTeam": "BRA",
-          "awayTeam": "ARG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-04-24",
-          "homeTeam": "ARG",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-09-08",
-          "homeTeam": "BRA",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-05-08",
-          "homeTeam": "BRA",
-          "awayTeam": "ARG",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2023-09-29",
-          "homeTeam": "ARG",
-          "awayTeam": "BRA",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        }
-      ]
-    },
-    "ENG-GER": {
-      "teamA": "ENG",
-      "teamB": "GER",
-      "totalMatches": 33,
-      "teamAWins": 13,
-      "draws": 5,
-      "teamBWins": 15,
-      "teamAGoals": 38,
-      "teamBGoals": 41,
-      "recentMatches": [
-        {
-          "date": "2025-10-11",
-          "homeTeam": "ENG",
-          "awayTeam": "GER",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2025-04-08",
-          "homeTeam": "GER",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-10-30",
-          "homeTeam": "ENG",
-          "awayTeam": "GER",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-03-11",
-          "homeTeam": "GER",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2023-10-27",
-          "homeTeam": "GER",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "ESP-POR": {
-      "teamA": "ESP",
-      "teamB": "POR",
-      "totalMatches": 38,
-      "teamAWins": 17,
-      "draws": 12,
-      "teamBWins": 9,
-      "teamAGoals": 50,
-      "teamBGoals": 38,
-      "recentMatches": [
-        {
-          "date": "2025-09-26",
-          "homeTeam": "POR",
-          "awayTeam": "ESP",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-04-02",
-          "homeTeam": "ESP",
-          "awayTeam": "POR",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-09-16",
-          "homeTeam": "POR",
-          "awayTeam": "ESP",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-05-05",
-          "homeTeam": "POR",
-          "awayTeam": "ESP",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2023-11-12",
-          "homeTeam": "ESP",
-          "awayTeam": "POR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "FRA-GER": {
-      "teamA": "FRA",
-      "teamB": "GER",
-      "totalMatches": 31,
-      "teamAWins": 14,
-      "draws": 8,
-      "teamBWins": 9,
-      "teamAGoals": 40,
-      "teamBGoals": 33,
-      "recentMatches": [
-        {
-          "date": "2025-09-22",
-          "homeTeam": "GER",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2025-04-04",
-          "homeTeam": "FRA",
-          "awayTeam": "GER",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-10-09",
-          "homeTeam": "FRA",
-          "awayTeam": "GER",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-04-09",
-          "homeTeam": "FRA",
-          "awayTeam": "GER",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2023-10-15",
-          "homeTeam": "FRA",
-          "awayTeam": "GER",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-finale",
-          "venue": null
-        }
-      ]
-    },
-    "BRA-GER": {
-      "teamA": "BRA",
-      "teamB": "GER",
-      "totalMatches": 23,
-      "teamAWins": 12,
-      "draws": 5,
-      "teamBWins": 6,
-      "teamAGoals": 32,
-      "teamBGoals": 23,
-      "recentMatches": [
-        {
-          "date": "2025-09-30",
-          "homeTeam": "GER",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2025-03-21",
-          "homeTeam": "GER",
-          "awayTeam": "BRA",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-10-12",
-          "homeTeam": "BRA",
-          "awayTeam": "GER",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2024-04-29",
-          "homeTeam": "BRA",
-          "awayTeam": "GER",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2023-11-09",
-          "homeTeam": "GER",
-          "awayTeam": "BRA",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "ARG-GER": {
-      "teamA": "ARG",
-      "teamB": "GER",
-      "totalMatches": 22,
-      "teamAWins": 9,
-      "draws": 5,
-      "teamBWins": 8,
-      "teamAGoals": 27,
-      "teamBGoals": 25,
-      "recentMatches": [
-        {
-          "date": "2025-09-02",
-          "homeTeam": "ARG",
-          "awayTeam": "GER",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2025-03-18",
-          "homeTeam": "GER",
-          "awayTeam": "ARG",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-10-31",
-          "homeTeam": "GER",
-          "awayTeam": "ARG",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-04-25",
-          "homeTeam": "ARG",
-          "awayTeam": "GER",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2023-10-15",
-          "homeTeam": "ARG",
-          "awayTeam": "GER",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "ESP-FRA": {
-      "teamA": "ESP",
-      "teamB": "FRA",
-      "totalMatches": 36,
-      "teamAWins": 16,
-      "draws": 7,
-      "teamBWins": 13,
-      "teamAGoals": 45,
-      "teamBGoals": 41,
-      "recentMatches": [
-        {
-          "date": "2025-09-13",
-          "homeTeam": "FRA",
-          "awayTeam": "ESP",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-03-28",
-          "homeTeam": "ESP",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-09-29",
-          "homeTeam": "ESP",
-          "awayTeam": "FRA",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-04-09",
-          "homeTeam": "ESP",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2023-10-11",
-          "homeTeam": "FRA",
-          "awayTeam": "ESP",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        }
-      ]
-    },
-    "ENG-FRA": {
-      "teamA": "ENG",
-      "teamB": "FRA",
-      "totalMatches": 31,
-      "teamAWins": 17,
-      "draws": 5,
-      "teamBWins": 9,
-      "teamAGoals": 43,
-      "teamBGoals": 31,
-      "recentMatches": [
-        {
-          "date": "2025-10-24",
-          "homeTeam": "ENG",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2025-03-24",
-          "homeTeam": "FRA",
-          "awayTeam": "ENG",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2024-10-21",
-          "homeTeam": "FRA",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-03-19",
-          "homeTeam": "FRA",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2023-09-23",
-          "homeTeam": "ENG",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "VM-gruppespill",
-          "venue": null
-        }
-      ]
-    },
-    "BEL-NED": {
-      "teamA": "BEL",
-      "teamB": "NED",
-      "totalMatches": 128,
-      "teamAWins": 41,
-      "draws": 30,
-      "teamBWins": 57,
-      "teamAGoals": 140,
-      "teamBGoals": 164,
-      "recentMatches": [
-        {
-          "date": "2025-10-03",
-          "homeTeam": "BEL",
-          "awayTeam": "NED",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2025-04-27",
-          "homeTeam": "NED",
-          "awayTeam": "BEL",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-10-13",
-          "homeTeam": "NED",
-          "awayTeam": "BEL",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-04-15",
-          "homeTeam": "BEL",
-          "awayTeam": "NED",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2023-11-11",
-          "homeTeam": "BEL",
-          "awayTeam": "NED",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "ARG-URU": {
-      "teamA": "ARG",
-      "teamB": "URU",
-      "totalMatches": 200,
-      "teamAWins": 97,
-      "draws": 47,
-      "teamBWins": 56,
-      "teamAGoals": 269,
-      "teamBGoals": 207,
-      "recentMatches": [
-        {
-          "date": "2025-09-17",
-          "homeTeam": "URU",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2025-03-19",
-          "homeTeam": "URU",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-10-23",
-          "homeTeam": "URU",
-          "awayTeam": "ARG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-03-31",
-          "homeTeam": "URU",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2023-10-09",
-          "homeTeam": "URU",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "MEX-USA": {
-      "teamA": "MEX",
-      "teamB": "USA",
-      "totalMatches": 76,
-      "teamAWins": 36,
-      "draws": 15,
-      "teamBWins": 25,
-      "teamAGoals": 99,
-      "teamBGoals": 83,
-      "recentMatches": [
-        {
-          "date": "2025-10-25",
-          "homeTeam": "USA",
-          "awayTeam": "MEX",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2025-04-21",
-          "homeTeam": "MEX",
-          "awayTeam": "USA",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2024-09-12",
-          "homeTeam": "MEX",
-          "awayTeam": "USA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-03-25",
-          "homeTeam": "MEX",
-          "awayTeam": "USA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2023-09-13",
-          "homeTeam": "MEX",
-          "awayTeam": "USA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "NOR-SWE": {
-      "teamA": "NOR",
-      "teamB": "SWE",
-      "totalMatches": 105,
-      "teamAWins": 41,
-      "draws": 22,
-      "teamBWins": 42,
-      "teamAGoals": 125,
-      "teamBGoals": 126,
-      "recentMatches": [
-        {
-          "date": "2025-09-21",
-          "homeTeam": "NOR",
-          "awayTeam": "SWE",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2025-03-26",
-          "homeTeam": "NOR",
-          "awayTeam": "SWE",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-10-15",
-          "homeTeam": "SWE",
-          "awayTeam": "NOR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2024-04-30",
-          "homeTeam": "NOR",
-          "awayTeam": "SWE",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2023-10-18",
-          "homeTeam": "SWE",
-          "awayTeam": "NOR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "CRO-FRA": {
-      "teamA": "CRO",
-      "teamB": "FRA",
-      "totalMatches": 10,
-      "teamAWins": 3,
-      "draws": 1,
-      "teamBWins": 6,
-      "teamAGoals": 10,
-      "teamBGoals": 14,
-      "recentMatches": [
-        {
-          "date": "2025-10-01",
-          "homeTeam": "FRA",
-          "awayTeam": "CRO",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2025-05-03",
-          "homeTeam": "CRO",
-          "awayTeam": "FRA",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2024-10-30",
-          "homeTeam": "CRO",
-          "awayTeam": "FRA",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-04-28",
-          "homeTeam": "FRA",
-          "awayTeam": "CRO",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2023-11-08",
-          "homeTeam": "CRO",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "FRA-MAR": {
-      "teamA": "FRA",
-      "teamB": "MAR",
-      "totalMatches": 7,
-      "teamAWins": 5,
-      "draws": 1,
-      "teamBWins": 1,
-      "teamAGoals": 11,
-      "teamBGoals": 5,
-      "recentMatches": [
-        {
-          "date": "2025-10-17",
-          "homeTeam": "MAR",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2025-04-12",
-          "homeTeam": "FRA",
-          "awayTeam": "MAR",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-11-05",
-          "homeTeam": "FRA",
-          "awayTeam": "MAR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-04-16",
-          "homeTeam": "FRA",
-          "awayTeam": "MAR",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2023-11-03",
-          "homeTeam": "FRA",
-          "awayTeam": "MAR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        }
-      ]
-    },
-    "MAR-POR": {
-      "teamA": "MAR",
-      "teamB": "POR",
-      "totalMatches": 5,
-      "teamAWins": 1,
-      "draws": 1,
-      "teamBWins": 3,
-      "teamAGoals": 4,
-      "teamBGoals": 7,
-      "recentMatches": [
-        {
-          "date": "2025-10-10",
-          "homeTeam": "MAR",
-          "awayTeam": "POR",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2025-04-30",
-          "homeTeam": "POR",
-          "awayTeam": "MAR",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-09-26",
-          "homeTeam": "POR",
-          "awayTeam": "MAR",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-04-22",
-          "homeTeam": "MAR",
-          "awayTeam": "POR",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2023-10-11",
-          "homeTeam": "POR",
-          "awayTeam": "MAR",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "JPN-KOR": {
-      "teamA": "JPN",
-      "teamB": "KOR",
-      "totalMatches": 80,
-      "teamAWins": 41,
-      "draws": 23,
-      "teamBWins": 16,
-      "teamAGoals": 113,
-      "teamBGoals": 75,
-      "recentMatches": [
-        {
-          "date": "2025-10-09",
-          "homeTeam": "JPN",
-          "awayTeam": "KOR",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2025-04-24",
-          "homeTeam": "JPN",
-          "awayTeam": "KOR",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-09-11",
-          "homeTeam": "KOR",
-          "awayTeam": "JPN",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-04-09",
-          "homeTeam": "KOR",
-          "awayTeam": "JPN",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2023-10-20",
-          "homeTeam": "KOR",
-          "awayTeam": "JPN",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        }
-      ]
-    },
-    "BEL-FRA": {
-      "teamA": "BEL",
-      "teamB": "FRA",
-      "totalMatches": 76,
-      "teamAWins": 30,
-      "draws": 19,
-      "teamBWins": 27,
-      "teamAGoals": 92,
-      "teamBGoals": 88,
-      "recentMatches": [
-        {
-          "date": "2025-09-29",
-          "homeTeam": "FRA",
-          "awayTeam": "BEL",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-04-27",
-          "homeTeam": "FRA",
-          "awayTeam": "BEL",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-09-28",
-          "homeTeam": "FRA",
-          "awayTeam": "BEL",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-04-15",
-          "homeTeam": "FRA",
-          "awayTeam": "BEL",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2023-11-07",
-          "homeTeam": "BEL",
-          "awayTeam": "FRA",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "BRA-FRA": {
-      "teamA": "BRA",
-      "teamB": "FRA",
-      "totalMatches": 12,
-      "teamAWins": 1,
-      "draws": 4,
-      "teamBWins": 7,
-      "teamAGoals": 9,
-      "teamBGoals": 18,
-      "recentMatches": [
-        {
-          "date": "2025-09-20",
-          "homeTeam": "FRA",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2025-04-10",
-          "homeTeam": "FRA",
-          "awayTeam": "BRA",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-10-11",
-          "homeTeam": "BRA",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-04-26",
-          "homeTeam": "BRA",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2023-10-09",
-          "homeTeam": "FRA",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        }
-      ]
-    },
-    "ARG-FRA": {
-      "teamA": "ARG",
-      "teamB": "FRA",
-      "totalMatches": 12,
-      "teamAWins": 6,
-      "draws": 3,
-      "teamBWins": 3,
-      "teamAGoals": 16,
-      "teamBGoals": 12,
-      "recentMatches": [
-        {
-          "date": "2025-09-14",
-          "homeTeam": "FRA",
-          "awayTeam": "ARG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2025-03-13",
-          "homeTeam": "FRA",
-          "awayTeam": "ARG",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-10-08",
-          "homeTeam": "ARG",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-04-25",
-          "homeTeam": "ARG",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2023-10-13",
-          "homeTeam": "FRA",
-          "awayTeam": "ARG",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        }
-      ]
-    },
-    "ARG-ENG": {
-      "teamA": "ARG",
-      "teamB": "ENG",
-      "totalMatches": 17,
-      "teamAWins": 6,
-      "draws": 5,
-      "teamBWins": 6,
-      "teamAGoals": 20,
-      "teamBGoals": 20,
-      "recentMatches": [
-        {
-          "date": "2025-10-10",
-          "homeTeam": "ARG",
-          "awayTeam": "ENG",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2025-05-02",
-          "homeTeam": "ENG",
-          "awayTeam": "ARG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2024-09-25",
-          "homeTeam": "ARG",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-05-08",
-          "homeTeam": "ENG",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2023-09-27",
-          "homeTeam": "ENG",
-          "awayTeam": "ARG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "ENG-ESP": {
-      "teamA": "ENG",
-      "teamB": "ESP",
-      "totalMatches": 27,
-      "teamAWins": 11,
-      "draws": 3,
-      "teamBWins": 13,
-      "teamAGoals": 31,
-      "teamBGoals": 34,
-      "recentMatches": [
-        {
-          "date": "2025-09-13",
-          "homeTeam": "ESP",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2025-04-24",
-          "homeTeam": "ENG",
-          "awayTeam": "ESP",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-11-05",
-          "homeTeam": "ENG",
-          "awayTeam": "ESP",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-05-01",
-          "homeTeam": "ESP",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2023-11-03",
-          "homeTeam": "ENG",
-          "awayTeam": "ESP",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "CAN-USA": {
-      "teamA": "CAN",
-      "teamB": "USA",
-      "totalMatches": 43,
-      "teamAWins": 10,
-      "draws": 14,
-      "teamBWins": 19,
-      "teamAGoals": 43,
-      "teamBGoals": 57,
-      "recentMatches": [
-        {
-          "date": "2025-10-15",
-          "homeTeam": "USA",
-          "awayTeam": "CAN",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "CONCACAF Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-04-18",
-          "homeTeam": "USA",
-          "awayTeam": "CAN",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-10-24",
-          "homeTeam": "CAN",
-          "awayTeam": "USA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-03-27",
-          "homeTeam": "USA",
-          "awayTeam": "CAN",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2023-11-02",
-          "homeTeam": "CAN",
-          "awayTeam": "USA",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "AUT-GER": {
-      "teamA": "AUT",
-      "teamB": "GER",
-      "totalMatches": 41,
-      "teamAWins": 6,
-      "draws": 5,
-      "teamBWins": 30,
-      "teamAGoals": 32,
-      "teamBGoals": 68,
-      "recentMatches": [
-        {
-          "date": "2025-09-09",
-          "homeTeam": "AUT",
-          "awayTeam": "GER",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2025-04-07",
-          "homeTeam": "GER",
-          "awayTeam": "AUT",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-11-02",
-          "homeTeam": "AUT",
-          "awayTeam": "GER",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-05-06",
-          "homeTeam": "AUT",
-          "awayTeam": "GER",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2023-10-11",
-          "homeTeam": "GER",
-          "awayTeam": "AUT",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        }
-      ]
-    },
-    "ENG-SCO": {
-      "teamA": "ENG",
-      "teamB": "SCO",
-      "totalMatches": 115,
-      "teamAWins": 50,
-      "draws": 24,
-      "teamBWins": 41,
-      "teamAGoals": 144,
-      "teamBGoals": 131,
-      "recentMatches": [
-        {
-          "date": "2025-10-03",
-          "homeTeam": "ENG",
-          "awayTeam": "SCO",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2025-04-24",
-          "homeTeam": "SCO",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-10-14",
-          "homeTeam": "ENG",
-          "awayTeam": "SCO",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-03-31",
-          "homeTeam": "SCO",
-          "awayTeam": "ENG",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2023-10-12",
-          "homeTeam": "SCO",
-          "awayTeam": "ENG",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "FRA-SUI": {
-      "teamA": "FRA",
-      "teamB": "SUI",
-      "totalMatches": 39,
-      "teamAWins": 24,
-      "draws": 6,
-      "teamBWins": 9,
-      "teamAGoals": 58,
-      "teamBGoals": 36,
-      "recentMatches": [
-        {
-          "date": "2025-10-01",
-          "homeTeam": "FRA",
-          "awayTeam": "SUI",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2025-04-22",
-          "homeTeam": "SUI",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2024-09-22",
-          "homeTeam": "SUI",
-          "awayTeam": "FRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2024-05-10",
-          "homeTeam": "FRA",
-          "awayTeam": "SUI",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2023-09-13",
-          "homeTeam": "SUI",
-          "awayTeam": "FRA",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "MAR-SEN": {
-      "teamA": "MAR",
-      "teamB": "SEN",
-      "totalMatches": 18,
-      "teamAWins": 7,
-      "draws": 5,
-      "teamBWins": 6,
-      "teamAGoals": 22,
-      "teamBGoals": 20,
-      "recentMatches": [
-        {
-          "date": "2025-09-09",
-          "homeTeam": "SEN",
-          "awayTeam": "MAR",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        },
-        {
-          "date": "2025-04-06",
-          "homeTeam": "SEN",
-          "awayTeam": "MAR",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-09-10",
-          "homeTeam": "SEN",
-          "awayTeam": "MAR",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-04-27",
-          "homeTeam": "MAR",
-          "awayTeam": "SEN",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2023-11-10",
-          "homeTeam": "SEN",
-          "awayTeam": "MAR",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        }
-      ]
-    },
-    "EGY-TUN": {
-      "teamA": "EGY",
-      "teamB": "TUN",
-      "totalMatches": 30,
-      "teamAWins": 14,
-      "draws": 8,
-      "teamBWins": 8,
-      "teamAGoals": 40,
-      "teamBGoals": 31,
-      "recentMatches": [
-        {
-          "date": "2025-09-17",
-          "homeTeam": "EGY",
-          "awayTeam": "TUN",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2025-03-28",
-          "homeTeam": "TUN",
-          "awayTeam": "EGY",
-          "homeScore": 0,
-          "awayScore": 2,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-10-11",
-          "homeTeam": "EGY",
-          "awayTeam": "TUN",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2024-05-07",
-          "homeTeam": "EGY",
-          "awayTeam": "TUN",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2023-09-13",
-          "homeTeam": "TUN",
-          "awayTeam": "EGY",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "BRA-COL": {
-      "teamA": "BRA",
-      "teamB": "COL",
-      "totalMatches": 35,
-      "teamAWins": 24,
-      "draws": 9,
-      "teamBWins": 2,
-      "teamAGoals": 58,
-      "teamBGoals": 25,
-      "recentMatches": [
-        {
-          "date": "2025-10-26",
-          "homeTeam": "COL",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2025-03-27",
-          "homeTeam": "BRA",
-          "awayTeam": "COL",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2024-10-15",
-          "homeTeam": "COL",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-03-20",
-          "homeTeam": "BRA",
-          "awayTeam": "COL",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2023-10-02",
-          "homeTeam": "BRA",
-          "awayTeam": "COL",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Copa América",
-          "venue": null
-        }
-      ]
-    },
-    "BRA-URU": {
-      "teamA": "BRA",
-      "teamB": "URU",
-      "totalMatches": 78,
-      "teamAWins": 39,
-      "draws": 19,
-      "teamBWins": 20,
-      "teamAGoals": 107,
-      "teamBGoals": 78,
-      "recentMatches": [
-        {
-          "date": "2025-10-17",
-          "homeTeam": "BRA",
-          "awayTeam": "URU",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "EM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2025-04-04",
-          "homeTeam": "BRA",
-          "awayTeam": "URU",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2024-09-19",
-          "homeTeam": "URU",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-04-07",
-          "homeTeam": "URU",
-          "awayTeam": "BRA",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "VM-kvalifisering",
-          "venue": null
-        },
-        {
-          "date": "2023-10-26",
-          "homeTeam": "URU",
-          "awayTeam": "BRA",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "VM-finale",
-          "venue": null
-        }
-      ]
-    },
-    "AUS-JPN": {
-      "teamA": "AUS",
-      "teamB": "JPN",
-      "totalMatches": 27,
-      "teamAWins": 11,
-      "draws": 8,
-      "teamBWins": 8,
-      "teamAGoals": 34,
-      "teamBGoals": 29,
-      "recentMatches": [
-        {
-          "date": "2025-11-01",
-          "homeTeam": "JPN",
-          "awayTeam": "AUS",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2025-04-12",
-          "homeTeam": "JPN",
-          "awayTeam": "AUS",
-          "homeScore": 2,
-          "awayScore": 2,
-          "competition": "AFC Asian Cup",
-          "venue": null
-        },
-        {
-          "date": "2024-09-20",
-          "homeTeam": "AUS",
-          "awayTeam": "JPN",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "VM-finale",
-          "venue": null
-        },
-        {
-          "date": "2024-04-23",
-          "homeTeam": "JPN",
-          "awayTeam": "AUS",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Nations League",
-          "venue": null
-        },
-        {
-          "date": "2023-10-10",
-          "homeTeam": "JPN",
-          "awayTeam": "AUS",
-          "homeScore": 1,
-          "awayScore": 2,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    },
-    "IRN-KOR": {
-      "teamA": "IRN",
-      "teamB": "KOR",
-      "totalMatches": 33,
-      "teamAWins": 9,
-      "draws": 11,
-      "teamBWins": 13,
-      "teamAGoals": 35,
-      "teamBGoals": 41,
-      "recentMatches": [
-        {
-          "date": "2025-09-21",
-          "homeTeam": "KOR",
-          "awayTeam": "IRN",
-          "homeScore": 2,
-          "awayScore": 1,
-          "competition": "Copa América",
-          "venue": null
-        },
-        {
-          "date": "2025-04-04",
-          "homeTeam": "KOR",
-          "awayTeam": "IRN",
-          "homeScore": 3,
-          "awayScore": 2,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-10-27",
-          "homeTeam": "KOR",
-          "awayTeam": "IRN",
-          "homeScore": 1,
-          "awayScore": 1,
-          "competition": "Africa Cup of Nations",
-          "venue": null
-        },
-        {
-          "date": "2024-03-29",
-          "homeTeam": "IRN",
-          "awayTeam": "KOR",
-          "homeScore": 1,
-          "awayScore": 0,
-          "competition": "VM-gruppespill",
-          "venue": null
-        },
-        {
-          "date": "2023-09-13",
-          "homeTeam": "IRN",
-          "awayTeam": "KOR",
-          "homeScore": 0,
-          "awayScore": 1,
-          "competition": "Vennskapskamp",
-          "venue": null
-        }
-      ]
-    }
-  }
+  "headToHead": {}
 }
