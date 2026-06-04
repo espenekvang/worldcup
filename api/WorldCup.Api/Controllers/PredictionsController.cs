@@ -186,14 +186,14 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             return NotFound("Match not found.");
         }
 
-        var locked = matchScheduleProvider.Current.IsMatchLocked(matchId);
-
+        // Scores returneres anonymt (uten navn/bilde) slik at odds kan beregnes
+        // mens betting er åpent. Aggregatet H/U/B er hele poenget med odds.
         var predictions = await dbContext.Predictions
             .Where(p => p.MatchId == matchId)
             .Select(p => new MatchPredictionResponse
             {
-                HomeScore = locked ? p.HomeScore : null,
-                AwayScore = locked ? p.AwayScore : null,
+                HomeScore = p.HomeScore,
+                AwayScore = p.AwayScore,
             })
             .AsNoTracking()
             .ToListAsync();
