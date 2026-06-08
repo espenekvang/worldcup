@@ -6,7 +6,7 @@ import {
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
-  setMemberPaid, broadcastMessage,
+  setMemberPaid, broadcastMessage, setBossNameDisplay,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
@@ -269,6 +269,23 @@ export default function AdminPanel() {
       await loadGroups()
     } catch (err) {
       setMemberError(err instanceof Error ? err.message : 'Kunne ikke fjerne medlem')
+    }
+  }
+
+  async function handleToggleBossName(groupId: string, showFullName: boolean) {
+    // Optimistisk oppdatering av lokal liste, så slider'en føles responsiv.
+    setGroupList((prev) => prev.map((g) => (g.id === groupId ? { ...g, showFullName } : g)))
+    try {
+      const updated = await setBossNameDisplay(groupId, showFullName)
+      setGroupList((prev) => prev.map((g) => (g.id === groupId ? updated : g)))
+      // Synk konteksten slik at "The Boss"-listen oppdateres umiddelbart.
+      if (activeGroup?.id === groupId) {
+        setActiveGroup({ ...activeGroup, showFullName: updated.showFullName })
+      }
+    } catch (err) {
+      // Rull tilbake ved feil.
+      setGroupList((prev) => prev.map((g) => (g.id === groupId ? { ...g, showFullName: !showFullName } : g)))
+      setGroupError(err instanceof Error ? err.message : 'Kunne ikke endre visning av navn')
     }
   }
 
@@ -732,6 +749,41 @@ export default function AdminPanel() {
                     className="ml-4 mt-1 rounded-lg border p-3"
                     style={{ borderColor: 'var(--color-border-light)', backgroundColor: 'var(--color-surface-elevated)' }}
                   >
+                    {/* The Boss-listen: vis fornavn eller fullt navn */}
+                    <div className="mb-3">
+                      <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                        The Boss listen skal vise:
+                      </p>
+                      <div className="mt-2 flex items-center gap-3">
+                        <span
+                          className="text-sm"
+                          style={{ color: group.showFullName ? 'var(--color-text-muted)' : 'var(--color-text-primary)' }}
+                        >
+                          Fornavn
+                        </span>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={group.showFullName}
+                          aria-label="The Boss listen skal vise fornavn eller fullt navn"
+                          onClick={() => handleToggleBossName(group.id, !group.showFullName)}
+                          className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2"
+                          style={{ backgroundColor: group.showFullName ? 'var(--color-primary)' : 'var(--color-border)' }}
+                        >
+                          <span
+                            className="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                            style={{ transform: group.showFullName ? 'translateX(22px)' : 'translateX(2px)' }}
+                          />
+                        </button>
+                        <span
+                          className="text-sm"
+                          style={{ color: group.showFullName ? 'var(--color-text-primary)' : 'var(--color-text-muted)' }}
+                        >
+                          Fornavn og etternavn
+                        </span>
+                      </div>
+                    </div>
+
                     <form onSubmit={handleAddMember} className="flex flex-col gap-2 sm:flex-row">
                       <input
                         type="email"

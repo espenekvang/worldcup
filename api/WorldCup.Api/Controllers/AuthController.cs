@@ -175,6 +175,7 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
                 m.IsGroupAdmin,
                 m.BettingGroup.IsPaid,
                 m.BettingGroup.EntryFee,
+                m.BettingGroup.ShowFullName,
                 PaidMemberCount = m.BettingGroup.Members.Count(x => x.HasPaid),
                 CurrentUserHasPaid = m.HasPaid
             })
@@ -190,7 +191,8 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
                 m.EntryFee,
                 m.IsPaid ? m.EntryFee * m.PaidMemberCount : 0m,
                 m.PaidMemberCount,
-                m.CurrentUserHasPaid))
+                m.CurrentUserHasPaid,
+                m.ShowFullName))
             .ToList();
 
         var groupAdminGroupIds = memberships

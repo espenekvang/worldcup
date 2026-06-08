@@ -60,6 +60,8 @@ export interface BettingGroup {
   paidMemberCount: number
   /** True hvis innlogget bruker selv har betalt i denne ligaen. */
   currentUserHasPaid: boolean
+  /** True = "The Boss"-listen viser fullt navn (fornavn + etternavn), false = kun fornavn. */
+  showFullName: boolean
 }
 
 export interface BettingGroupMember {

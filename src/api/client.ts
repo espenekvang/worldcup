@@ -322,6 +322,14 @@ export function deleteGroup(id: string): Promise<void> {
   })
 }
 
+/** Setter om "The Boss"-listen i ligaen skal vise fornavn (false) eller fullt navn (true). */
+export function setBossNameDisplay(id: string, showFullName: boolean): Promise<BettingGroup> {
+  return request<BettingGroup>(`/api/groups/${id}/boss-name-display`, {
+    method: 'PUT',
+    body: JSON.stringify({ showFullName }),
+  })
+}
+
 export function getGroupMembers(groupId: string): Promise<BettingGroupMember[]> {
   return request<BettingGroupMember[]>(`/api/groups/${groupId}/members`)
 }

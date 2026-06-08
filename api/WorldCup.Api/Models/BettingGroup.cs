@@ -18,6 +18,13 @@ public class BettingGroup
     /// </summary>
     public decimal EntryFee { get; set; }
 
+    /// <summary>
+    /// Styrer hvordan deltakernavn vises i "The Boss"-listen for denne ligaen.
+    /// false (standard) = kun fornavn, true = fullt navn (fornavn + etternavn).
+    /// Settes av liga-admin (eller global admin).
+    /// </summary>
+    public bool ShowFullName { get; set; }
+
     public User CreatedByUser { get; set; } = null!;
     public ICollection<BettingGroupMember> Members { get; set; } = [];
 }
