@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getLeaderboard, getGlobalLeaderboard, getMyGroups, type LeaderboardEntry, type GlobalLeaderboardEntry } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
-import { firstName } from '../utils/nameUtils'
+import { firstName, displayName } from '../utils/nameUtils'
 
 /**
  * Beregner premie per deltaker for en betalt liga.
@@ -101,6 +101,9 @@ export default function Leaderboard() {
     return calculatePrizes(entries.filter(e => e.hasPaid), activeGroup.prizePot)
   }, [entries, activeGroup])
 
+  // Ligaens innstilling for "The Boss"-listen: fornavn (false) eller fullt navn (true).
+  const showFullName = activeGroup?.showFullName ?? false
+
   if (loading) {
     return (
       <div className="p-2 sm:p-4">
@@ -189,7 +192,7 @@ export default function Leaderboard() {
               )}
               <div>
                 <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                  {firstName(entry.name)}
+                  {displayName(entry.name, showFullName)}
                 </span>
                 <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   {entry.matchCount} {entry.matchCount === 1 ? 'kamp' : 'kamper'}
@@ -301,7 +304,7 @@ export default function Leaderboard() {
                   <div>
                     <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {entry.isInCurrentGroup
-                        ? firstName(entry.name ?? '')
+                        ? displayName(entry.name ?? '', showFullName)
                         : `Spiller fra ${entry.groupName ?? 'ukjent liga'}`}
                     </span>
                     <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>

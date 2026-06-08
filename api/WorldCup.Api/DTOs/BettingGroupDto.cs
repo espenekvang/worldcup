@@ -9,7 +9,8 @@ public record BettingGroupResponse(
     decimal EntryFee,
     decimal PrizePot,
     int PaidMemberCount,
-    bool CurrentUserHasPaid);
+    bool CurrentUserHasPaid,
+    bool ShowFullName);
 
 public record BettingGroupDetailResponse(Guid Id, string Name, DateTime CreatedAt, List<BettingGroupMemberResponse> Members);
 
@@ -33,3 +34,4 @@ public record UpdateBettingGroupRequest(string Name, bool? IsPaid = null, decima
 public record AddGroupMemberRequest(string Email);
 public record SetGroupAdminRequest(bool IsGroupAdmin);
 public record SetMemberPaidRequest(bool HasPaid);
+public record SetBossNameDisplayRequest(bool ShowFullName);

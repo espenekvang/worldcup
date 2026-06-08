@@ -42,6 +42,7 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 g.CreatedAt,
                 g.IsPaid,
                 g.EntryFee,
+                g.ShowFullName,
                 MemberCount = g.Members.Count,
                 PaidMemberCount = g.Members.Count(m => m.HasPaid),
                 CurrentUserHasPaid = g.Members.Any(m => m.UserId == userId.Value && m.HasPaid)
@@ -59,7 +60,8 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 g.EntryFee,
                 g.IsPaid ? g.EntryFee * g.PaidMemberCount : 0m,
                 g.PaidMemberCount,
-                g.CurrentUserHasPaid))
+                g.CurrentUserHasPaid,
+                g.ShowFullName))
             .ToList();
 
         return Ok(response);
@@ -80,6 +82,7 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 g.CreatedAt,
                 g.IsPaid,
                 g.EntryFee,
+                g.ShowFullName,
                 MemberCount = g.Members.Count,
                 PaidMemberCount = g.Members.Count(m => m.HasPaid),
                 CurrentUserHasPaid = g.Members.Any(m => m.UserId == userId && m.HasPaid)
@@ -97,7 +100,8 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 g.EntryFee,
                 g.IsPaid ? g.EntryFee * g.PaidMemberCount : 0m,
                 g.PaidMemberCount,
-                g.CurrentUserHasPaid))
+                g.CurrentUserHasPaid,
+                g.ShowFullName))
             .ToList();
 
         return Ok(response);
@@ -173,7 +177,8 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
                 group.EntryFee,
                 0m,
                 0,
-                false));
+                false,
+                group.ShowFullName));
     }
 
     [HttpPut("{id:guid}")]
@@ -254,7 +259,47 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
             group.EntryFee,
             group.IsPaid ? group.EntryFee * paidCount : 0m,
             paidCount,
-            currentUserPaid));
+            currentUserPaid,
+            group.ShowFullName));
+    }
+
+    /// <summary>
+    /// Setter om "The Boss"-listen i ligaen skal vise fornavn eller fullt navn.
+    /// Både global admin og liga-admin kan endre dette.
+    /// </summary>
+    [HttpPut("{id:guid}/boss-name-display")]
+    [Authorize]
+    public async Task<ActionResult<BettingGroupResponse>> SetBossNameDisplay(Guid id, [FromBody] SetBossNameDisplayRequest request)
+    {
+        var callerUserId = GetAuthenticatedUserId();
+        if (callerUserId is null) return Unauthorized();
+
+        if (!await IsGlobalOrGroupAdmin(callerUserId.Value, id))
+            return Forbid();
+
+        var group = await dbContext.BettingGroups
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (group is null) return NotFound();
+
+        group.ShowFullName = request.ShowFullName;
+        await dbContext.SaveChangesAsync();
+
+        var paidCount = group.Members.Count(m => m.HasPaid);
+        var currentUserPaid = group.Members.Any(m => m.UserId == callerUserId.Value && m.HasPaid);
+
+        return Ok(new BettingGroupResponse(
+            group.Id,
+            group.Name,
+            group.Members.Count,
+            group.CreatedAt,
+            group.IsPaid,
+            group.EntryFee,
+            group.IsPaid ? group.EntryFee * paidCount : 0m,
+            paidCount,
+            currentUserPaid,
+            group.ShowFullName));
     }
 
     [HttpDelete("{id:guid}")]

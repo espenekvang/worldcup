@@ -57,6 +57,7 @@ export default function InvitePage() {
           prizePot: 0,
           paidMemberCount: 0,
           currentUserHasPaid: false,
+          showFullName: false,
         }
         const merged = groups.some((g) => g.id === newGroup.id)
           ? groups
