@@ -80,8 +80,14 @@ export default function Leaderboard() {
         if (!cancelled) {
           setEntries(leaderboardData)
           setGlobalEntries(globalData)
+          // Synk aktiv liga med ferske serverdata når visningsrelevante felter
+          // har endret seg. Konteksten lastes ellers fra cachet innlogging, så
+          // f.eks. liga-admins endring av navnevisning ville ikke slått gjennom.
           const freshGroup = freshGroups.find(g => g.id === activeGroup.id)
-          if (freshGroup && freshGroup.currentUserHasPaid !== activeGroup.currentUserHasPaid) {
+          if (freshGroup && (
+            freshGroup.currentUserHasPaid !== activeGroup.currentUserHasPaid ||
+            freshGroup.showFullName !== activeGroup.showFullName
+          )) {
             setActiveGroup(freshGroup)
           }
         }
