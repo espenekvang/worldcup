@@ -8,6 +8,19 @@ export function formatMatchTime(isoDate: string): string {
   return new Intl.DateTimeFormat('nb-NO', { hour: 'numeric', minute: '2-digit' }).format(new Date(isoDate))
 }
 
+/**
+ * Nøkkel for å gruppere kamper etter kalenderdag i brukerens lokale tidssone.
+ * Bruker lokale datokomponenter (ikke UTC-slice), slik at en kamp som starter
+ * f.eks. 01:00 lokal tid havner på riktig dag selv om UTC-datoen er dagen før.
+ */
+export function getLocalDateKey(isoDate: string): string {
+  const d = new Date(isoDate)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function getTimeUntil(targetDate: string): { days: number; hours: number; minutes: number; seconds: number } {
   const diff = Math.max(0, new Date(targetDate).getTime() - Date.now())
 
