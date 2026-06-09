@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { AuthResponse } from '../api/client'
-import { loginWithGoogle as apiLoginWithGoogle } from '../api/client'
+import { loginWithGoogle as apiLoginWithGoogle, getMyGroups } from '../api/client'
 import type { BettingGroup } from '../types'
 import { useBettingGroup } from './BettingGroupContext'
 
@@ -65,19 +65,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
   const { setGroups, clearActiveGroup } = useBettingGroup()
 
-  // On mount: restore groups from stored user
+  // On mount: restore groups from stored user, deretter hent ferske grupper fra
+  // serveren. Den cachede innloggingen kan ha utdaterte visningsfelter (f.eks.
+  // showFullName endret av liga-admin etter innlogging), så vi synker på nytt
+  // slik at hele appen – ikke bare The Boss-listen – ser gjeldende innstilling.
   useEffect(() => {
     const token = safeGetItem(TOKEN_KEY)
     if (!token) {
       setUser(null)
       safeRemoveItem(USER_KEY)
       setGroups([])
-    } else {
-      const storedUser = loadStoredUser()
-      if (storedUser?.groups) {
-        setGroups(storedUser.groups)
-      }
+      return
     }
+
+    const storedUser = loadStoredUser()
+    if (storedUser?.groups) {
+      setGroups(storedUser.groups)
+    }
+
+    let cancelled = false
+    getMyGroups()
+      .then(freshGroups => {
+        if (cancelled) return
+        setGroups(freshGroups)
+        // Hold den cachede brukeren i synk så neste oppstart starter oppdatert.
+        const cached = loadStoredUser()
+        if (cached) {
+          safeSetItem(USER_KEY, JSON.stringify({ ...cached, groups: freshGroups }))
+        }
+      })
+      .catch(() => {
+        // Behold cachede grupper hvis nettverket feiler.
+      })
+
+    return () => { cancelled = true }
   }, [setGroups])
 
   const loginWithGoogle = useCallback(async (idToken: string, inviteToken?: string) => {
