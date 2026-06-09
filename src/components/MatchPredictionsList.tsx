@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getMatchPredictions, type MatchPredictionResponse } from '../api/client'
-import { firstName } from '../utils/nameUtils'
+import { useBettingGroup } from '../context/BettingGroupContext'
+import { firstName, displayName } from '../utils/nameUtils'
 
 interface MatchPredictionsListProps {
   matchId: number
@@ -18,9 +19,13 @@ interface MatchPredictionsListProps {
  * detaljsiden kan gjenbruke samme rendering.
  */
 export default function MatchPredictionsList({ matchId, variant = 'modal' }: MatchPredictionsListProps) {
+  const { activeGroup } = useBettingGroup()
   const [predictions, setPredictions] = useState<MatchPredictionResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Følger ligaens navnevisning, samme innstilling som "The Boss"-listen.
+  const showFullName = activeGroup?.showFullName ?? false
 
   useEffect(() => {
     let cancelled = false
@@ -66,7 +71,7 @@ export default function MatchPredictionsList({ matchId, variant = 'modal' }: Mat
                 {firstName(p.name ?? '').charAt(0)}
               </div>
             )}
-            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{firstName(p.name ?? '')}</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{displayName(p.name ?? '', showFullName)}</span>
           </div>
           {p.homeScore !== null && p.awayScore !== null ? (
             <div className="flex items-center gap-2">
