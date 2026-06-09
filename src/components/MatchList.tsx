@@ -1,5 +1,5 @@
 import type { Match, Team, Venue, Stage } from '../types'
-import { formatMatchDate, isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
+import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined } from '../utils/dateUtils'
 import MatchCard from './MatchCard'
 
 interface MatchListProps {
@@ -35,7 +35,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const dayGroups = new Map<string, Match[]>()
   for (const match of regularMatches) {
-    const dayKey = match.date.slice(0, 10)
+    const dayKey = getLocalDateKey(match.date)
     if (!dayGroups.has(dayKey)) dayGroups.set(dayKey, [])
     dayGroups.get(dayKey)!.push(match)
   }
