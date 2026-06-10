@@ -198,6 +198,95 @@ public class TeamStatsServiceTests : IDisposable
     }
 
     [Fact]
+    public void WithWorldCupForm_uten_vm_kamper_returnerer_base_uendret()
+    {
+        var baseStats = SeedStats(recentForm: "WWDWL");
+
+        var result = TeamStatsService.WithWorldCupForm(baseStats, "BRA", Array.Empty<RecentMatchEntry>());
+
+        result.Should().BeSameAs(baseStats);
+    }
+
+    [Fact]
+    public void WithWorldCupForm_legger_vm_kamper_forst_og_regner_form_pa_nytt()
+    {
+        var baseStats = SeedStats(recentForm: "WWDWL");
+
+        // VM-kamper kommer inn nyeste først (slik GetWorldCupMatchesAsync leverer).
+        var wc = new[]
+        {
+            new RecentMatchEntry("2026-06-20", "FRA", "away", 1, 2, "L", "VM 2026"),
+            new RecentMatchEntry("2026-06-15", "MEX", "home", 3, 0, "W", "VM 2026"),
+            new RecentMatchEntry("2026-06-11", "RSA", "home", 2, 2, "D", "VM 2026"),
+        };
+
+        var result = TeamStatsService.WithWorldCupForm(baseStats, "BRA", wc)!;
+
+        // Nyeste VM-kamp ligger først i lista.
+        result.RecentMatches.First().Opponent.Should().Be("FRA");
+        result.RecentMatches.Should().HaveCount(3);
+        // recentForm er eldste først: D (RSA), W (MEX), L (FRA).
+        result.RecentForm.Should().Be("DWL");
+        // Snitt regnes fra de spilte kampene: (1+3+2)/3 og (2+0+2)/3.
+        result.GoalsScoredAvg.Should().Be(2.0);
+        result.GoalsConcededAvg.Should().BeApproximately(1.33, 0.001);
+        // Stabile seed-felt beholdes.
+        result.FifaRank.Should().Be(5);
+        result.Manager.Should().Be("Test Manager");
+    }
+
+    [Fact]
+    public void WithWorldCupForm_form_bruker_kun_siste_fem_kamper()
+    {
+        var baseStats = SeedStats(recentForm: null);
+        var wc = new[]
+        {
+            new RecentMatchEntry("2026-07-06", "ARG", "home", 1, 0, "W", "VM 2026"),
+            new RecentMatchEntry("2026-07-01", "ESP", "home", 1, 0, "W", "VM 2026"),
+            new RecentMatchEntry("2026-06-25", "GER", "home", 1, 0, "W", "VM 2026"),
+            new RecentMatchEntry("2026-06-20", "FRA", "away", 0, 1, "L", "VM 2026"),
+            new RecentMatchEntry("2026-06-15", "MEX", "home", 2, 2, "D", "VM 2026"),
+            new RecentMatchEntry("2026-06-11", "RSA", "home", 3, 0, "W", "VM 2026"),
+        };
+
+        var result = TeamStatsService.WithWorldCupForm(baseStats, "BRA", wc)!;
+
+        // Kun de fem nyeste teller, eldste først: MEX(D), FRA(L), GER(W), ESP(W), ARG(W).
+        result.RecentForm.Should().Be("DLWWW");
+    }
+
+    [Fact]
+    public void WithWorldCupForm_bygger_minimal_respons_naar_base_mangler()
+    {
+        var wc = new[]
+        {
+            new RecentMatchEntry("2026-06-15", "MEX", "home", 3, 0, "W", "VM 2026"),
+        };
+
+        var result = TeamStatsService.WithWorldCupForm(null, "BRA", wc)!;
+
+        result.Should().NotBeNull();
+        result.TeamCode.Should().Be("BRA");
+        result.RecentForm.Should().Be("W");
+        result.RecentMatches.Should().HaveCount(1);
+        result.GoalsScoredAvg.Should().Be(3.0);
+    }
+
+    private static TeamStatsResponse SeedStats(string? recentForm) =>
+        new(
+            TeamCode: "BRA",
+            FifaRank: 5,
+            Manager: "Test Manager",
+            StarPlayer: "Star",
+            PreferredFormation: "4-3-3",
+            GoalsScoredAvg: 1.8,
+            GoalsConcededAvg: 0.9,
+            RecentForm: recentForm,
+            RecentMatches: Array.Empty<RecentMatchEntry>(),
+            KeyAbsences: Array.Empty<string>(),
+            LastWorldCupResult: "Kvartfinale 2022");
+
+    [Fact]
     public async Task Merge_faller_tilbake_til_seed_for_felt_ekstern_klient_lar_vaere_null()
     {
         // Ekstern API gir typisk bare form/recent/snitt — resten skal merges fra seed.

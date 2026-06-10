@@ -206,7 +206,7 @@ export default function MatchDetailsPage() {
           <>
             <section className="mt-4">
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>
-                Form siste 5 kamper
+                Form i VM
               </h2>
               <div className="mb-2">
                 <FormLegend />
