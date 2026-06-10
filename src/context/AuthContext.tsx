@@ -63,7 +63,7 @@ function loadStoredUser(): AuthUser | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(loadStoredUser)
   const [isLoading, setIsLoading] = useState(false)
-  const { setGroups, clearActiveGroup } = useBettingGroup()
+  const { setGroups } = useBettingGroup()
 
   // On mount: restore groups from stored user, deretter hent ferske grupper fra
   // serveren. Den cachede innloggingen kan ha utdaterte visningsfelter (f.eks.
@@ -130,8 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     safeRemoveItem('active_group_id')
     setUser(null)
     setGroups([])
-    clearActiveGroup()
-  }, [setGroups, clearActiveGroup])
+  }, [setGroups])
 
   const value = useMemo(
     () => ({ user, isLoading, loginWithGoogle, logout }),
