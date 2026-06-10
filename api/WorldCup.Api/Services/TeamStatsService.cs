@@ -1,6 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using WorldCup.Api.Data;
 using WorldCup.Api.DTOs;
 
 namespace WorldCup.Api.Services;
@@ -36,17 +39,25 @@ public sealed class TeamStatsService
     private readonly IMemoryCache _cache;
     private readonly ILogger<TeamStatsService> _logger;
     private readonly Lazy<SeedData> _seed;
+    private readonly IServiceScopeFactory? _scopeFactory;
+    private readonly MatchScheduleProvider? _scheduleProvider;
 
     public TeamStatsService(
         IExternalTeamStatsClient externalClient,
         IMemoryCache cache,
         ILogger<TeamStatsService> logger,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        IServiceScopeFactory? scopeFactory = null,
+        MatchScheduleProvider? scheduleProvider = null)
     {
         _externalClient = externalClient;
         _cache = cache;
         _logger = logger;
         _seed = new Lazy<SeedData>(() => LoadSeed(env, logger), isThreadSafe: true);
+        // Valgfrie avhengigheter — settes i prod (DI), men kan utelates i enhetstester
+        // som bare verifiserer seed/merge-logikken. Når de er null hoppes VM-overlayet over.
+        _scopeFactory = scopeFactory;
+        _scheduleProvider = scheduleProvider;
     }
 
     public async Task<TeamStatsResponse?> GetTeamStatsAsync(string teamCode, CancellationToken ct)
@@ -54,6 +65,23 @@ public sealed class TeamStatsService
         if (string.IsNullOrWhiteSpace(teamCode)) return null;
         var key = teamCode.Trim().ToUpperInvariant();
 
+        var baseStats = await GetBaseStatsAsync(key, ct);
+
+        // Legg de faktiske VM-kampene oppå seed/ekstern-formen slik at «Form siste 5
+        // kamper» fylles ut fortløpende etter hvert som resultater registreres. Disse
+        // hentes ferskt per kall (utenfor base-cachen) så et nytt resultat slår igjennom
+        // med en gang i stedet for å vente på at cachen utløper.
+        var worldCupMatches = await GetWorldCupMatchesAsync(key, ct);
+        return WithWorldCupForm(baseStats, key, worldCupMatches);
+    }
+
+    /// <summary>
+    /// Henter «stabil» lag-statistikk (ekstern API + seed-fil) og cacher den. Dette er
+    /// dataen som sjelden endrer seg (FIFA-rank, manager, formasjon osv.) — de ferske
+    /// VM-kampene legges på etterpå i <see cref="GetTeamStatsAsync"/>.
+    /// </summary>
+    private async Task<TeamStatsResponse?> GetBaseStatsAsync(string key, CancellationToken ct)
+    {
         var cacheKey = $"team-stats:{key}";
         if (_cache.TryGetValue<TeamStatsResponse?>(cacheKey, out var cached))
         {
@@ -75,6 +103,125 @@ public sealed class TeamStatsService
 
         _cache.Set(cacheKey, result, CacheTtl);
         return result;
+    }
+
+    /// <summary>
+    /// Bygger en liste over VM-kamper laget har spilt (dvs. har et registrert resultat),
+    /// nyeste først. Kobler kampoppsettet (<see cref="MatchScheduleProvider"/>) mot
+    /// resultat-tabellen i databasen. Returnerer tom liste hvis avhengighetene ikke er
+    /// satt (enhetstester) eller laget ikke har noen spilte kamper ennå.
+    /// </summary>
+    private async Task<IReadOnlyList<RecentMatchEntry>> GetWorldCupMatchesAsync(string teamCode, CancellationToken ct)
+    {
+        if (_scopeFactory is null || _scheduleProvider is null)
+        {
+            return Array.Empty<RecentMatchEntry>();
+        }
+
+        var teamMatches = _scheduleProvider.Current.GetAllMatches()
+            .Where(m =>
+                string.Equals(m.HomeTeam, teamCode, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(m.AwayTeam, teamCode, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (teamMatches.Count == 0)
+        {
+            return Array.Empty<RecentMatchEntry>();
+        }
+
+        var matchIds = teamMatches.Select(m => m.Id).ToHashSet();
+
+        Dictionary<int, Models.MatchResult> resultsById;
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var results = await db.MatchResults
+                .Where(r => matchIds.Contains(r.MatchId))
+                .AsNoTracking()
+                .ToListAsync(ct);
+            resultsById = results.ToDictionary(r => r.MatchId);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Kunne ikke hente VM-resultater for form-overlay ({Team})", teamCode);
+            return Array.Empty<RecentMatchEntry>();
+        }
+
+        var entries = new List<(DateTime Date, RecentMatchEntry Entry)>();
+        foreach (var match in teamMatches)
+        {
+            if (!resultsById.TryGetValue(match.Id, out var result)) continue;
+
+            var isHome = string.Equals(match.HomeTeam, teamCode, StringComparison.OrdinalIgnoreCase);
+            var opponent = isHome ? match.AwayTeam : match.HomeTeam;
+            if (string.IsNullOrWhiteSpace(opponent)) continue;
+
+            var goalsFor = isHome ? result.HomeScore : result.AwayScore;
+            var goalsAgainst = isHome ? result.AwayScore : result.HomeScore;
+            var outcome = goalsFor > goalsAgainst ? "W" : goalsFor < goalsAgainst ? "L" : "D";
+
+            entries.Add((match.Date, new RecentMatchEntry(
+                Date: match.Date.ToString("yyyy-MM-dd"),
+                Opponent: opponent.ToUpperInvariant(),
+                Venue: isHome ? "home" : "away",
+                GoalsFor: goalsFor,
+                GoalsAgainst: goalsAgainst,
+                Result: outcome,
+                Competition: "VM 2026")));
+        }
+
+        return entries
+            .OrderByDescending(e => e.Date)
+            .Select(e => e.Entry)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Slår sammen spilte VM-kamper med eksisterende seed/ekstern-form. VM-kampene legges
+    /// først (nyeste først), og form-strengen + mål-snittene regnes på nytt fra den
+    /// kombinerte lista så «Form siste 5 kamper» og «Sammenligning» gjenspeiler det som
+    /// faktisk har skjedd i mesterskapet. Uten VM-kamper returneres base uendret.
+    /// </summary>
+    public static TeamStatsResponse? WithWorldCupForm(
+        TeamStatsResponse? baseStats,
+        string teamCode,
+        IReadOnlyList<RecentMatchEntry> worldCupMatches)
+    {
+        if (worldCupMatches.Count == 0) return baseStats;
+
+        var seedMatches = baseStats?.RecentMatches ?? Array.Empty<RecentMatchEntry>();
+        var combined = worldCupMatches.Concat(seedMatches).Take(10).ToList();
+
+        // recentForm: siste 5 kamper, eldste først (matcher DTO-konvensjonen "WWDWL").
+        var recentForm = string.Concat(combined.Take(5).Reverse().Select(m => m.Result));
+
+        var goalsScoredAvg = Math.Round(combined.Average(m => (double)m.GoalsFor), 2);
+        var goalsConcededAvg = Math.Round(combined.Average(m => (double)m.GoalsAgainst), 2);
+
+        if (baseStats is null)
+        {
+            return new TeamStatsResponse(
+                TeamCode: teamCode,
+                FifaRank: null,
+                Manager: null,
+                StarPlayer: null,
+                PreferredFormation: null,
+                GoalsScoredAvg: goalsScoredAvg,
+                GoalsConcededAvg: goalsConcededAvg,
+                RecentForm: recentForm,
+                RecentMatches: combined,
+                KeyAbsences: Array.Empty<string>(),
+                LastWorldCupResult: null);
+        }
+
+        return baseStats with
+        {
+            RecentForm = recentForm,
+            RecentMatches = combined,
+            GoalsScoredAvg = goalsScoredAvg,
+            GoalsConcededAvg = goalsConcededAvg,
+        };
     }
 
     public async Task<HeadToHeadResponse?> GetHeadToHeadAsync(string teamA, string teamB, CancellationToken ct)
