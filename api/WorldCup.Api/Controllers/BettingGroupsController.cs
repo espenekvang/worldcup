@@ -20,20 +20,15 @@ public class BettingGroupsController(AppDbContext dbContext, IFeatureManager fea
         var userId = GetAuthenticatedUserId();
         if (userId is null) return Unauthorized();
 
-        var isAdmin = User.IsInRole("Admin");
+        // Denne lista driver bl.a. "Bytt liga"-velgeren, så den skal alltid kun
+        // inneholde ligaer brukeren faktisk er medlem i – også for globale admins.
+        // Admin-panelet bruker /api/admin/groups når det trenger alle ligaer.
+        var memberGroupIds = dbContext.BettingGroupMembers
+            .Where(m => m.UserId == userId.Value)
+            .Select(m => m.BettingGroupId);
 
-        IQueryable<BettingGroup> query = dbContext.BettingGroups;
-
-        if (!isAdmin)
-        {
-            var memberGroupIds = dbContext.BettingGroupMembers
-                .Where(m => m.UserId == userId.Value)
-                .Select(m => m.BettingGroupId);
-
-            query = query.Where(g => memberGroupIds.Contains(g.Id));
-        }
-
-        var groups = await query
+        var groups = await dbContext.BettingGroups
+            .Where(g => memberGroupIds.Contains(g.Id))
             .OrderBy(g => g.Name)
             .Select(g => new
             {
