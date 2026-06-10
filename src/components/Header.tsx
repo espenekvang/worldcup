@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { useBettingGroup } from '../context/BettingGroupContext'
 import { useChat } from '../context/ChatContext'
 import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
 import FeedbackModal from './FeedbackModal'
+import LeagueSwitcher from './LeagueSwitcher'
 
 export default function Header() {
   const { user, logout } = useAuth()
-  const { groups, activeGroup, clearActiveGroup } = useBettingGroup()
   const { unreadCount } = useChat()
   const { theme, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -38,9 +37,7 @@ export default function Header() {
             <h1 className="text-xl font-thin sm:text-3xl">
               VM-Betting 2026
             </h1>
-            <p className="mt-0.5 text-xs font-thin sm:mt-1 sm:text-sm" style={{ color: 'var(--color-header-text-muted)' }}>
-              {activeGroup ? activeGroup.name : 'USA • Mexico • Canada'}
-            </p>
+            <LeagueSwitcher />
             <p className="text-[10px] font-thin opacity-40" style={{ color: 'var(--color-header-text-muted)' }}>
               v{__APP_VERSION__}
             </p>
@@ -117,17 +114,6 @@ export default function Header() {
                       <span className="w-5 text-center">{theme === 'dark' ? '☀️' : '🌙'}</span>
                       {theme === 'dark' ? 'Lyst tema' : 'Mørkt tema'}
                     </button>
-
-                    {groups.length > 1 ? (
-                      <button
-                        onClick={() => { setMenuOpen(false); clearActiveGroup() }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
-                        style={{ color: 'var(--color-text-primary)' }}
-                      >
-                        <span className="w-5 text-center">🔄</span>
-                        Bytt liga
-                      </button>
-                    ) : null}
 
                     <div className="my-1 border-t" style={{ borderColor: 'var(--color-border)' }} />
 

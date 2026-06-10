@@ -13,7 +13,6 @@ import './index.css'
 import App from './App'
 import LoginPage from './pages/LoginPage'
 import WaitingPage from './pages/WaitingPage'
-import GroupSelectorPage from './pages/GroupSelectorPage'
 import ChatPage from './pages/ChatPage'
 import InvitePage from './pages/InvitePage'
 import MatchDetailsPage from './pages/MatchDetailsPage'
@@ -33,7 +32,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!activeGroup) {
-    return <GroupSelectorPage />
+    // Aktiv liga auto-velges i BettingGroupContext når man har minst én liga;
+    // dette er bare et kortvarig guard under første lasting.
+    return null
   }
 
   return <ChatProvider><FeatureFlagsProvider>{children}</FeatureFlagsProvider></ChatProvider>

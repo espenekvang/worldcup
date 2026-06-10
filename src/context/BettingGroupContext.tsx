@@ -6,7 +6,6 @@ interface BettingGroupContextValue {
   groups: BettingGroup[]
   activeGroup: BettingGroup | null
   setActiveGroup: (group: BettingGroup) => void
-  clearActiveGroup: () => void
   setGroups: (groups: BettingGroup[]) => void
   isLoading: boolean
 }
@@ -65,9 +64,9 @@ export function BettingGroupProvider({ children }: { children: ReactNode }) {
       setActiveGroupState(newGroups[0])
       safeSetItem(GROUP_KEY, newGroups[0].id)
     } else {
-      // Multiple groups, none stored → user must choose
-      setActiveGroupState(null)
-      safeRemoveItem(GROUP_KEY)
+      // Flere ligaer, ingen lagret → velg den første automatisk
+      setActiveGroupState(newGroups[0])
+      safeSetItem(GROUP_KEY, newGroups[0].id)
     }
 
     setIsLoading(false)
@@ -78,11 +77,6 @@ export function BettingGroupProvider({ children }: { children: ReactNode }) {
     safeSetItem(GROUP_KEY, group.id)
   }, [])
 
-  const clearActiveGroup = useCallback(() => {
-    setActiveGroupState(null)
-    safeRemoveItem(GROUP_KEY)
-  }, [])
-
   // On mount, mark as not loading if no groups are set yet
   useEffect(() => {
     // Initial load state will be resolved when setGroups is called from AuthContext
@@ -91,8 +85,8 @@ export function BettingGroupProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, isLoading }),
-    [groups, activeGroup, setActiveGroup, clearActiveGroup, setGroups, isLoading],
+    () => ({ groups, activeGroup, setActiveGroup, setGroups, isLoading }),
+    [groups, activeGroup, setActiveGroup, setGroups, isLoading],
   )
 
   return <BettingGroupContext value={value}>{children}</BettingGroupContext>
