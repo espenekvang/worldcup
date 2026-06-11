@@ -126,6 +126,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     currentGroupIdRef.current = groupId
     let cancelled = false
 
+    // Clear previous group's messages so we never scroll to / mark-as-read
+    // against stale data while the new group is loading.
+    setMessages([])
     setNewMessagesMarkerId(null)
     setIsLoading(true)
     getChatMessages(undefined, PAGE_SIZE)
@@ -321,14 +324,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [hasMore, messages])
 
   const markAsRead = useCallback(() => {
-    if (!activeGroup) return
-    if (messages.length === 0) {
-      // Still record a marker so unread is 0
-      const now = new Date().toISOString()
-      safeSet(lastReadKey(activeGroup.id), now)
-      setLastReadAt(now)
-      return
-    }
+    // No-op while messages are empty (loading, or genuinely empty chat). Writing
+    // here would clobber the stored last-read timestamp before messages load,
+    // which would break the "first unread" detection. unreadCount already
+    // returns 0 when there are no messages.
+    if (!activeGroup || messages.length === 0) return
     const newest = messages[messages.length - 1].createdAt
     safeSet(lastReadKey(activeGroup.id), newest)
     setLastReadAt(newest)
