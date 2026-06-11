@@ -24,7 +24,7 @@ export default function DisplayNameModal({ onClose }: DisplayNameModalProps) {
       await updateDisplayName(value.trim())
       onClose()
     } catch {
-      setError('Kunne ikke lagre visningsnavn. Prøv igjen senere.')
+      setError('Kunne ikke lagre kallenavn. Prøv igjen senere.')
     } finally {
       setSaving(false)
     }
@@ -46,7 +46,7 @@ export default function DisplayNameModal({ onClose }: DisplayNameModalProps) {
         onClick={e => e.stopPropagation()}
       >
         <h2 className="mb-1 text-lg font-medium" style={{ color: 'var(--color-text-primary)' }}>
-          Visningsnavn
+          Kallenavn
         </h2>
         <p className="mb-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           Velg navnet som skal vises for deg på poengtavlen, i tipsoversikter og i chatten.
@@ -65,7 +65,7 @@ export default function DisplayNameModal({ onClose }: DisplayNameModalProps) {
           maxLength={MAX_LENGTH}
           onChange={e => setValue(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && hasChange && !saving) handleSave() }}
-          placeholder={user?.name ?? 'Ditt visningsnavn'}
+          placeholder={user?.name ?? 'Ditt kallenavn'}
           autoFocus
         />
         <p className="mt-1 text-right text-xs" style={{ color: 'var(--color-text-muted)' }}>
