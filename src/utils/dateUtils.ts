@@ -68,6 +68,23 @@ export function isMatchLocked(match: Match, now: number = Date.now()): boolean {
   return now >= new Date(match.date).getTime()
 }
 
+/**
+ * Antatt maks varighet for en kamp: spilletid + pause + ev. ekstraomganger og
+ * straffer, med litt margin. Brukes som øvre grense for "pågår"-vinduet slik at
+ * en glemt resultatregistrering ikke etterlater kampen som "pågår" i dagevis.
+ */
+const MATCH_DURATION_MS = 3.5 * 60 * 60 * 1000
+
+/**
+ * En kamp regnes som "pågår" når avsparket har vært, men vi ennå ikke har et
+ * resultat – innenfor et rimelig tidsvindu fra avspark.
+ */
+export function isMatchInProgress(match: Match, hasResult: boolean, now: number = Date.now()): boolean {
+  if (hasResult || areTeamsUndetermined(match)) return false
+  const kickoff = new Date(match.date).getTime()
+  return now >= kickoff && now < kickoff + MATCH_DURATION_MS
+}
+
 /** Menneskelig navn for hver runde, brukt i UI. */
 export const STAGE_LABELS: Record<Stage, string> = {
   'group-1': 'Runde 1',

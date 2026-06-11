@@ -14,6 +14,7 @@ interface MatchCardProps {
   venues: Venue[]
   locked: boolean
   isNext?: boolean
+  isLive?: boolean
   onTipClick: (match: Match) => void
   onViewOthers: (match: Match) => void
 }
@@ -30,7 +31,7 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
-export default function MatchCard({ match, teams, venues, locked, isNext, onTipClick, onViewOthers }: MatchCardProps) {
+export default function MatchCard({ match, teams, venues, locked, isNext, isLive, onTipClick, onViewOthers }: MatchCardProps) {
   const navigate = useNavigate()
   const { predictions } = usePredictions()
   const { results, points } = useResults()
@@ -90,11 +91,11 @@ export default function MatchCard({ match, teams, venues, locked, isNext, onTipC
       tabIndex={0}
       onClick={goToDetails}
       onKeyDown={handleCardKeyDown}
-      className={`cursor-pointer rounded-lg border px-3 py-2 shadow-sm transition-colors hover:shadow-md sm:px-4 sm:py-2.5 ${isNext ? 'ring-2' : ''}`}
+      className={`cursor-pointer rounded-lg border px-3 py-2 shadow-sm transition-colors hover:shadow-md sm:px-4 sm:py-2.5 ${isNext || isLive ? 'ring-2' : ''}`}
       style={{
-        backgroundColor: isNext ? 'var(--color-primary-light)' : 'var(--color-surface-card)',
-        borderColor: isNext ? 'var(--color-primary)' : 'var(--color-border)',
-        ...(isNext ? { '--tw-ring-color': 'var(--color-primary)' } as React.CSSProperties : {}),
+        backgroundColor: isLive ? 'var(--color-danger-light)' : isNext ? 'var(--color-primary-light)' : 'var(--color-surface-card)',
+        borderColor: isLive ? 'var(--color-danger)' : isNext ? 'var(--color-primary)' : 'var(--color-border)',
+        ...(isNext || isLive ? { '--tw-ring-color': isLive ? 'var(--color-danger)' : 'var(--color-primary)' } as React.CSSProperties : {}),
       }}
     >
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
@@ -107,6 +108,15 @@ export default function MatchCard({ match, teams, venues, locked, isNext, onTipC
             >
               {stageLabel}
             </span>
+            {isLive && (
+              <span
+                className="mt-0.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide"
+                style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full" style={{ backgroundColor: '#fff' }} />
+                Pågår
+              </span>
+            )}
             {tvChannel && <ChannelLogo channel={tvChannel} className="mt-0.5" />}
           </div>
 
