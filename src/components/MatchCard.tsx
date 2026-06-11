@@ -5,6 +5,8 @@ import { usePredictions } from '../context/PredictionsContext'
 import { useResults } from '../context/ResultsContext'
 import { useWeather } from '../hooks/useWeather'
 import WeatherBadge from './WeatherBadge'
+import ChannelLogo from './ChannelLogo'
+import { getTvChannel } from '../data'
 
 interface MatchCardProps {
   match: Match
@@ -38,6 +40,7 @@ export default function MatchCard({ match, teams, venues, locked, isNext, onTipC
   const pts = points.get(match.id)
 
   const venue = venues.find(v => v.id === match.venueId)
+  const tvChannel = getTvChannel(match.id)
   const isGroupStage = isGroupStageFn(match.stage)
   const teamsUndetermined = areTeamsUndetermined(match)
   const { forecast, loading: weatherLoading } = useWeather(venue?.id, match.date, venue?.timezone)
@@ -104,6 +107,7 @@ export default function MatchCard({ match, teams, venues, locked, isNext, onTipC
             >
               {stageLabel}
             </span>
+            {tvChannel && <ChannelLogo channel={tvChannel} className="mt-0.5" />}
           </div>
 
           <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold sm:gap-2 sm:text-base" style={{ color: 'var(--color-text-primary)' }}>

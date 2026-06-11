@@ -1,7 +1,8 @@
-import type { MatchData, Team, Venue, Match, Stage } from '../types'
+import type { MatchData, Team, Venue, Match, Stage, TvChannel } from '../types'
 import venuesData from './venues.json'
 import teamsData from './teams.json'
 import matchesData from './matches.json'
+import tvChannelsData from './tvChannels.json'
 
 const STAGES = new Set<string>(['group-1', 'group-2', 'group-3', 'round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'third-place', 'final'])
 
@@ -92,9 +93,38 @@ function parseMatches(data: unknown): Match[] {
   return data
 }
 
+function isTvChannel(value: unknown): value is TvChannel {
+  return value === 'NRK' || value === 'TV2'
+}
+
+function parseTvChannels(data: unknown): Record<number, TvChannel> {
+  if (typeof data !== 'object' || data === null) {
+    throw new Error('Invalid tvChannels data')
+  }
+
+  const parsed: Record<number, TvChannel> = {}
+
+  for (const [id, channel] of Object.entries(data)) {
+    const matchId = Number(id)
+    if (!Number.isInteger(matchId) || !isTvChannel(channel)) {
+      throw new Error('Invalid tvChannels data')
+    }
+
+    parsed[matchId] = channel
+  }
+
+  return parsed
+}
+
 export const venues = parseVenues(venuesData)
 export const teams = parseTeams(teamsData)
 export const matches = parseMatches(matchesData)
+export const tvChannels = parseTvChannels(tvChannelsData)
+
+/** Norsk TV-kanal for en kamp, eller undefined hvis ikke kanalsatt (f.eks. sluttspill). */
+export function getTvChannel(matchId: number): TvChannel | undefined {
+  return tvChannels[matchId]
+}
 
 export const matchData = {
   teams,
@@ -102,4 +132,4 @@ export const matchData = {
   matches,
 } satisfies MatchData
 
-export type { Team, Venue, Match, Stage, MatchData }
+export type { Team, Venue, Match, Stage, MatchData, TvChannel }

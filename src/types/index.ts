@@ -13,6 +13,9 @@ export type Stage =
 /** Top-level UI grouping: gruppespill, sluttspill eller The Boss. */
 export type Section = "group" | "knockout" | "leaderboard" | "admin"
 
+/** Norsk TV-kanal som sender en kamp. NRK og TV2 deler VM-rettighetene. */
+export type TvChannel = "NRK" | "TV2"
+
 export interface Team {
   code: string
   name: string

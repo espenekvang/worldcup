@@ -51,6 +51,24 @@ describe('MatchCard', () => {
     expect(screen.getAllByText(/MetLife Stadium, East Rutherford/).length).toBeGreaterThan(0)
   })
 
+  it('viser TV-kanal-logo for en kamp som er kanalsatt', () => {
+    // Kamp 1 (Mexico–Sør-Afrika) sendes på TV2 ifølge tvChannels-dataen.
+    const match: Match = { id: 1, date: '2026-06-15T18:00:00Z', homeTeam: 'BRA', awayTeam: 'ARG', stage: 'group-1', group: 'C', venueId: 'metlife' }
+
+    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} onViewOthers={onViewOthers} />, { wrapper: Wrapper })
+
+    expect(screen.getByText('TV 2')).toBeInTheDocument()
+  })
+
+  it('viser ingen TV-kanal-logo for en kamp uten kanal (sluttspill)', () => {
+    const match: Match = { id: 104, date: '2026-07-19T19:00:00Z', homeTeam: null, awayTeam: null, homePlaceholder: 'Vinner kamp 101', awayPlaceholder: 'Vinner kamp 102', stage: 'final', venueId: 'metlife' }
+
+    render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} onViewOthers={onViewOthers} />, { wrapper: Wrapper })
+
+    expect(screen.queryByText('NRK')).not.toBeInTheDocument()
+    expect(screen.queryByText('TV 2')).not.toBeInTheDocument()
+  })
+
   it('renders knockout placeholders and stage label', () => {
     const match: Match = { id: 73, date: '2026-07-01T20:00:00Z', homeTeam: null, awayTeam: null, homePlaceholder: '1st Group A', awayPlaceholder: '2nd Group B', stage: 'round-of-32', venueId: 'metlife' }
 
