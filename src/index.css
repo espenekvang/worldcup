@@ -57,6 +57,7 @@
   --color-success-text: #15803d;
 
   --color-danger: #dc2626;
+  --color-danger-light: #fef2f2;
 
   --color-input-border: #cbd5e1;
   --color-input-focus: #2A398D;
@@ -103,6 +104,7 @@
   --color-success-text: #4ade80;
 
   --color-danger: #f87171;
+  --color-danger-light: rgba(248, 113, 113, 0.12);
 
   --color-input-border: #2a3050;
   --color-input-focus: #6375d0;
