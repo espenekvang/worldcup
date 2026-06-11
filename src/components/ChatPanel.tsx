@@ -101,6 +101,13 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
     return user.groupAdminGroupIds?.includes(activeGroup.id) ?? false
   }, [user, activeGroup])
 
+  // Reset scroll state when switching betting groups so the new group's chat
+  // gets scrolled to its own first unread message instead of the bottom.
+  useEffect(() => {
+    hasScrolledToUnreadRef.current = false
+    lastMessageIdRef.current = null
+  }, [activeGroup?.id])
+
   // Auto-scroll: to "nye meldinger" divider on first load, otherwise to bottom
   useLayoutEffect(() => {
     const list = listRef.current
