@@ -69,6 +69,8 @@ export interface AuthResponse {
   token: string
   email: string
   name: string
+  /** Selvvalgt visningsnavn. Null = bruk `name`. */
+  displayName: string | null
   picture: string | null
   isAdmin: boolean
   groups: BettingGroup[]
@@ -107,6 +109,21 @@ export function loginWithGoogle(idToken: string, inviteToken?: string): Promise<
   return request<AuthResponse>('/api/auth/google', {
     method: 'POST',
     body: JSON.stringify({ idToken, inviteToken: inviteToken ?? null }),
+  })
+}
+
+export interface UpdateDisplayNameResponse {
+  displayName: string | null
+}
+
+/**
+ * Setter eller nullstiller brukerens eget visningsnavn. Tom streng nullstiller
+ * det slik at appen faller tilbake til Google-navnet.
+ */
+export function updateDisplayName(displayName: string): Promise<UpdateDisplayNameResponse> {
+  return request<UpdateDisplayNameResponse>('/api/auth/display-name', {
+    method: 'PUT',
+    body: JSON.stringify({ displayName }),
   })
 }
 
@@ -203,6 +220,8 @@ export function acceptInviteLink(token: string): Promise<AcceptInviteLinkRespons
 
 export interface MatchPredictionResponse {
   name: string | null
+  /** Selvvalgt visningsnavn. Null = bruk `name`. */
+  displayName: string | null
   picture: string | null
   homeScore: number | null
   awayScore: number | null
@@ -211,6 +230,8 @@ export interface MatchPredictionResponse {
 
 export interface LeaderboardEntry {
   name: string
+  /** Selvvalgt visningsnavn. Null = bruk `name`. */
+  displayName: string | null
   picture: string | null
   totalPoints: number
   matchCount: number
@@ -229,6 +250,8 @@ export function getMatchOdds(matchId: number): Promise<MatchPredictionResponse[]
 
 export interface GlobalLeaderboardEntry {
   name: string | null
+  /** Selvvalgt visningsnavn. Null = bruk `name`. */
+  displayName: string | null
   picture: string | null
   totalPoints: number
   matchCount: number

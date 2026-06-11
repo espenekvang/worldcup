@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getMatchPredictions, type MatchPredictionResponse } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
-import { firstName, displayName } from '../utils/nameUtils'
+import { displayName } from '../utils/nameUtils'
 
 interface MatchPredictionsListProps {
   matchId: number
@@ -68,10 +68,10 @@ export default function MatchPredictionsList({ matchId, variant = 'modal' }: Mat
                 className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                 style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
               >
-                {firstName(p.name ?? '').charAt(0)}
+                {displayName(p.name ?? '', showFullName, p.displayName).charAt(0)}
               </div>
             )}
-            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{displayName(p.name ?? '', showFullName)}</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{displayName(p.name ?? '', showFullName, p.displayName)}</span>
           </div>
           {p.homeScore !== null && p.awayScore !== null ? (
             <div className="flex items-center gap-2">

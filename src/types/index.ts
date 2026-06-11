@@ -88,6 +88,8 @@ export interface ChatMessage {
   id: string
   userId: string
   userName: string
+  /** Avsenderens selvvalgte visningsnavn. Når satt vises det i sin helhet. Null = bruk userName. */
+  userDisplayName: string | null
   userPicture: string | null
   content: string
   createdAt: string

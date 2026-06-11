@@ -4,6 +4,7 @@ import { useChat } from '../context/ChatContext'
 import { firstName } from '../utils/nameUtils'
 import { useTheme } from '../hooks/useTheme'
 import FeedbackModal from './FeedbackModal'
+import DisplayNameModal from './DisplayNameModal'
 import LeagueSwitcher from './LeagueSwitcher'
 
 export default function Header() {
@@ -12,7 +13,11 @@ export default function Header() {
   const { theme, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [displayNameOpen, setDisplayNameOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Eget visningsnavn overstyrer Google-navnet overalt det vises.
+  const shownName = user ? (user.displayName?.trim() || user.name) : ''
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -63,7 +68,7 @@ export default function Header() {
                 {user.picture ? (
                   <img
                     src={user.picture}
-                    alt={firstName(user.name)}
+                    alt={firstName(shownName)}
                     className="h-8 w-8 rounded-full sm:h-9 sm:w-9"
                     referrerPolicy="no-referrer"
                   />
@@ -72,7 +77,7 @@ export default function Header() {
                     className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium sm:h-9 sm:w-9"
                 style={{ backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }}
                   >
-                    {firstName(user.name).charAt(0).toUpperCase()}
+                    {firstName(shownName).charAt(0).toUpperCase()}
                   </div>
                 )}
                 {unreadCount > 0 && (
@@ -98,7 +103,7 @@ export default function Header() {
                 >
                   <div className="border-b px-4 py-3" style={{ borderColor: 'var(--color-border)' }}>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                      {user.name}
+                      {shownName}
                     </p>
                     <p className="truncate text-xs" style={{ color: 'var(--color-text-muted)' }}>
                       {user.email}
@@ -106,6 +111,15 @@ export default function Header() {
                   </div>
 
                   <div className="py-1">
+                    <button
+                      onClick={() => { setMenuOpen(false); setDisplayNameOpen(true) }}
+                      className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
+                      style={{ color: 'var(--color-text-primary)' }}
+                    >
+                      <span className="w-5 text-center">✏️</span>
+                      Visningsnavn
+                    </button>
+
                     <button
                       onClick={toggleTheme}
                       className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:opacity-80"
@@ -132,6 +146,7 @@ export default function Header() {
             </div>
           ) : null}
           {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
+          {displayNameOpen && <DisplayNameModal onClose={() => setDisplayNameOpen(false)} />}
         </div>
       </div>
     </header>

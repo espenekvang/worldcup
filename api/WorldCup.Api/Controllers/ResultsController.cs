@@ -177,6 +177,7 @@ public class ResultsController(
             {
                 m.UserId,
                 Name = m.User.Name,
+                DisplayName = m.User.DisplayName,
                 Picture = m.User.Picture,
                 m.HasPaid,
                 TotalPoints = dbContext.Predictions
@@ -221,6 +222,7 @@ public class ResultsController(
             .Select(e => new LeaderboardEntry
             {
                 Name = e.Name,
+                DisplayName = e.DisplayName,
                 Picture = e.Picture,
                 TotalPoints = e.TotalPoints,
                 MatchCount = e.MatchCount,
@@ -273,7 +275,7 @@ public class ResultsController(
         var userIds = allUsers.Select(u => u.UserId).ToList();
         var userInfos = await dbContext.Users
             .Where(u => userIds.Contains(u.Id))
-            .Select(u => new { u.Id, u.Name, u.Picture })
+            .Select(u => new { u.Id, u.Name, u.DisplayName, u.Picture })
             .ToDictionaryAsync(u => u.Id);
 
         var globalLeaderboard = allUsers
@@ -286,6 +288,7 @@ public class ResultsController(
                 return new GlobalLeaderboardEntry
                 {
                     Name = isInGroup ? info?.Name : null,
+                    DisplayName = isInGroup ? info?.DisplayName : null,
                     Picture = isInGroup ? info?.Picture : null,
                     TotalPoints = u.TotalPoints,
                     MatchCount = u.MatchCount,

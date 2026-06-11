@@ -1,13 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { AuthResponse } from '../api/client'
-import { loginWithGoogle as apiLoginWithGoogle, getMyGroups } from '../api/client'
+import {
+  loginWithGoogle as apiLoginWithGoogle,
+  getMyGroups,
+  updateDisplayName as apiUpdateDisplayName,
+} from '../api/client'
 import type { BettingGroup } from '../types'
 import { useBettingGroup } from './BettingGroupContext'
 
 interface AuthUser {
   email: string
   name: string
+  /** Selvvalgt visningsnavn. Null = bruk `name`. */
+  displayName: string | null
   picture: string | null
   isAdmin: boolean
   groups: BettingGroup[]
@@ -18,6 +24,8 @@ interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
   loginWithGoogle: (idToken: string, inviteToken?: string) => Promise<void>
+  /** Setter/nullstiller eget visningsnavn. Tom streng nullstiller det. */
+  updateDisplayName: (displayName: string) => Promise<void>
   logout: () => void
 }
 
@@ -110,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const authUser: AuthUser = {
         email: response.email,
         name: response.name,
+        displayName: response.displayName ?? null,
         picture: response.picture,
         isAdmin: response.isAdmin,
         groups: response.groups,
@@ -124,6 +133,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [setGroups])
 
+  const updateDisplayName = useCallback(async (displayName: string) => {
+    const response = await apiUpdateDisplayName(displayName)
+    setUser(prev => {
+      if (!prev) return prev
+      const updated = { ...prev, displayName: response.displayName ?? null }
+      safeSetItem(USER_KEY, JSON.stringify(updated))
+      return updated
+    })
+  }, [])
+
   const logout = useCallback(() => {
     safeRemoveItem(TOKEN_KEY)
     safeRemoveItem(USER_KEY)
@@ -133,8 +152,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [setGroups])
 
   const value = useMemo(
-    () => ({ user, isLoading, loginWithGoogle, logout }),
-    [user, isLoading, loginWithGoogle, logout],
+    () => ({ user, isLoading, loginWithGoogle, updateDisplayName, logout }),
+    [user, isLoading, loginWithGoogle, updateDisplayName, logout],
   )
 
   return <AuthContext value={value}>{children}</AuthContext>

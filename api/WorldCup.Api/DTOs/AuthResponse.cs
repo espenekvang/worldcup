@@ -5,6 +5,10 @@ public class AuthResponse
     public string Token { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>Selvvalgt visningsnavn. Null/tom = bruk <see cref="Name"/>.</summary>
+    public string? DisplayName { get; set; }
+
     public string? Picture { get; set; }
     public bool IsAdmin { get; set; }
     public List<BettingGroupResponse> Groups { get; set; } = [];

@@ -22,6 +22,13 @@ public class ChatMessageResponse
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Avsenderens selvvalgte visningsnavn. Når satt vises dette i sin helhet
+    /// (ikke avkortet til fornavn). Null for system-/kringkastingsmeldinger.
+    /// </summary>
+    public string? UserDisplayName { get; set; }
+
     public string? UserPicture { get; set; }
     public string Content { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getLeaderboard, getGlobalLeaderboard, getMyGroups, type LeaderboardEntry, type GlobalLeaderboardEntry } from '../api/client'
 import { useBettingGroup } from '../context/BettingGroupContext'
-import { firstName, displayName } from '../utils/nameUtils'
+import { displayName } from '../utils/nameUtils'
 
 /**
  * Beregner premie per deltaker for en betalt liga.
@@ -193,12 +193,12 @@ export default function Leaderboard() {
                   className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                   style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
                 >
-                  {firstName(entry.name).charAt(0)}
+                  {displayName(entry.name, showFullName, entry.displayName).charAt(0)}
                 </div>
               )}
               <div>
                 <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                  {displayName(entry.name, showFullName)}
+                  {displayName(entry.name, showFullName, entry.displayName)}
                 </span>
                 <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   {entry.matchCount} {entry.matchCount === 1 ? 'kamp' : 'kamper'}
@@ -294,7 +294,7 @@ export default function Leaderboard() {
                         className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                         style={{ backgroundColor: 'var(--color-surface-elevated)', color: 'var(--color-text-muted)' }}
                       >
-                        {entry.name ? firstName(entry.name).charAt(0) : '?'}
+                        {entry.name ? displayName(entry.name, showFullName, entry.displayName).charAt(0) : '?'}
                       </div>
                     )
                   ) : (
@@ -310,7 +310,7 @@ export default function Leaderboard() {
                   <div>
                     <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {entry.isInCurrentGroup
-                        ? displayName(entry.name ?? '', showFullName)
+                        ? displayName(entry.name ?? '', showFullName, entry.displayName)
                         : `Spiller fra ${entry.groupName ?? 'ukjent liga'}`}
                     </span>
                     <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>

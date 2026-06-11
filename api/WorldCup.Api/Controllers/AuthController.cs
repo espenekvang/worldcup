@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -231,6 +232,7 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Email = user.Email,
             Name = user.Name,
+            DisplayName = user.DisplayName,
             Picture = user.Picture,
             IsAdmin = user.IsAdmin,
             Groups = groups,
@@ -238,5 +240,47 @@ public class AuthController(AppDbContext dbContext, IConfiguration configuration
         };
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Setter eller nullstiller den innloggede brukerens selvvalgte visningsnavn.
+    /// Visningsnavnet vises i stedet for Google-navnet overalt navnet vises i appen.
+    /// </summary>
+    [HttpPut("display-name")]
+    [Authorize]
+    public async Task<ActionResult<UpdateDisplayNameResponse>> UpdateDisplayName(
+        [FromBody] UpdateDisplayNameRequest request)
+    {
+        const int maxLength = 40;
+
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await dbContext.Users.FindAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var trimmed = request.DisplayName?.Trim();
+        if (string.IsNullOrEmpty(trimmed))
+        {
+            user.DisplayName = null;
+        }
+        else if (trimmed.Length > maxLength)
+        {
+            return BadRequest($"Visningsnavn kan maks være {maxLength} tegn.");
+        }
+        else
+        {
+            user.DisplayName = trimmed;
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        return Ok(new UpdateDisplayNameResponse { DisplayName = user.DisplayName });
     }
 }

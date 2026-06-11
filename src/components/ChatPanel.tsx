@@ -24,6 +24,17 @@ interface ChatPanelProps {
 
 const MAX_LENGTH = 500
 
+/**
+ * Navnet som vises for en chat-melding. Et selvvalgt visningsnavn vises i sin
+ * helhet; ellers vises hele navnet for system-/kringkastingsmeldinger og kun
+ * fornavnet for vanlige brukere.
+ */
+function chatDisplayName(m: ChatMessage): string {
+  const custom = m.userDisplayName?.trim()
+  if (custom) return custom
+  return m.isSystem ? m.userName : firstName(m.userName)
+}
+
 // Configure marked once: GitHub-flavoured, breaks=true (single newline -> <br>).
 marked.setOptions({ gfm: true, breaks: true })
 
@@ -345,7 +356,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                     ) : m.userPicture ? (
                       <img
                         src={m.userPicture}
-                        alt={firstName(m.userName)}
+                        alt={chatDisplayName(m)}
                         referrerPolicy="no-referrer"
                         className="h-7 w-7 shrink-0 rounded-full"
                       />
@@ -357,7 +368,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                           color: 'var(--color-text-inverse)',
                         }}
                       >
-                        {firstName(m.userName).charAt(0).toUpperCase()}
+                        {chatDisplayName(m).charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
@@ -368,7 +379,7 @@ export default function ChatPanel({ visible = true, className }: ChatPanelProps)
                             color: isOwn ? 'var(--color-tab-active)' : 'var(--color-text-primary)',
                           }}
                         >
-                          {m.isSystem ? m.userName : firstName(m.userName)}
+                          {chatDisplayName(m)}
                         </span>
                         <span
                           className="text-[10px]"

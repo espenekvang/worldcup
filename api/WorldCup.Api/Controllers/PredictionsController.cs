@@ -160,6 +160,7 @@ public class PredictionsController(AppDbContext dbContext, MatchScheduleProvider
             .Select(p => new MatchPredictionResponse
             {
                 Name = p.User.Name,
+                DisplayName = p.User.DisplayName,
                 Picture = p.User.Picture,
                 HomeScore = locked ? p.HomeScore : null,
                 AwayScore = locked ? p.AwayScore : null,
