@@ -21,6 +21,14 @@ export function getLocalDateKey(isoDate: string): string {
   return `${year}-${month}-${day}`
 }
 
+/**
+ * Sjekker om en kamp er på samme kalenderdag som `now` i brukerens lokale
+ * tidssone. Brukes for å løfte frem at neste kamp faktisk er i dag.
+ */
+export function isToday(isoDate: string, now: Date = new Date()): boolean {
+  return getLocalDateKey(isoDate) === getLocalDateKey(now.toISOString())
+}
+
 export function getTimeUntil(targetDate: string): { days: number; hours: number; minutes: number; seconds: number } {
   const diff = Math.max(0, new Date(targetDate).getTime() - Date.now())
 
