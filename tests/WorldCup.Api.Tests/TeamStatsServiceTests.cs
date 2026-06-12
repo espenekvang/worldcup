@@ -272,6 +272,95 @@ public class TeamStatsServiceTests : IDisposable
         result.GoalsScoredAvg.Should().Be(3.0);
     }
 
+    [Fact]
+    public void WithWorldCupHeadToHead_uten_vm_kamper_returnerer_base_uendret()
+    {
+        var baseH2h = H2hStats();
+
+        var result = TeamStatsService.WithWorldCupHeadToHead(baseH2h, "ARG", "BRA", Array.Empty<HeadToHeadMatch>());
+
+        result.Should().BeSameAs(baseH2h);
+    }
+
+    [Fact]
+    public void WithWorldCupHeadToHead_legger_vm_kamper_forst_og_oppdaterer_tellerne()
+    {
+        var baseH2h = H2hStats();
+
+        // To VM-møter: ARG vinner hjemme 2-1, og BRA vinner hjemme 3-0 (ARG taper borte).
+        var wc = new[]
+        {
+            new HeadToHeadMatch("2026-07-05", "BRA", "ARG", 3, 0, "VM 2026", null),
+            new HeadToHeadMatch("2026-06-20", "ARG", "BRA", 2, 1, "VM 2026", null),
+        };
+
+        var result = TeamStatsService.WithWorldCupHeadToHead(baseH2h, "ARG", "BRA", wc)!;
+
+        // Nyeste VM-kamp ligger først.
+        result.RecentMatches.First().Date.Should().Be("2026-07-05");
+        // ARG (teamA): én seier (2-1) og ett tap (0-3 borte) lagt til seed (41/26/43).
+        result.TeamAWins.Should().Be(42);
+        result.Draws.Should().Be(26);
+        result.TeamBWins.Should().Be(44);
+        // Mål fra ARGs perspektiv: +2 og +0 = 162→165 ... seed 163 + 2 = 165.
+        result.TeamAGoals.Should().Be(165);
+        result.TeamBGoals.Should().Be(164); // 160 + 1 + 3
+        result.TotalMatches.Should().Be(112);
+    }
+
+    [Fact]
+    public void WithWorldCupHeadToHead_bygger_respons_naar_base_mangler()
+    {
+        var wc = new[]
+        {
+            new HeadToHeadMatch("2026-06-20", "ARG", "BRA", 2, 1, "VM 2026", null),
+        };
+
+        var result = TeamStatsService.WithWorldCupHeadToHead(null, "ARG", "BRA", wc)!;
+
+        result.Should().NotBeNull();
+        result.TeamA.Should().Be("ARG");
+        result.TeamB.Should().Be("BRA");
+        result.TotalMatches.Should().Be(1);
+        result.TeamAWins.Should().Be(1);
+        result.TeamBWins.Should().Be(0);
+        result.TeamAGoals.Should().Be(2);
+        result.TeamBGoals.Should().Be(1);
+        result.RecentMatches.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void WithWorldCupHeadToHead_begrenser_siste_moter_til_fem()
+    {
+        var baseH2h = H2hStats() with
+        {
+            RecentMatches = new[]
+            {
+                new HeadToHeadMatch("2025-01-01", "ARG", "BRA", 1, 1, "Vennskap", null),
+            },
+        };
+        var wc = Enumerable.Range(0, 6)
+            .Select(i => new HeadToHeadMatch($"2026-06-{10 + i:D2}", "ARG", "BRA", 1, 0, "VM 2026", null))
+            .ToArray();
+
+        var result = TeamStatsService.WithWorldCupHeadToHead(baseH2h, "ARG", "BRA", wc)!;
+
+        result.RecentMatches.Should().HaveCount(5);
+        result.RecentMatches.Should().OnlyContain(m => m.Competition == "VM 2026");
+    }
+
+    private static HeadToHeadResponse H2hStats() =>
+        new(
+            TeamA: "ARG",
+            TeamB: "BRA",
+            TotalMatches: 110,
+            TeamAWins: 41,
+            Draws: 26,
+            TeamBWins: 43,
+            TeamAGoals: 163,
+            TeamBGoals: 160,
+            RecentMatches: Array.Empty<HeadToHeadMatch>());
+
     private static TeamStatsResponse SeedStats(string? recentForm) =>
         new(
             TeamCode: "BRA",

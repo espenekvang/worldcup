@@ -251,24 +251,154 @@ public sealed class TeamStatsService
             _cache.Set(cacheKey, stored, CacheTtl);
         }
 
-        if (stored is null) return null;
-
+        // Orienter base-dataen i klientens rekkefølge (teamA = a) før vi legger på VM-kamper.
         // Speilvend tellerne hvis klienten spurte i motsatt rekkefølge av canonical.
-        if (stored.TeamA == a)
+        var baseH2h = stored is null || stored.TeamA == a ? stored : Mirror(stored, a, b);
+
+        // Legg de faktiske VM-kampene mellom lagene oppå seed/ekstern-historikken — på samme
+        // måte som «Form i VM» overlayes i GetTeamStatsAsync. Hentes ferskt per kall (utenfor
+        // base-cachen) så et nytt resultat slår igjennom umiddelbart. Hvis vi verken har base
+        // eller spilte VM-kamper returneres null, og UI viser «ingen tidligere oppgjør».
+        var worldCupMatches = await GetWorldCupHeadToHeadMatchesAsync(a, b, ct);
+        return WithWorldCupHeadToHead(baseH2h, a, b, worldCupMatches);
+
+        // Speilvender en lagret H2H slik at TeamA blir det laget klienten spurte om først.
+        static HeadToHeadResponse Mirror(HeadToHeadResponse src, string clientA, string clientB) =>
+            new(
+                TeamA: clientA,
+                TeamB: clientB,
+                TotalMatches: src.TotalMatches,
+                TeamAWins: src.TeamBWins,
+                Draws: src.Draws,
+                TeamBWins: src.TeamAWins,
+                TeamAGoals: src.TeamBGoals,
+                TeamBGoals: src.TeamAGoals,
+                RecentMatches: src.RecentMatches);
+    }
+
+    /// <summary>
+    /// Finner VM-kampene de to lagene har spilt mot hverandre (dvs. har et registrert
+    /// resultat), nyeste først. Kobler kampoppsettet mot resultat-tabellen, akkurat som
+    /// <see cref="GetWorldCupMatchesAsync"/> gjør for form. Returnerer tom liste hvis
+    /// avhengighetene ikke er satt (enhetstester) eller lagene ikke har møttes ennå.
+    /// </summary>
+    private async Task<IReadOnlyList<HeadToHeadMatch>> GetWorldCupHeadToHeadMatchesAsync(
+        string teamA, string teamB, CancellationToken ct)
+    {
+        if (_scopeFactory is null || _scheduleProvider is null)
         {
-            return stored;
+            return Array.Empty<HeadToHeadMatch>();
         }
 
-        return new HeadToHeadResponse(
-            TeamA: a,
-            TeamB: b,
-            TotalMatches: stored.TotalMatches,
-            TeamAWins: stored.TeamBWins,
-            Draws: stored.Draws,
-            TeamBWins: stored.TeamAWins,
-            TeamAGoals: stored.TeamBGoals,
-            TeamBGoals: stored.TeamAGoals,
-            RecentMatches: stored.RecentMatches);
+        var meetings = _scheduleProvider.Current.GetAllMatches()
+            .Where(m =>
+                (string.Equals(m.HomeTeam, teamA, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(m.AwayTeam, teamB, StringComparison.OrdinalIgnoreCase)) ||
+                (string.Equals(m.HomeTeam, teamB, StringComparison.OrdinalIgnoreCase) &&
+                 string.Equals(m.AwayTeam, teamA, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+
+        if (meetings.Count == 0)
+        {
+            return Array.Empty<HeadToHeadMatch>();
+        }
+
+        var matchIds = meetings.Select(m => m.Id).ToHashSet();
+
+        Dictionary<int, Models.MatchResult> resultsById;
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var results = await db.MatchResults
+                .Where(r => matchIds.Contains(r.MatchId))
+                .AsNoTracking()
+                .ToListAsync(ct);
+            resultsById = results.ToDictionary(r => r.MatchId);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Kunne ikke hente VM-resultater for H2H-overlay ({A}-{B})", teamA, teamB);
+            return Array.Empty<HeadToHeadMatch>();
+        }
+
+        var entries = new List<(DateTime Date, HeadToHeadMatch Match)>();
+        foreach (var match in meetings)
+        {
+            if (!resultsById.TryGetValue(match.Id, out var result)) continue;
+            if (string.IsNullOrWhiteSpace(match.HomeTeam) || string.IsNullOrWhiteSpace(match.AwayTeam)) continue;
+
+            entries.Add((match.Date, new HeadToHeadMatch(
+                Date: match.Date.ToString("yyyy-MM-dd"),
+                HomeTeam: match.HomeTeam.ToUpperInvariant(),
+                AwayTeam: match.AwayTeam.ToUpperInvariant(),
+                HomeScore: result.HomeScore,
+                AwayScore: result.AwayScore,
+                Competition: "VM 2026",
+                Venue: null)));
+        }
+
+        return entries
+            .OrderByDescending(e => e.Date)
+            .Select(e => e.Match)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Slår sammen spilte VM-kamper mellom lagene med eksisterende seed/ekstern-historikk.
+    /// VM-kampene legges først i «siste møter» (nyeste først), og samletellere (seire,
+    /// uavgjort, mål) oppdateres fra <paramref name="teamA"/>s perspektiv. Uten VM-kamper
+    /// returneres base uendret. Hvis base mangler bygges en respons kun fra VM-kampene.
+    /// </summary>
+    public static HeadToHeadResponse? WithWorldCupHeadToHead(
+        HeadToHeadResponse? baseH2h,
+        string teamA,
+        string teamB,
+        IReadOnlyList<HeadToHeadMatch> worldCupMatches)
+    {
+        if (worldCupMatches.Count == 0) return baseH2h;
+
+        int teamAWins = 0, draws = 0, teamBWins = 0, teamAGoals = 0, teamBGoals = 0;
+        foreach (var m in worldCupMatches)
+        {
+            var teamAIsHome = string.Equals(m.HomeTeam, teamA, StringComparison.OrdinalIgnoreCase);
+            var teamAScore = teamAIsHome ? m.HomeScore : m.AwayScore;
+            var teamBScore = teamAIsHome ? m.AwayScore : m.HomeScore;
+
+            teamAGoals += teamAScore;
+            teamBGoals += teamBScore;
+            if (teamAScore > teamBScore) teamAWins++;
+            else if (teamAScore < teamBScore) teamBWins++;
+            else draws++;
+        }
+
+        var baseMatches = baseH2h?.RecentMatches ?? Array.Empty<HeadToHeadMatch>();
+        var combined = worldCupMatches.Concat(baseMatches).Take(5).ToList();
+
+        if (baseH2h is null)
+        {
+            return new HeadToHeadResponse(
+                TeamA: teamA,
+                TeamB: teamB,
+                TotalMatches: worldCupMatches.Count,
+                TeamAWins: teamAWins,
+                Draws: draws,
+                TeamBWins: teamBWins,
+                TeamAGoals: teamAGoals,
+                TeamBGoals: teamBGoals,
+                RecentMatches: combined);
+        }
+
+        return baseH2h with
+        {
+            TotalMatches = baseH2h.TotalMatches + worldCupMatches.Count,
+            TeamAWins = baseH2h.TeamAWins + teamAWins,
+            Draws = baseH2h.Draws + draws,
+            TeamBWins = baseH2h.TeamBWins + teamBWins,
+            TeamAGoals = baseH2h.TeamAGoals + teamAGoals,
+            TeamBGoals = baseH2h.TeamBGoals + teamBGoals,
+            RecentMatches = combined,
+        };
     }
 
     /// <summary>
