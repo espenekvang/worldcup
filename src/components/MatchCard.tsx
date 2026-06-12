@@ -137,14 +137,17 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-1 sm:hidden">
+        <div className="flex flex-col gap-1 sm:hidden">
           {venue ? (
-            <p className="text-center text-[11px] inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
-              <span>{venue.name}, {venue.city}</span>
-              <WeatherBadge forecast={forecast} loading={weatherLoading} />
-            </p>
+            <div className="flex items-start gap-2">
+              <div className="w-20 shrink-0" />
+              <p className="flex-1 text-center text-[11px] inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
+                <span>{venue.name}, {venue.city}</span>
+                <WeatherBadge forecast={forecast} loading={weatherLoading} />
+              </p>
+            </div>
           ) : null}
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {result && pts !== undefined && (
               <span
                 className="rounded-md px-1.5 py-0.5 text-xs font-bold"
