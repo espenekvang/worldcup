@@ -62,6 +62,23 @@ function formatCurrency(amount: number): string {
   return `${Math.round(amount).toLocaleString('no-NO')} kr`
 }
 
+/**
+ * Beregner plassering (rank) for en allerede synkende sortert poengliste.
+ * Bruker "standard competition ranking" (1-2-2-4): spillere med lik poengsum
+ * deler samme plassering, og neste plassering hopper over de delte plassene.
+ */
+function computeRanks(points: number[]): number[] {
+  const ranks: number[] = []
+  for (let i = 0; i < points.length; i++) {
+    if (i > 0 && points[i] === points[i - 1]) {
+      ranks.push(ranks[i - 1])
+    } else {
+      ranks.push(i + 1)
+    }
+  }
+  return ranks
+}
+
 export default function Leaderboard() {
   const { activeGroup, setActiveGroup } = useBettingGroup()
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
@@ -106,6 +123,10 @@ export default function Leaderboard() {
     if (!activeGroup?.isPaid) return new Map<string, number>()
     return calculatePrizes(entries.filter(e => e.hasPaid), activeGroup.prizePot)
   }, [entries, activeGroup])
+
+  // Plassering med delt rank ved lik poengsum (1-2-2-4).
+  const ranks = useMemo(() => computeRanks(entries.map(e => e.totalPoints)), [entries])
+  const globalRanks = useMemo(() => computeRanks(globalEntries.map(e => e.totalPoints)), [globalEntries])
 
   // Ligaens innstilling for "The Boss"-listen: fornavn (false) eller fullt navn (true).
   const showFullName = activeGroup?.showFullName ?? false
@@ -180,11 +201,11 @@ export default function Leaderboard() {
               <span
                 className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
                 style={{
-                  backgroundColor: i === 0 ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
-                  color: i === 0 ? 'var(--color-success-text)' : 'var(--color-text-muted)',
+                  backgroundColor: ranks[i] === 1 ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
+                  color: ranks[i] === 1 ? 'var(--color-success-text)' : 'var(--color-text-muted)',
                 }}
               >
-                {i + 1}
+                {ranks[i]}
               </span>
               {entry.picture ? (
                 <img src={entry.picture} alt="" className="h-8 w-8 rounded-full" referrerPolicy="no-referrer" />
@@ -218,7 +239,7 @@ export default function Leaderboard() {
               style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-text)' }}
             >
               {(() => {
-                const currentRank = i + 1
+                const currentRank = ranks[i]
                 const prev = entry.previousRank
                 if (prev == null) return null
                 if (prev === currentRank) {
@@ -280,11 +301,11 @@ export default function Leaderboard() {
                   <span
                     className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
                     style={{
-                      backgroundColor: i === 0 ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
-                      color: i === 0 ? 'var(--color-success-text)' : 'var(--color-text-muted)',
+                      backgroundColor: globalRanks[i] === 1 ? 'var(--color-success-light)' : 'var(--color-surface-elevated)',
+                      color: globalRanks[i] === 1 ? 'var(--color-success-text)' : 'var(--color-text-muted)',
                     }}
                   >
-                    {i + 1}
+                    {globalRanks[i]}
                   </span>
                   {entry.isInCurrentGroup ? (
                     entry.picture ? (

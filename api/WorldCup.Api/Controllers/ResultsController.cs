@@ -203,12 +203,28 @@ public class ResultsController(
         Dictionary<Guid, int> previousRanks;
         if (hasPreviousMatch)
         {
-            previousRanks = rawEntries
+            // Bruk "standard competition ranking" (1-2-2-4): spillere med lik
+            // poengsum deler plassering, slik at det stemmer med plasseringen
+            // som vises i klienten.
+            var orderedPrev = rawEntries
                 .Select(e => new { e.UserId, PrevPoints = e.TotalPoints - e.LastMatchPoints, e.Name })
                 .OrderByDescending(e => e.PrevPoints)
                 .ThenBy(e => e.Name)
-                .Select((e, idx) => new { e.UserId, Rank = idx + 1 })
-                .ToDictionary(x => x.UserId, x => x.Rank);
+                .ToList();
+
+            previousRanks = new Dictionary<Guid, int>();
+            int rank = 0;
+            int? lastPoints = null;
+            for (int idx = 0; idx < orderedPrev.Count; idx++)
+            {
+                var e = orderedPrev[idx];
+                if (lastPoints == null || e.PrevPoints != lastPoints)
+                {
+                    rank = idx + 1;
+                    lastPoints = e.PrevPoints;
+                }
+                previousRanks[e.UserId] = rank;
+            }
         }
         else
         {
