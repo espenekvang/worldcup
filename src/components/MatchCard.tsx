@@ -137,8 +137,14 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
           </div>
         </div>
 
-        <div className="flex items-start gap-2 sm:hidden">
-          <div className="flex w-20 shrink-0 flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1 sm:hidden">
+          {venue ? (
+            <p className="text-center text-[11px] inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
+              <span>{venue.name}, {venue.city}</span>
+              <WeatherBadge forecast={forecast} loading={weatherLoading} />
+            </p>
+          ) : null}
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {result && pts !== undefined && (
               <span
                 className="rounded-md px-1.5 py-0.5 text-xs font-bold"
@@ -177,48 +183,31 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
                 >
                   {prediction.homeScore}–{prediction.awayScore}
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={stop(() => onTipClick(match))}
-                    className="rounded-md px-2 py-0.5 text-xs font-medium"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    Endre
-                  </button>
-                  <button
-                    onClick={stop(() => onViewOthers(match))}
-                    className="text-xs font-medium transition-colors"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    👥
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center gap-1.5">
                 <button
                   onClick={stop(() => onTipClick(match))}
-                  className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+                  className="rounded-md px-2 py-0.5 text-xs font-medium"
+                  style={{ color: 'var(--color-primary)' }}
                 >
-                  Bet
+                  Endre
                 </button>
-                <button
-                  onClick={stop(() => onViewOthers(match))}
-                  className="text-xs font-medium transition-colors"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  👥
-                </button>
-              </div>
+              </>
+            ) : (
+              <button
+                onClick={stop(() => onTipClick(match))}
+                className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+                style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+              >
+                Bet
+              </button>
             )}
+            <button
+              onClick={stop(() => onViewOthers(match))}
+              className="text-xs font-medium transition-colors"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              👥
+            </button>
           </div>
-          {venue ? (
-            <p className="flex-1 text-center text-[11px] pt-0.5 inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
-              <span>{venue.name}, {venue.city}</span>
-              <WeatherBadge forecast={forecast} loading={weatherLoading} />
-            </p>
-          ) : null}
         </div>
 
         <div className="hidden sm:flex items-center justify-end gap-2 sm:shrink-0">
