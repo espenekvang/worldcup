@@ -96,7 +96,11 @@ public class ChatController(AppDbContext dbContext, IHubContext<ChatHub, IChatCl
             UserName = m.UserName,
             UserPicture = m.UserPicture,
             Content = m.Content,
-            CreatedAt = m.CreatedAt,
+            // Verdier hentet fra databasen får DateTimeKind.Unspecified, og serialiseres
+            // da uten 'Z'-suffiks. Klienten tolker da tidspunktet som lokal tid i stedet
+            // for UTC. Vi markerer eksplisitt som UTC slik at det serialiseres med 'Z'
+            // og klienten kan konvertere til riktig lokal tid.
+            CreatedAt = DateTime.SpecifyKind(m.CreatedAt, DateTimeKind.Utc),
             IsDeleted = m.IsDeleted,
             IsSystem = m.IsSystem,
             Reactions = reactionsByMessage.GetValueOrDefault(m.Id) ?? []
