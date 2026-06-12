@@ -15,13 +15,13 @@ public sealed class ResultFetcherService(
     // Stage-aware buffer: how long after kickoff we *expect* a result to be available.
     // Group games: 90' + HT + ~15 min stoppage + API publish delay.
     // Knockout: add 30' ET + ~15 min penalty buffer.
-    private static readonly TimeSpan GroupStageBuffer = TimeSpan.FromHours(2.25);
+    private static readonly TimeSpan GroupStageBuffer = TimeSpan.FromHours(2.10);
     private static readonly TimeSpan KnockoutBuffer = TimeSpan.FromHours(3.25);
     private static readonly TimeSpan FinalBuffer = TimeSpan.FromHours(3.5);
 
     // Backoff between retry attempts when a poll returns no result for a due match.
-    private static readonly TimeSpan RetryInterval = TimeSpan.FromMinutes(30);
-    private const int MaxFetchAttempts = 3;
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromMinutes(5);
+    private const int MaxFetchAttempts = 5;
 
     // Safety caps. We always wake at least this often, even if no match is due,
     // so config changes / schedule reloads are picked up. And we never sleep less
@@ -214,13 +214,19 @@ public sealed class ResultFetcherService(
         {
             if (foundMatchIds.Contains(match.Id)) continue;
 
+            logger.LogError(
+                "No result available from WC2026 API for due match {MatchId} ({Stage}, kickoff {Kickoff:o}).",
+                match.Id,
+                match.Stage,
+                match.Date);
+
             if (pendingFetches.TryGetValue(match.Id, out var pending))
             {
                 pending.AttemptCount += 1;
                 pending.NextAttemptAt = now + RetryInterval;
                 if (pending.AttemptCount >= MaxFetchAttempts)
                 {
-                    logger.LogWarning(
+                    logger.LogError(
                         "Match {MatchId} exhausted {Attempts} fetch attempts without a result. Giving up; manual intervention required.",
                         match.Id,
                         pending.AttemptCount);
