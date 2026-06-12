@@ -99,55 +99,56 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
       }}
     >
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-        <div className="flex items-center gap-2 sm:contents">
-          <div className="flex w-20 shrink-0 flex-col items-center text-xs" style={{ color: 'var(--color-text-muted)' }}>
-            <span className="font-medium">{formatMatchTime(match.date)}</span>
+        {/* Info: full-bredde linje over kampen på mobil (tid venstre, gruppe i midten,
+            TV høyre), vertikal kolonne til venstre på desktop */}
+        <div className="flex w-full items-center text-xs sm:w-20 sm:shrink-0 sm:flex-col sm:gap-0.5" style={{ color: 'var(--color-text-muted)' }}>
+          <span className="flex-1 text-left font-medium sm:flex-none sm:text-center">{formatMatchTime(match.date)}</span>
+          <span className="flex flex-col items-center gap-0.5">
             <span
-              className="mt-0.5 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
+              className="whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
               style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
             >
               {stageLabel}
             </span>
             {isLive && (
               <span
-                className="mt-0.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide"
+                className="inline-flex items-center gap-1 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide"
                 style={{ backgroundColor: 'var(--color-danger)', color: '#fff' }}
               >
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full" style={{ backgroundColor: '#fff' }} />
                 Pågår
               </span>
             )}
-            {tvChannel && <ChannelLogo channel={tvChannel} className="mt-0.5" />}
-          </div>
+          </span>
+          <span className="flex flex-1 justify-end sm:flex-none sm:justify-center">
+            {tvChannel && <ChannelLogo channel={tvChannel} />}
+          </span>
+        </div>
 
-          <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold sm:gap-2 sm:text-base" style={{ color: 'var(--color-text-primary)' }}>
-            <span className="min-w-0 break-words sm:truncate text-right">
-              {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-1.5 text-sm font-semibold sm:gap-2 sm:text-base" style={{ color: 'var(--color-text-primary)' }}>
+          <span className="min-w-0 break-words sm:truncate text-right">
+            {homeFlag ? `${homeFlag} ` : ''}{homeDisplay}
+          </span>
+          {result ? (
+            <span className="shrink-0 font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              {result.homeScore} – {result.awayScore}
             </span>
-            {result ? (
-              <span className="shrink-0 font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                {result.homeScore} – {result.awayScore}
-              </span>
-            ) : (
-              <span className="shrink-0 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>–</span>
-            )}
-            <span className="min-w-0 break-words sm:truncate text-left">
-              {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
-            </span>
-          </div>
+          ) : (
+            <span className="shrink-0 text-xs font-normal" style={{ color: 'var(--color-text-muted)' }}>–</span>
+          )}
+          <span className="min-w-0 break-words sm:truncate text-left">
+            {awayFlag ? `${awayFlag} ` : ''}{awayDisplay}
+          </span>
         </div>
 
         <div className="flex flex-col gap-1 sm:hidden">
           {venue ? (
-            <div className="flex items-start gap-2">
-              <div className="w-20 shrink-0" />
-              <p className="flex-1 text-center text-[11px] inline-flex items-center justify-center gap-1.5 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
-                <span>{venue.name}, {venue.city}</span>
-                <WeatherBadge forecast={forecast} loading={weatherLoading} />
-              </p>
-            </div>
+            <p className="flex flex-wrap items-center justify-center gap-1.5 text-center text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+              <span>{venue.name}, {venue.city}</span>
+              <WeatherBadge forecast={forecast} loading={weatherLoading} />
+            </p>
           ) : null}
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex w-full items-center justify-between gap-2">
             {result && pts !== undefined && (
               <span
                 className="rounded-md px-1.5 py-0.5 text-xs font-bold"
