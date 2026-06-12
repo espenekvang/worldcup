@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import type { Match, Team, Venue, Stage } from '../types'
 import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined, isMatchInProgress } from '../utils/dateUtils'
 import { useResults } from '../context/ResultsContext'
@@ -12,8 +13,17 @@ interface MatchListProps {
   onViewOthers: (match: Match) => void
 }
 
+type MatchView = 'remaining' | 'finished'
+
 export default function MatchList({ matches, teams, venues, activeStage, onTipClick, onViewOthers }: MatchListProps) {
   const { results } = useResults()
+  const [view, setView] = useState<MatchView>('remaining')
+
+  // Reset til "gjenstående" når brukeren bytter runde, slik at man ikke havner
+  // i en tom "ferdigspilte"-visning for en runde uten spilte kamper.
+  useEffect(() => {
+    setView('remaining')
+  }, [activeStage])
 
   const filtered = matches.filter(m => {
     if (activeStage === 'final') return m.stage === 'final' || m.stage === 'third-place'
@@ -24,6 +34,11 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   const isLocked = (match: Match) => isMatchLocked(match) || areTeamsUndetermined(match)
 
+  // En kamp regnes som ferdigspilt når den har et registrert resultat.
+  const isFinished = (match: Match) => results.has(match.id)
+  const finishedMatches = sorted.filter(isFinished)
+  const remainingMatches = sorted.filter(m => !isFinished(m))
+
   // Find the globally next upcoming unlocked match (across all stages)
   const now = new Date()
   const globalNextMatch = [...matches]
@@ -31,87 +46,150 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
     .find(m => new Date(m.date) > now && !isLocked(m))
 
   // Only show "Neste kamp" if it belongs to the currently active stage
-  const nextMatch = sorted.find(m => m.id === globalNextMatch?.id) || null
+  const nextMatch = remainingMatches.find(m => m.id === globalNextMatch?.id) || null
 
   // Matches in the active stage that have kicked off but have no result yet
-  const inProgressMatches = sorted.filter(m => isMatchInProgress(m, results.has(m.id)))
+  const inProgressMatches = remainingMatches.filter(m => isMatchInProgress(m, results.has(m.id)))
   const inProgressIds = new Set(inProgressMatches.map(m => m.id))
 
   // Remove the pinned and in-progress matches from the regular list
-  const regularMatches = sorted.filter(m => m.id !== nextMatch?.id && !inProgressIds.has(m.id))
+  const regularMatches = remainingMatches.filter(m => m.id !== nextMatch?.id && !inProgressIds.has(m.id))
 
-  const dayGroups = new Map<string, Match[]>()
-  for (const match of regularMatches) {
-    const dayKey = getLocalDateKey(match.date)
-    if (!dayGroups.has(dayKey)) dayGroups.set(dayKey, [])
-    dayGroups.get(dayKey)!.push(match)
+  const groupByDay = (list: Match[]) => {
+    const dayGroups = new Map<string, Match[]>()
+    for (const match of list) {
+      const dayKey = getLocalDateKey(match.date)
+      if (!dayGroups.has(dayKey)) dayGroups.set(dayKey, [])
+      dayGroups.get(dayKey)!.push(match)
+    }
+    return dayGroups
   }
+
+  const regularDayGroups = groupByDay(regularMatches)
+  const finishedDayGroups = groupByDay(finishedMatches)
 
   return (
     <div className="space-y-6 p-2 sm:p-4">
-      <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{sorted.length} kamper</p>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+        <button
+          type="button"
+          onClick={() => setView('remaining')}
+          className="transition-colors"
+          style={{
+            color: view === 'remaining' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+            fontWeight: view === 'remaining' ? 600 : 400,
+          }}
+          aria-pressed={view === 'remaining'}
+        >
+          {remainingMatches.length} gjenstående kamper
+        </button>
+        <button
+          type="button"
+          onClick={() => setView('finished')}
+          className="transition-colors"
+          style={{
+            color: view === 'finished' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+            fontWeight: view === 'finished' ? 600 : 400,
+          }}
+          aria-pressed={view === 'finished'}
+        >
+          {finishedMatches.length} ferdigspilte kamper
+        </button>
+      </div>
 
-      {inProgressMatches.length > 0 && (
-        <div>
-          <h3
-            className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide"
-            style={{ color: 'var(--color-danger)' }}
-          >
-            <span className="h-2 w-2 animate-pulse rounded-full" style={{ backgroundColor: 'var(--color-danger)' }} />
-            Pågår nå
-          </h3>
-          <div className="space-y-3">
-            {inProgressMatches.map(match => (
+      {view === 'finished' ? (
+        finishedMatches.length === 0 ? (
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            Ingen ferdigspilte kamper i denne runden ennå.
+          </p>
+        ) : (
+          [...finishedDayGroups.entries()].map(([dayKey, dayMatches]) => (
+            <div key={dayKey}>
+              <h3
+                className="mb-3 text-sm font-semibold uppercase tracking-wide"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                {formatMatchDate(dayMatches[0].date)}
+              </h3>
+              <div className="space-y-3">
+                {dayMatches.map(match => (
+                  <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
+                ))}
+              </div>
+            </div>
+          ))
+        )
+      ) : (
+        <>
+          {inProgressMatches.length > 0 && (
+            <div>
+              <h3
+                className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide"
+                style={{ color: 'var(--color-danger)' }}
+              >
+                <span className="h-2 w-2 animate-pulse rounded-full" style={{ backgroundColor: 'var(--color-danger)' }} />
+                Pågår nå
+              </h3>
+              <div className="space-y-3">
+                {inProgressMatches.map(match => (
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    teams={teams}
+                    venues={venues}
+                    locked={isLocked(match)}
+                    isLive
+                    onTipClick={onTipClick}
+                    onViewOthers={onViewOthers}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {nextMatch && (
+            <div>
+              <h3
+                className="mb-3 text-sm font-semibold uppercase tracking-wide"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                ⚽ Neste kamp &middot; {formatMatchDate(nextMatch.date)}
+              </h3>
               <MatchCard
-                key={match.id}
-                match={match}
+                match={nextMatch}
                 teams={teams}
                 venues={venues}
-                locked={isLocked(match)}
-                isLive
+                locked={isLocked(nextMatch)}
+                isNext
                 onTipClick={onTipClick}
                 onViewOthers={onViewOthers}
               />
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
 
-      {nextMatch && (
-        <div>
-          <h3
-            className="mb-3 text-sm font-semibold uppercase tracking-wide"
-            style={{ color: 'var(--color-primary)' }}
-          >
-            ⚽ Neste kamp &middot; {formatMatchDate(nextMatch.date)}
-          </h3>
-          <MatchCard
-            match={nextMatch}
-            teams={teams}
-            venues={venues}
-            locked={isLocked(nextMatch)}
-            isNext
-            onTipClick={onTipClick}
-            onViewOthers={onViewOthers}
-          />
-        </div>
-      )}
+          {regularMatches.length === 0 && !nextMatch && inProgressMatches.length === 0 && (
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Ingen gjenstående kamper i denne runden.
+            </p>
+          )}
 
-      {[...dayGroups.entries()].map(([dayKey, dayMatches]) => (
-        <div key={dayKey}>
-          <h3
-            className="mb-3 text-sm font-semibold uppercase tracking-wide"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {formatMatchDate(dayMatches[0].date)}
-          </h3>
-          <div className="space-y-3">
-            {dayMatches.map(match => (
-              <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
-            ))}
-          </div>
-        </div>
-      ))}
+          {[...regularDayGroups.entries()].map(([dayKey, dayMatches]) => (
+            <div key={dayKey}>
+              <h3
+                className="mb-3 text-sm font-semibold uppercase tracking-wide"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                {formatMatchDate(dayMatches[0].date)}
+              </h3>
+              <div className="space-y-3">
+                {dayMatches.map(match => (
+                  <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }
