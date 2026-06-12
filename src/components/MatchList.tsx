@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team, Venue, Stage } from '../types'
-import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined, isMatchInProgress } from '../utils/dateUtils'
+import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined, isMatchInProgress, isToday } from '../utils/dateUtils'
 import { useResults } from '../context/ResultsContext'
 import MatchCard from './MatchCard'
 
@@ -153,7 +153,7 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
                 className="mb-3 text-sm font-semibold uppercase tracking-wide"
                 style={{ color: 'var(--color-primary)' }}
               >
-                ⚽ Neste kamp &middot; {formatMatchDate(nextMatch.date)}
+                ⚽ {isToday(nextMatch.date) ? 'Neste kamp i dag' : <>Neste kamp &middot; {formatMatchDate(nextMatch.date)}</>}
               </h3>
               <MatchCard
                 match={nextMatch}
