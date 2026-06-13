@@ -161,10 +161,28 @@ public sealed class ResultFetcherService(
 
         foreach (var dto in completedMatches)
         {
-            if (dto.Score?.Ft is not [var homeScore, var awayScore]) continue;
+            if (dto.Score?.Ft is not [var homeScore, var awayScore])
+            {
+                logger.LogWarning(
+                    "WC2026 API returned a completed match (matchNumber {MatchNumber}, kickoff {Kickoff:o}) with no parseable full-time score. Skipping.",
+                    dto.MatchNumber,
+                    dto.KickoffAt);
+                continue;
+            }
 
             var matchId = apiClient.MapToLocalMatchId(dto.KickoffAt, schedule);
-            if (matchId is null || existingResults.Contains(matchId.Value)) continue;
+            if (matchId is null)
+            {
+                logger.LogWarning(
+                    "WC2026 API returned a completed match (matchNumber {MatchNumber}, kickoff {Kickoff:o}, score {Home}-{Away}) that did not map to any local fixture within the time window. Skipping.",
+                    dto.MatchNumber,
+                    dto.KickoffAt,
+                    homeScore,
+                    awayScore);
+                continue;
+            }
+
+            if (existingResults.Contains(matchId.Value)) continue;
 
             var localMatch = schedule.GetMatch(matchId.Value);
             var refereeName = string.IsNullOrWhiteSpace(dto.Referee) ? null : dto.Referee.Trim();
