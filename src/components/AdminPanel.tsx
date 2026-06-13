@@ -90,6 +90,7 @@ export default function AdminPanel() {
   const [broadcastSuccess, setBroadcastSuccess] = useState<string | null>(null)
 
   const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
+  const matchesWithoutResult = matches.filter((m) => !results.has(m.id))
   const sortedTeams = Object.values(teams).sort((a, b) => a.name.localeCompare(b.name))
 
   // Load groups
@@ -1202,7 +1203,7 @@ export default function AdminPanel() {
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Sett resultat</h2>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett eller overstyr kampresultat manuelt. Poeng beregnes automatisk.</p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>Sett kampresultat manuelt. Kun kamper uten resultat vises. Poeng beregnes automatisk.</p>
 
         <form onSubmit={handleResultSubmit} className="mt-4 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -1213,16 +1214,8 @@ export default function AdminPanel() {
                 const id = e.target.value === '' ? '' as const : Number(e.target.value)
                 setResultMatchId(id)
                 setResultSuccess(false)
-                if (id !== '') {
-                  const existing = results.get(id)
-                  if (existing) {
-                    setResultHome(String(existing.homeScore))
-                    setResultAway(String(existing.awayScore))
-                  } else {
-                    setResultHome('')
-                    setResultAway('')
-                  }
-                }
+                setResultHome('')
+                setResultAway('')
               }}
               className="rounded-lg border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 sm:py-2"
               style={{
@@ -1232,15 +1225,13 @@ export default function AdminPanel() {
               }}
             >
               <option value="">-- Velg kamp --</option>
-              {matches.map((m) => {
+              {matchesWithoutResult.map((m) => {
                 const homeLabel = m.homeTeam ? (teams[m.homeTeam]?.name ?? m.homeTeam) : (m.homePlaceholder || '?')
                 const awayLabel = m.awayTeam ? (teams[m.awayTeam]?.name ?? m.awayTeam) : (m.awayPlaceholder || '?')
                 const stageLabel = stageNames[m.stage] || m.stage
-                const existingResult = results.get(m.id)
-                const resultLabel = existingResult ? ` (${existingResult.homeScore}-${existingResult.awayScore})` : ''
                 return (
                   <option key={m.id} value={m.id}>
-                    {stageLabel}: {homeLabel} vs {awayLabel}{resultLabel} (kamp {m.id})
+                    {stageLabel}: {homeLabel} vs {awayLabel} (kamp {m.id})
                   </option>
                 )
               })}
