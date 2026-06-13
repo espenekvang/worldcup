@@ -36,7 +36,8 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
   // En kamp regnes som ferdigspilt når den har et registrert resultat.
   const isFinished = (match: Match) => results.has(match.id)
-  const finishedMatches = sorted.filter(isFinished)
+  // Vis nyeste ferdigspilte kamp øverst.
+  const finishedMatches = sorted.filter(isFinished).reverse()
   const remainingMatches = sorted.filter(m => !isFinished(m))
 
   // Find the globally next upcoming unlocked match (across all stages)
