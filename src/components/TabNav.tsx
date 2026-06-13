@@ -3,7 +3,6 @@ import type { Section } from '../types'
 interface TabNavProps {
   activeSection: Section
   onSectionChange: (section: Section) => void
-  canAccessAdmin?: boolean
 }
 
 const TABS: { section: Section; label: string }[] = [
@@ -13,10 +12,10 @@ const TABS: { section: Section; label: string }[] = [
 ]
 
 /**
- * Desktop-tab-nav (lg+). Toppnivå-faner. Admin-fanen vises helt til høyre
- * kun for brukere med admin-tilgang.
+ * Desktop-tab-nav (lg+). Toppnivå-faner. Admin nås via tannhjul-ikonet i
+ * headeren (kun synlig for brukere med admin-tilgang).
  */
-export default function TabNav({ activeSection, onSectionChange, canAccessAdmin }: TabNavProps) {
+export default function TabNav({ activeSection, onSectionChange }: TabNavProps) {
   return (
     <nav
       className="hidden gap-1 border-b lg:flex"
@@ -35,18 +34,6 @@ export default function TabNav({ activeSection, onSectionChange, canAccessAdmin 
           {tab.label}
         </button>
       ))}
-      {canAccessAdmin ? (
-        <button
-          onClick={() => onSectionChange('admin')}
-          className="ml-auto whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors"
-          style={{
-            color: activeSection === 'admin' ? 'var(--color-tab-active)' : 'var(--color-tab-inactive)',
-            borderBottom: activeSection === 'admin' ? '2px solid var(--color-tab-active)' : '2px solid transparent',
-          }}
-        >
-          Admin
-        </button>
-      ) : null}
     </nav>
   )
 }

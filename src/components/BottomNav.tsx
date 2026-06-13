@@ -8,19 +8,13 @@ interface BottomNavProps {
   mobileView?: MobileView
   /** Called when user selects Kamper or The Boss from the home route. */
   onSelectView?: (view: MobileView) => void
-  /** Whether to show the Admin tab. */
-  canAccessAdmin?: boolean
-  /** Whether the admin view is currently active. */
-  adminActive?: boolean
-  /** Called when user taps Admin. */
-  onAdminClick?: () => void
 }
 
 /**
  * Fast bunnmeny synlig kun på mobil (<lg). Tre hovedvalg: Kamper, The Boss, Chat.
- * Chat-knappen viser ulest-badge.
+ * Chat-knappen viser ulest-badge. Admin nås via tannhjul-ikonet i headeren.
  */
-export default function BottomNav({ mobileView, onSelectView, canAccessAdmin, adminActive, onAdminClick }: BottomNavProps) {
+export default function BottomNav({ mobileView, onSelectView }: BottomNavProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { unreadCount } = useChat()
@@ -67,20 +61,6 @@ export default function BottomNav({ mobileView, onSelectView, canAccessAdmin, ad
         badge={unreadCount}
         onClick={() => navigate('/chat')}
       />
-      {canAccessAdmin ? (
-        <NavButton
-          label="Admin"
-          icon="⚙️"
-          active={!!adminActive}
-          onClick={() => {
-            if (onHome) {
-              onAdminClick?.()
-            } else {
-              navigate('/', { state: { mobileView: 'admin' } })
-            }
-          }}
-        />
-      ) : null}
     </nav>
   )
 }

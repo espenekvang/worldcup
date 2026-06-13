@@ -148,7 +148,7 @@ function AppContent() {
         <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:flex lg:min-h-0 lg:flex-1 lg:gap-6 lg:p-8">
           <div className="min-w-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:themed-scrollbar">
             <Countdown matches={matches} teams={teams} venues={venues} onShowRules={() => setShowRules(true)} />
-            <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} canAccessAdmin={canAccessAdmin} />
+            <TabNav activeSection={activeSection} onSectionChange={handleSectionChange} />
             {activeSection === 'admin' && canAccessAdmin ? (
               <AdminPanel />
             ) : activeSection === 'leaderboard' ? (
@@ -185,9 +185,6 @@ function AppContent() {
       <BottomNav
         mobileView={mobileView}
         onSelectView={handleMobileViewChange}
-        canAccessAdmin={canAccessAdmin}
-        adminActive={activeSection === 'admin'}
-        onAdminClick={() => setActiveSection('admin')}
       />
 
       {bettingMatch ? (
