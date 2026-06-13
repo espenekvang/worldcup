@@ -149,13 +149,56 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
         return $"matchNumber={match.MatchNumber}, kickoffAt={match.KickoffAt:o}, score.ft={ft}";
     }
 
-    public int? MapToLocalMatchId(DateTime kickoffAt, MatchSchedule schedule) =>
-        schedule.GetAllMatches()
-            .FirstOrDefault(m => Math.Abs((m.Date - kickoffAt).TotalMinutes) <= TimeSpan.FromMinutes(60).TotalMinutes)
-            ?.Id;
+    // How far a DTO kickoff may sit from a local fixture's kickoff before we refuse
+    // to treat them as the same game (used only by the time-based fallback below).
+    private const double KickoffMatchToleranceMinutes = 60;
+
+    /// <summary>
+    /// Resolves a completed-match DTO to a local fixture Id.
+    /// <para>
+    /// The primary key is the FIFA <paramref name="matchNumber"/>, which equals the local
+    /// <see cref="MatchEntry.Id"/>. This is exact and completely immune to clock/timezone
+    /// differences between matches.json and the upstream payload.
+    /// </para>
+    /// <para>
+    /// Only when the match number is unknown do we fall back to kickoff time, comparing both
+    /// sides normalized to UTC (a plain <see cref="DateTime"/> subtraction ignores
+    /// <see cref="DateTimeKind"/>, so an offset/local kickoff would otherwise look hours away
+    /// from the UTC value in matches.json and never match). The fallback resolves only when
+    /// exactly one local fixture is in range — simultaneous kickoffs (e.g. final-round group
+    /// games) must never be guessed by time alone.
+    /// </para>
+    /// </summary>
+    public int? MapToLocalMatchId(int matchNumber, DateTime kickoffAt, MatchSchedule schedule)
+    {
+        if (schedule.GetMatch(matchNumber) is { } byNumber)
+        {
+            return byNumber.Id;
+        }
+
+        var kickoffUtc = ToUtc(kickoffAt);
+        var candidates = schedule.GetAllMatches()
+            .Where(m => Math.Abs((ToUtc(m.Date) - kickoffUtc).TotalMinutes) <= KickoffMatchToleranceMinutes)
+            .ToList();
+
+        return candidates.Count == 1 ? candidates[0].Id : null;
+    }
 
     public int? MapToLocalMatchIdByMatchNumber(int matchNumber, MatchSchedule schedule) =>
         schedule.GetMatch(matchNumber)?.Id;
+
+    /// <summary>
+    /// Normalizes a <see cref="DateTime"/> to UTC for instant-comparison. An offset in the
+    /// source JSON yields <see cref="DateTimeKind.Local"/> (converted to host local) and is
+    /// converted back; a <c>Z</c> yields <see cref="DateTimeKind.Utc"/> as-is; an offset-less
+    /// value is treated as UTC to match how matches.json is authored.
+    /// </summary>
+    private static DateTime ToUtc(DateTime value) => value.Kind switch
+    {
+        DateTimeKind.Utc => value,
+        DateTimeKind.Local => value.ToUniversalTime(),
+        _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+    };
 }
 
 public sealed class Wc2026MatchDto
