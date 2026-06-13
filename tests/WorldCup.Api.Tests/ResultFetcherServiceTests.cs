@@ -324,6 +324,86 @@ public class ResultFetcherServiceTests : IDisposable
         updated!.HomeTeam.Should().Be("BRA");
         updated.AwayTeam.Should().Be("GER");
     }
+
+    private static MatchSchedule ScheduleWith(params MatchEntry[] matches) => new(matches);
+
+    private Wc2026ApiClient BuildApiClientNoHttp() =>
+        BuildApiClient(new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("[]", Encoding.UTF8, "application/json")
+            }));
+
+    [Fact]
+    public void MapToLocalMatchId_ResolvesByMatchNumber_RegardlessOfKickoffTime()
+    {
+        var schedule = ScheduleWith(new MatchEntry
+        {
+            Id = 42,
+            Date = new DateTime(2026, 6, 20, 16, 0, 0, DateTimeKind.Utc),
+            Stage = "group-2",
+            HomeTeam = "BRA",
+            AwayTeam = "GER",
+            VenueId = "venue-1",
+        });
+
+        var apiClient = BuildApiClientNoHttp();
+
+        // Kickoff time is hours off, but the match number is authoritative.
+        var matchId = apiClient.MapToLocalMatchId(
+            matchNumber: 42,
+            kickoffAt: new DateTime(2026, 6, 20, 9, 0, 0, DateTimeKind.Utc),
+            schedule);
+
+        matchId.Should().Be(42);
+    }
+
+    [Fact]
+    public void MapToLocalMatchId_TimeFallback_NormalizesOffsetKickoffToUtc()
+    {
+        // Regression: matches.json stores kickoff in UTC ("...Z"). When the upstream payload
+        // delivers kickoff with a numeric offset, System.Text.Json yields a Local/converted
+        // DateTime. A raw DateTime subtraction ignores Kind and would land hours away from the
+        // UTC fixture, so the result never mapped and we logged "No result available".
+        var schedule = ScheduleWith(new MatchEntry
+        {
+            Id = 7,
+            Date = new DateTime(2026, 6, 11, 19, 0, 0, DateTimeKind.Utc),
+            Stage = "group-1",
+            HomeTeam = "MEX",
+            AwayTeam = "RSA",
+            VenueId = "azteca",
+        });
+
+        // Same instant as 19:00Z, expressed with a -07:00 offset — exactly what the deserializer
+        // hands us for a Pacific-time venue. Match number is unknown so the time fallback runs.
+        var offsetKickoff = JsonSerializer.Deserialize<DateTime>("\"2026-06-11T12:00:00-07:00\"");
+
+        var apiClient = BuildApiClientNoHttp();
+
+        var matchId = apiClient.MapToLocalMatchId(matchNumber: 9999, offsetKickoff, schedule);
+
+        matchId.Should().Be(7);
+    }
+
+    [Fact]
+    public void MapToLocalMatchId_TimeFallback_DoesNotGuessAmongSimultaneousKickoffs()
+    {
+        // Final-round group games kick off at the same instant. The time fallback must refuse
+        // to guess, otherwise both DTOs collapse onto one fixture.
+        var kickoff = new DateTime(2026, 6, 26, 20, 0, 0, DateTimeKind.Utc);
+        var schedule = ScheduleWith(
+            new MatchEntry { Id = 71, Date = kickoff, Stage = "group-3", HomeTeam = "ARG", AwayTeam = "FRA", VenueId = "v1" },
+            new MatchEntry { Id = 72, Date = kickoff, Stage = "group-3", HomeTeam = "ESP", AwayTeam = "ITA", VenueId = "v2" });
+
+        var apiClient = BuildApiClientNoHttp();
+
+        // Unknown match number + ambiguous time => no match (rather than the wrong one).
+        apiClient.MapToLocalMatchId(matchNumber: 9999, kickoff, schedule).Should().BeNull();
+
+        // But a known match number still resolves the correct one of the pair.
+        apiClient.MapToLocalMatchId(matchNumber: 72, kickoff, schedule).Should().Be(72);
+    }
 }
 
 internal sealed class FakeHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler

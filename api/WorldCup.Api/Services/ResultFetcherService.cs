@@ -170,7 +170,7 @@ public sealed class ResultFetcherService(
                 continue;
             }
 
-            var matchId = apiClient.MapToLocalMatchId(dto.KickoffAt, schedule);
+            var matchId = apiClient.MapToLocalMatchId(dto.MatchNumber, dto.KickoffAt, schedule);
             if (matchId is null)
             {
                 logger.LogWarning(
