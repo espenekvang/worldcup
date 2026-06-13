@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WorldCup.Api.Services;
 
@@ -104,7 +105,7 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
                 return [];
             }
 
-            var withScore = matches.Count(m => m.Score?.Ft is [_, _]);
+            var withScore = matches.Count(m => m.HomeScore is not null && m.AwayScore is not null);
             logger.LogInformation(
                 "WC2026 API {Endpoint} -> {StatusCode}: {Count} matches ({WithScore} with full-time score). First: {Sample}",
                 endpoint,
@@ -140,13 +141,13 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
 
     /// <summary>
     /// Renders the fields we depend on for the first returned match so a field-name /
-    /// shape mismatch is obvious in the logs: an unparsed <c>kickoffAt</c> shows up as
-    /// <c>0001-01-01</c>, and a renamed/reshaped score shows up as <c>score.ft=null</c>.
+    /// shape mismatch is obvious in the logs: an unparsed <c>kickoff_utc</c> shows up as
+    /// <c>0001-01-01</c>, and a renamed/reshaped score shows up as <c>score=null</c>.
     /// </summary>
     private static string DescribeSample(Wc2026MatchDto match)
     {
-        var ft = match.Score?.Ft is { } values ? "[" + string.Join(",", values) + "]" : "null";
-        return $"matchNumber={match.MatchNumber}, kickoffAt={match.KickoffAt:o}, score.ft={ft}";
+        var score = match is { HomeScore: { } home, AwayScore: { } away } ? $"{home}-{away}" : "null";
+        return $"matchNumber={match.MatchNumber}, kickoffAt={match.KickoffAt:o}, score={score}";
     }
 
     // How far a DTO kickoff may sit from a local fixture's kickoff before we refuse
@@ -201,23 +202,61 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
     };
 }
 
+/// <summary>
+/// Mirrors the WC2026 API match payload, which is flat snake_case (e.g.
+/// <c>match_number</c>, <c>home_team</c>, <c>home_score</c>). Property names are bound
+/// explicitly with <see cref="JsonPropertyNameAttribute"/> so binding does not depend on
+/// the serializer's naming policy.
+/// </summary>
 public sealed class Wc2026MatchDto
 {
+    /// <summary>FIFA match number (1..104), equals the local <see cref="MatchEntry.Id"/>.</summary>
+    [JsonPropertyName("match_number")]
     public int MatchNumber { get; init; }
+
+    [JsonPropertyName("home_team")]
     public string Home { get; init; } = "";
+
+    [JsonPropertyName("away_team")]
     public string Away { get; init; } = "";
+
+    /// <summary>Three-letter team code (e.g. "MEX"); aligns with our teams.json keys.</summary>
+    [JsonPropertyName("home_team_code")]
+    public string? HomeCode { get; init; }
+
+    [JsonPropertyName("away_team_code")]
+    public string? AwayCode { get; init; }
+
+    [JsonPropertyName("kickoff_utc")]
     public DateTime KickoffAt { get; init; }
-    public Wc2026ScoreDto? Score { get; init; }
+
+    /// <summary>
+    /// Final score in play. For knockout games decided in extra time this already includes
+    /// the ET goals; a penalty shootout is reported separately in <see cref="HomePen"/>/
+    /// <see cref="AwayPen"/> and is not counted into the score.
+    /// </summary>
+    [JsonPropertyName("home_score")]
+    public int? HomeScore { get; init; }
+
+    [JsonPropertyName("away_score")]
+    public int? AwayScore { get; init; }
+
+    /// <summary>Penalty-shootout tally, null outside knockout / for games not decided on penalties.</summary>
+    [JsonPropertyName("home_pen")]
+    public int? HomePen { get; init; }
+
+    [JsonPropertyName("away_pen")]
+    public int? AwayPen { get; init; }
+
+    /// <summary>Match phase: PRE, 1H, HT, 2H, ET1, ET2, PEN, FT, or FT_PEN.</summary>
+    [JsonPropertyName("phase")]
+    public string? Phase { get; init; }
 
     /// <summary>
     /// Dommer for kampen, hvis oppstr\u00f8ms-API returnerer det. Feltet er valgfritt
     /// \u2014 hvis JSON ikke inneholder "referee" forblir det null og koden faller tilbake
     /// til standardnavnet "Dommeren".
     /// </summary>
+    [JsonPropertyName("referee")]
     public string? Referee { get; init; }
-}
-
-public sealed class Wc2026ScoreDto
-{
-    public int[]? Ft { get; init; }
 }
