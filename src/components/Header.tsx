@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header
-      className="py-2 text-white sm:py-4"
+      className="sticky top-0 z-40 py-2 text-white sm:py-4"
       style={{ background: 'linear-gradient(to right, var(--color-header-from), var(--color-header-to))' }}
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
