@@ -161,10 +161,10 @@ public sealed class ResultFetcherService(
 
         foreach (var dto in completedMatches)
         {
-            if (dto.Score?.Ft is not [var homeScore, var awayScore])
+            if (dto.HomeScore is not { } homeScore || dto.AwayScore is not { } awayScore)
             {
                 logger.LogWarning(
-                    "WC2026 API returned a completed match (matchNumber {MatchNumber}, kickoff {Kickoff:o}) with no parseable full-time score. Skipping.",
+                    "WC2026 API returned a completed match (matchNumber {MatchNumber}, kickoff {Kickoff:o}) with no parseable score. Skipping.",
                     dto.MatchNumber,
                     dto.KickoffAt);
                 continue;
@@ -367,6 +367,17 @@ public sealed class ResultFetcherService(
     }
 
     /// <summary>
+    /// Resolves a fixture's team to a local three-letter code. The API's <c>*_team_code</c>
+    /// already matches our teams.json keys, so it is used directly; the full team name is a
+    /// fallback for the rare case the code is missing.
+    /// </summary>
+    private string? ResolveTeamCode(string? code, string? name)
+    {
+        if (!string.IsNullOrWhiteSpace(code)) return code.Trim();
+        return string.IsNullOrWhiteSpace(name) ? null : teamCodeMapper.GetCode(name);
+    }
+
+    /// <summary>
     /// Fetches scheduled matches from upstream and rewrites matches.json for any knockout
     /// fixture whose teams have just been determined. Kept internal-accessible so existing
     /// reflection-based tests continue to work.
@@ -403,12 +414,10 @@ public sealed class ResultFetcherService(
                 continue;
             }
 
-            var homeTeamCode = string.IsNullOrWhiteSpace(dto.Home)
-                ? null
-                : teamCodeMapper.GetCode(dto.Home);
-            var awayTeamCode = string.IsNullOrWhiteSpace(dto.Away)
-                ? null
-                : teamCodeMapper.GetCode(dto.Away);
+            // Prefer the API's three-letter code (aligns with teams.json keys); fall back to
+            // mapping the full team name only when the code is absent.
+            var homeTeamCode = ResolveTeamCode(dto.HomeCode, dto.Home);
+            var awayTeamCode = ResolveTeamCode(dto.AwayCode, dto.Away);
 
             if (homeTeamCode is null && awayTeamCode is null)
             {

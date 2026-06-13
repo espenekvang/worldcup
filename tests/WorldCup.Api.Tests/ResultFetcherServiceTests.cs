@@ -215,11 +215,12 @@ public class ResultFetcherServiceTests : IDisposable
         WriteMatches([undeterminedMatch]);
         _scheduleProvider.Reload([undeterminedMatch]);
 
+        // No team codes, and the names don't map to any local code -> both codes resolve null.
         var apiDto = new List<object>
         {
-            new { matchNumber = 60, home = "Unknown FC", away = "Mystery United", kickoffAt = undeterminedMatch.Date }
+            new { match_number = 60, home_team = "Unknown FC", away_team = "Mystery United", kickoff_utc = undeterminedMatch.Date }
         };
-        var apiJson = JsonSerializer.Serialize(apiDto, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        var apiJson = JsonSerializer.Serialize(apiDto);
 
         var handler = new FakeHttpMessageHandler(_ =>
             new HttpResponseMessage(HttpStatusCode.OK)
@@ -278,9 +279,9 @@ public class ResultFetcherServiceTests : IDisposable
 
         var apiDto = new[]
         {
-            new { matchNumber = 1, home = "Brasil", away = "Tyskland", kickoffAt = undeterminedMatch.Date }
+            new { match_number = 1, home_team = "Brasil", away_team = "Tyskland", home_team_code = "BRA", away_team_code = "GER", kickoff_utc = undeterminedMatch.Date }
         };
-        var apiJson = JsonSerializer.Serialize(apiDto, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        var apiJson = JsonSerializer.Serialize(apiDto);
 
         var handler = new FakeHttpMessageHandler(_ =>
             new HttpResponseMessage(HttpStatusCode.OK)
@@ -326,6 +327,96 @@ public class ResultFetcherServiceTests : IDisposable
     }
 
     private static MatchSchedule ScheduleWith(params MatchEntry[] matches) => new(matches);
+
+    [Fact]
+    public async Task GetCompletedMatchesAsync_ParsesRealApiShape_IntoScoreAndMatchNumber()
+    {
+        // Regression: the WC2026 API returns flat snake_case (match_number, home_team,
+        // home_score, home_pen, phase) — not camelCase with a nested score.ft. When the DTO
+        // didn't match, every field bound to default and results were silently skipped.
+        // This is a verbatim sample of the live /matches?status=completed payload.
+        const string realPayload = """
+            [
+              {
+                "id": 2,
+                "match_number": 1,
+                "round": "group",
+                "group_name": "A",
+                "home_team": "Mexico",
+                "home_team_code": "MEX",
+                "away_team": "South Africa",
+                "away_team_code": "RSA",
+                "kickoff_utc": "2026-06-11T19:00:00.000Z",
+                "home_score": 2,
+                "away_score": 0,
+                "home_pen": null,
+                "away_pen": null,
+                "status": "completed",
+                "phase": "FT"
+              }
+            ]
+            """;
+
+        var handler = new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(realPayload, Encoding.UTF8, "application/json")
+            });
+
+        var apiClient = BuildApiClient(handler);
+
+        var matches = await apiClient.GetCompletedMatchesAsync();
+
+        matches.Should().HaveCount(1);
+        var match = matches[0];
+        match.MatchNumber.Should().Be(1);
+        match.Home.Should().Be("Mexico");
+        match.HomeCode.Should().Be("MEX");
+        match.AwayCode.Should().Be("RSA");
+        match.KickoffAt.Should().Be(new DateTime(2026, 6, 11, 19, 0, 0, DateTimeKind.Utc));
+        match.HomeScore.Should().Be(2);
+        match.AwayScore.Should().Be(0);
+        match.HomePen.Should().BeNull();
+        match.Phase.Should().Be("FT");
+    }
+
+    [Fact]
+    public async Task GetCompletedMatchesAsync_KnockoutDecidedOnPenalties_KeepsAfterEtScoreSeparateFromPens()
+    {
+        // A knockout game that went 1-1 after 90', 2-2 after extra time, won 4-3 on penalties.
+        // home_score/away_score carry the after-ET score; penalties are reported separately
+        // and must not leak into the score (we score predictions on the after-ET result).
+        const string penaltyPayload = """
+            [
+              {
+                "match_number": 90,
+                "home_team_code": "BRA",
+                "away_team_code": "GER",
+                "kickoff_utc": "2026-07-10T19:00:00.000Z",
+                "home_score": 2,
+                "away_score": 2,
+                "home_pen": 4,
+                "away_pen": 3,
+                "status": "completed",
+                "phase": "FT_PEN"
+              }
+            ]
+            """;
+
+        var handler = new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(penaltyPayload, Encoding.UTF8, "application/json")
+            });
+
+        var match = (await BuildApiClient(handler).GetCompletedMatchesAsync()).Single();
+
+        match.HomeScore.Should().Be(2);
+        match.AwayScore.Should().Be(2);
+        match.HomePen.Should().Be(4);
+        match.AwayPen.Should().Be(3);
+        match.Phase.Should().Be("FT_PEN");
+    }
 
     private Wc2026ApiClient BuildApiClientNoHttp() =>
         BuildApiClient(new FakeHttpMessageHandler(_ =>
