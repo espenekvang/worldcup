@@ -133,6 +133,28 @@ export function getNextBettingDeadline(
   return { stage: bestMatch.stage, deadline: bestMatch.date, isFirstMatch }
 }
 
+/**
+ * Hvilken runde appen bør åpne som standard: runden som har en kamp som
+ * pågår akkurat nå («pågår»), ellers runden med neste kommende kamp. Slik
+ * åpner vi f.eks. runde 2 så snart alle kampene i runde 1 er ferdigspilt,
+ * men blir værende på runde 1 så lenge den fortsatt har en kamp i gang.
+ * Returnerer null når ingen kamper gjenstår (turneringen er ferdig).
+ */
+export function getDefaultStage(
+  matches: Match[],
+  hasResult: (matchId: number) => boolean,
+  now: number = Date.now(),
+): Stage | null {
+  const byKickoff = [...matches].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+  )
+  const inProgress = byKickoff.find(m => isMatchInProgress(m, hasResult(m.id), now))
+  if (inProgress) return inProgress.stage
+  const upcoming = byKickoff.find(m => new Date(m.date).getTime() > now)
+  if (upcoming) return upcoming.stage
+  return null
+}
+
 export function areTeamsUndetermined(match: Match): boolean {
   return !match.homeTeam || !match.awayTeam
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { Stage, Section, Match } from './types'
 import { teams, venues } from './data'
@@ -17,7 +17,8 @@ import ChatPanel from './components/ChatPanel'
 import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
-import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage } from './utils/dateUtils'
+import { useResults } from './context/ResultsContext'
+import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage, getDefaultStage } from './utils/dateUtils'
 
 type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
 
@@ -77,9 +78,26 @@ function nextBettingStage(matches: Match[]): { section: MatchesSection; stage: S
   return { section, stage: next.stage }
 }
 
+/**
+ * Runden appen skal åpne som standard: den med en pågående kamp, ellers den
+ * med neste kommende kamp. Returnerer null hvis ingen kamper gjenstår eller
+ * runden ikke hører hjemme i kamp-seksjonene (gruppe/sluttspill).
+ */
+function defaultMatchesStage(
+  matches: Match[],
+  hasResult: (matchId: number) => boolean,
+): { section: MatchesSection; stage: Stage } | null {
+  const stage = getDefaultStage(matches, hasResult)
+  if (!stage) return null
+  const section = getSectionForStage(stage)
+  if (section === 'leaderboard' || section === 'admin') return null
+  return { section, stage }
+}
+
 function AppContent() {
   const { user } = useAuth()
   const { matches } = useMatches()
+  const { results, isLoading: resultsLoading } = useResults()
   const location = useLocation()
   const navigate = useNavigate()
   // Gjenopprett tidligere visning hvis den finnes (f.eks. etter retur fra
@@ -115,20 +133,31 @@ function AppContent() {
 
   const canAccessAdmin = user?.isAdmin || (user?.groupAdminGroupIds?.length ?? 0) > 0
 
-  // Når matches lastes inn (asynkront), hopp til neste runde brukeren kan bette på.
-  // Skjer kun ved første lasting, slik at vi ikke overstyrer brukerens egne valg senere.
-  const [hasAutoSelected, setHasAutoSelected] = useState(persistedView !== null || initialBetting !== null)
+  // Velg standardrunde: den med en pågående kamp («pågår»), ellers den med
+  // neste kommende kamp. Vi venter til resultatene er ferdig lastet, ellers
+  // ville en ferdigspilt (men ennå ikke registrert) kamp se ut som «pågår».
+  // Skjer kun én gang, slik at vi ikke overstyrer brukerens egne valg senere.
+  // Har vi en lagret visning (retur fra kampdetaljer) hopper vi over auto-valg.
+  const [hasAutoSelected, setHasAutoSelected] = useState(persistedView !== null)
+  const resultsFetchStarted = useRef(false)
+  useEffect(() => {
+    if (resultsLoading) resultsFetchStarted.current = true
+  }, [resultsLoading])
   useEffect(() => {
     if (hasAutoSelected || matches.length === 0) return
-    const next = nextBettingStage(matches)
-    if (!next) return
-    setActiveSection(next.section)
-    setActiveStage(next.stage)
-    if (next.section === 'group') setLastGroupStage(next.stage)
-    if (next.section === 'knockout') setLastKnockoutStage(next.stage)
-    setLastMatchesSection(next.section)
+    // Vent på at resultat-henting har startet og fullført, slik at «pågår»-
+    // deteksjonen baserer seg på faktiske resultater og ikke en tom cache.
+    if (!resultsFetchStarted.current || resultsLoading) return
+    const next = defaultMatchesStage(matches, id => results.has(id))
+    if (next) {
+      setActiveSection(next.section)
+      setActiveStage(next.stage)
+      if (next.section === 'group') setLastGroupStage(next.stage)
+      if (next.section === 'knockout') setLastKnockoutStage(next.stage)
+      setLastMatchesSection(next.section)
+    }
     setHasAutoSelected(true)
-  }, [matches, hasAutoSelected])
+  }, [matches, results, resultsLoading, hasAutoSelected])
 
   // Husk siste seksjon (utenom leaderboard/admin) og siste stage per seksjon.
   useEffect(() => {

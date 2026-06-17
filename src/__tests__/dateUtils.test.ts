@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { formatMatchDate, formatMatchTime, getTimeUntil, getNextMatch, isBeforeTournament, isMatchInProgress } from '../utils/dateUtils'
+import { formatMatchDate, formatMatchTime, getTimeUntil, getNextMatch, isBeforeTournament, isMatchInProgress, getDefaultStage } from '../utils/dateUtils'
 import type { Match } from '../types'
 
 describe('dateUtils', () => {
@@ -72,6 +72,45 @@ describe('dateUtils', () => {
       const knockout: Match = { id: 73, date: '2026-07-01T20:00:00Z', homeTeam: null, awayTeam: null, stage: 'round-of-32', venueId: 'metlife' }
       const now = new Date('2026-07-01T20:45:00Z').getTime()
       expect(isMatchInProgress(knockout, false, now)).toBe(false)
+    })
+  })
+
+  describe('getDefaultStage', () => {
+    const round1a: Match = { id: 1, date: '2026-06-11T16:00:00Z', homeTeam: 'A', awayTeam: 'B', stage: 'group-1', group: 'A', venueId: 'metlife' }
+    const round1b: Match = { id: 2, date: '2026-06-11T20:00:00Z', homeTeam: 'C', awayTeam: 'D', stage: 'group-1', group: 'B', venueId: 'azteca' }
+    const round2a: Match = { id: 3, date: '2026-06-14T16:00:00Z', homeTeam: 'A', awayTeam: 'C', stage: 'group-2', group: 'A', venueId: 'metlife' }
+    const matches = [round1a, round1b, round2a]
+    const noResults = () => false
+
+    it('opens the round with the next upcoming match', () => {
+      const now = new Date('2026-06-10T00:00:00Z').getTime()
+      expect(getDefaultStage(matches, noResults, now)).toBe('group-1')
+    })
+
+    it('stays on the round while it still has upcoming matches', () => {
+      // round1a has kicked off and finished, round1b is still upcoming
+      const now = new Date('2026-06-11T19:00:00Z').getTime()
+      const finished = (id: number) => id === round1a.id
+      expect(getDefaultStage(matches, finished, now)).toBe('group-1')
+    })
+
+    it('stays on the round that has a match in progress (pågår)', () => {
+      // round1b kicked off 30 min ago with no result; next upcoming is round 2
+      const now = new Date('2026-06-11T20:30:00Z').getTime()
+      expect(getDefaultStage(matches, noResults, now)).toBe('group-1')
+    })
+
+    it('moves to the next round once the current round is completed', () => {
+      // all of round 1 is finished; next match is in round 2
+      const now = new Date('2026-06-12T00:00:00Z').getTime()
+      const finished = (id: number) => id === round1a.id || id === round1b.id
+      expect(getDefaultStage(matches, finished, now)).toBe('group-2')
+    })
+
+    it('returns null when no matches remain', () => {
+      const now = new Date('2026-07-01T00:00:00Z').getTime()
+      const finished = () => true
+      expect(getDefaultStage(matches, finished, now)).toBeNull()
     })
   })
 })
