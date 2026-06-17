@@ -69,6 +69,13 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
   const regularDayGroups = groupByDay(regularMatches)
   const finishedDayGroups = groupByDay(finishedMatches)
 
+  // Dager som allerede er representert av de festede "Neste kamp"- og "Pågår nå"-
+  // seksjonene over. For disse dagene dropper vi den overflødige dag/dato-
+  // overskriften i den vanlige listen.
+  const highlightedDayKeys = new Set<string>()
+  if (nextMatch) highlightedDayKeys.add(getLocalDateKey(nextMatch.date))
+  for (const match of inProgressMatches) highlightedDayKeys.add(getLocalDateKey(match.date))
+
   return (
     <div className="space-y-6 p-2 sm:p-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
@@ -176,12 +183,14 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
 
           {[...regularDayGroups.entries()].map(([dayKey, dayMatches]) => (
             <div key={dayKey}>
-              <h3
-                className="mb-3 text-sm font-semibold uppercase tracking-wide"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {formatMatchDate(dayMatches[0].date)}
-              </h3>
+              {!highlightedDayKeys.has(dayKey) && (
+                <h3
+                  className="mb-3 text-sm font-semibold uppercase tracking-wide"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  {formatMatchDate(dayMatches[0].date)}
+                </h3>
+              )}
               <div className="space-y-3">
                 {dayMatches.map(match => (
                   <MatchCard key={match.id} match={match} teams={teams} venues={venues} locked={isLocked(match)} onTipClick={onTipClick} onViewOthers={onViewOthers} />
