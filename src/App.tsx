@@ -22,6 +22,39 @@ import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage
 type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
 
 /**
+ * Husker hvilken seksjon/runde brukeren sist så på, slik at vi kan gjenopprette
+ * den når <App/> remountes – f.eks. når man har bettet på en kamp via
+ * detaljsiden (/match/:id) og trykker «Tilbake». Uten dette ville visningen
+ * alltid hoppe tilbake til auto-valgt standardrunde.
+ */
+const VIEW_STATE_KEY = 'worldcup:viewState'
+
+interface PersistedViewState {
+  section: Section
+  stage: Stage
+  lastGroupStage: Stage
+  lastKnockoutStage: Stage
+  lastMatchesSection: MatchesSection
+}
+
+function loadViewState(): PersistedViewState | null {
+  try {
+    const raw = sessionStorage.getItem(VIEW_STATE_KEY)
+    return raw ? (JSON.parse(raw) as PersistedViewState) : null
+  } catch {
+    return null
+  }
+}
+
+function saveViewState(state: PersistedViewState): void {
+  try {
+    sessionStorage.setItem(VIEW_STATE_KEY, JSON.stringify(state))
+  } catch {
+    // storage utilgjengelig – da faller vi tilbake til auto-valg
+  }
+}
+
+/**
  * Velg fornuftig default-runde når brukeren bytter til en seksjon.
  * For gruppespill: første runde som ikke er låst, ellers siste runde.
  * For sluttspill: alltid 32-delsfinale.
@@ -49,20 +82,25 @@ function AppContent() {
   const { matches } = useMatches()
   const location = useLocation()
   const navigate = useNavigate()
+  // Gjenopprett tidligere visning hvis den finnes (f.eks. etter retur fra
+  // kampdetaljer). Ellers faller vi tilbake til auto-valgt neste betting-runde.
+  const persistedView = loadViewState()
   const initialBetting = nextBettingStage(matches)
-  const [activeSection, setActiveSection] = useState<Section>(initialBetting?.section ?? 'group')
+  const [activeSection, setActiveSection] = useState<Section>(
+    persistedView?.section ?? initialBetting?.section ?? 'group',
+  )
   const [activeStage, setActiveStage] = useState<Stage>(
-    initialBetting?.stage ?? defaultStageFor('group', matches),
+    persistedView?.stage ?? initialBetting?.stage ?? defaultStageFor('group', matches),
   )
   // Husk siste valgte stage per seksjon, slik at bytting frem/tilbake bevarer kontekst.
   const [lastGroupStage, setLastGroupStage] = useState<Stage>(
-    initialBetting?.section === 'group' ? initialBetting.stage : 'group-1',
+    persistedView?.lastGroupStage ?? (initialBetting?.section === 'group' ? initialBetting.stage : 'group-1'),
   )
   const [lastKnockoutStage, setLastKnockoutStage] = useState<Stage>(
-    initialBetting?.section === 'knockout' ? initialBetting.stage : 'round-of-32',
+    persistedView?.lastKnockoutStage ?? (initialBetting?.section === 'knockout' ? initialBetting.stage : 'round-of-32'),
   )
   const [lastMatchesSection, setLastMatchesSection] = useState<MatchesSection>(
-    initialBetting?.section ?? 'group',
+    persistedView?.lastMatchesSection ?? initialBetting?.section ?? 'group',
   )
   const [bettingMatch, setBettingMatch] = useState<Match | null>(null)
   const [viewingOthersMatch, setViewingOthersMatch] = useState<Match | null>(null)
@@ -79,7 +117,7 @@ function AppContent() {
 
   // Når matches lastes inn (asynkront), hopp til neste runde brukeren kan bette på.
   // Skjer kun ved første lasting, slik at vi ikke overstyrer brukerens egne valg senere.
-  const [hasAutoSelected, setHasAutoSelected] = useState(initialBetting !== null)
+  const [hasAutoSelected, setHasAutoSelected] = useState(persistedView !== null || initialBetting !== null)
   useEffect(() => {
     if (hasAutoSelected || matches.length === 0) return
     const next = nextBettingStage(matches)
@@ -100,6 +138,18 @@ function AppContent() {
     if (activeSection === 'group') setLastGroupStage(activeStage)
     if (activeSection === 'knockout') setLastKnockoutStage(activeStage)
   }, [activeSection, activeStage])
+
+  // Lagre gjeldende visning slik at den overlever en remount av <App/>
+  // (typisk navigasjon til kampdetaljer og tilbake).
+  useEffect(() => {
+    saveViewState({
+      section: activeSection,
+      stage: activeStage,
+      lastGroupStage,
+      lastKnockoutStage,
+      lastMatchesSection,
+    })
+  }, [activeSection, activeStage, lastGroupStage, lastKnockoutStage, lastMatchesSection])
 
   // Reager på navigasjons-state (f.eks. fra BottomNav på ChatPage).
   useEffect(() => {
