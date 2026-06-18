@@ -24,11 +24,19 @@ type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
 
 /**
  * Husker hvilken seksjon/runde brukeren sist så på, slik at vi kan gjenopprette
- * den når <App/> remountes – f.eks. når man har bettet på en kamp via
- * detaljsiden (/match/:id) og trykker «Tilbake». Uten dette ville visningen
- * alltid hoppe tilbake til auto-valgt standardrunde.
+ * den når <App/> remountes innenfor samme økt – f.eks. når man har bettet på en
+ * kamp via detaljsiden (/match/:id) og trykker «Tilbake». Uten dette ville
+ * visningen alltid hoppe tilbake til auto-valgt standardrunde.
+ *
+ * Vi holder dette i en modul-variabel (in-memory), IKKE i sessionStorage.
+ * sessionStorage overlever en full sideoppdatering, noe som gjorde at en
+ * tidligere valgt runde «klistret seg fast» og overstyrte standardvalget ved
+ * refresh (man ble f.eks. værende på runde 1 selv om runde 1 var ferdigspilt).
+ * En modul-variabel nullstilles ved full reload, slik at en refresh alltid
+ * faller tilbake til pågår-/neste-kamp-runden, men består gjennom SPA-
+ * navigasjon (App unmountes/remountes uten at modulen lastes på nytt).
  */
-const VIEW_STATE_KEY = 'worldcup:viewState'
+let inMemoryViewState: PersistedViewState | null = null
 
 interface PersistedViewState {
   section: Section
@@ -39,20 +47,11 @@ interface PersistedViewState {
 }
 
 function loadViewState(): PersistedViewState | null {
-  try {
-    const raw = sessionStorage.getItem(VIEW_STATE_KEY)
-    return raw ? (JSON.parse(raw) as PersistedViewState) : null
-  } catch {
-    return null
-  }
+  return inMemoryViewState
 }
 
 function saveViewState(state: PersistedViewState): void {
-  try {
-    sessionStorage.setItem(VIEW_STATE_KEY, JSON.stringify(state))
-  } catch {
-    // storage utilgjengelig – da faller vi tilbake til auto-valg
-  }
+  inMemoryViewState = state
 }
 
 /**
