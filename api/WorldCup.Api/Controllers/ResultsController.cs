@@ -13,8 +13,7 @@ namespace WorldCup.Api.Controllers;
 public class ResultsController(
     AppDbContext dbContext,
     ScoringService scoringService,
-    MatchScheduleProvider scheduleProvider,
-    ResultAnnouncementService resultAnnouncer) : ControllerBase
+    MatchScheduleProvider scheduleProvider) : ControllerBase
 {
     [HttpPut("/api/admin/results/{matchId:int}")]
     [Authorize(Roles = "Admin")]
@@ -37,7 +36,6 @@ public class ResultsController(
         var existing = await dbContext.MatchResults
             .FirstOrDefaultAsync(r => r.MatchId == matchId, ct);
 
-        var isNewResult = existing is null;
         var refereeName = string.IsNullOrWhiteSpace(request.Referee) ? null : request.Referee.Trim();
 
         if (existing is not null)
@@ -78,19 +76,6 @@ public class ResultsController(
         }
 
         await dbContext.SaveChangesAsync(ct);
-
-        if (isNewResult)
-        {
-            try
-            {
-                await resultAnnouncer.AnnounceResultAsync(matchId, request.HomeScore, request.AwayScore, refereeName, ct);
-            }
-            catch (Exception)
-            {
-                // Chat-melding er en bonus — la admin-endepunktet svare OK selv om
-                // kringkasting feiler. Logg-feilen kommer fra service'en selv.
-            }
-        }
 
         return Ok(new ResultResponse
         {
