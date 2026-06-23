@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using WorldCup.Api.Data;
 using WorldCup.Api.Models;
@@ -22,6 +23,17 @@ public sealed class ResultFetcherService(
     // Backoff between retry attempts when a poll returns no result for a due match.
     private static readonly TimeSpan RetryInterval = TimeSpan.FromMinutes(5);
     private const int MaxFetchAttempts = 5;
+
+    // Cadence for re-polling the upstream "scheduled" feed while knockout fixtures whose
+    // feeder matches are all complete still have no teams (e.g. the bracket has not been
+    // published yet in the minutes after the final group game). In-memory; resets on restart.
+    private static readonly TimeSpan FixturePollRetryInterval = TimeSpan.FromMinutes(20);
+    private DateTime _nextFixturePollAtUtc = DateTime.MinValue;
+
+    // Matches the "kamp NN" reference inside a knockout placeholder ("Vinner kamp 73",
+    // "Taper kamp 101") so we can tell which earlier games a fixture feeds from.
+    private static readonly Regex FeederMatchPattern =
+        new(@"kamp\s+(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     // Safety caps. We always wake at least this often, even if no match is due,
     // so config changes / schedule reloads are picked up. And we never sleep less
@@ -136,7 +148,11 @@ public sealed class ResultFetcherService(
 
         if (dueMatches.Count == 0)
         {
-            return ComputeSleep(outstanding, now);
+            // No match results are due, but knockout fixtures may have become resolvable in an
+            // earlier cycle (e.g. the final group game's result has already landed). Try to pull
+            // in the teams, then sleep until the next result *or* fixture re-poll is due.
+            await TryResolveFixturesAsync(dbContext, existingResults, now, ct);
+            return ComputeSleep(outstanding, DateTime.UtcNow, NextFixturePollWake(existingResults));
         }
 
         // ---- Budget gate ----
@@ -155,7 +171,6 @@ public sealed class ResultFetcherService(
         var completedMatches = await apiClient.GetCompletedMatchesAsync(ct);
 
         var foundMatchIds = new HashSet<int>();
-        var newKnockoutResult = false;
         var newResults = 0;
 
         foreach (var dto in completedMatches)
@@ -183,7 +198,6 @@ public sealed class ResultFetcherService(
 
             if (existingResults.Contains(matchId.Value)) continue;
 
-            var localMatch = schedule.GetMatch(matchId.Value);
             var refereeName = string.IsNullOrWhiteSpace(dto.Referee) ? null : dto.Referee.Trim();
 
             dbContext.MatchResults.Add(new MatchResult
@@ -218,11 +232,6 @@ public sealed class ResultFetcherService(
             existingResults.Add(matchId.Value);
             foundMatchIds.Add(matchId.Value);
             newResults++;
-
-            if (localMatch is not null && !IsGroupStage(localMatch.Stage))
-            {
-                newKnockoutResult = true;
-            }
         }
 
         // For matches that were due but did NOT show up in this response, schedule a retry.
@@ -263,26 +272,15 @@ public sealed class ResultFetcherService(
         await dbContext.SaveChangesAsync(ct);
 
         logger.LogInformation(
-            "Result poll complete: {NewResults} new (of {Due} due). Knockout result: {Knockout}.",
+            "Result poll complete: {NewResults} new (of {Due} due).",
             newResults,
-            dueMatches.Count,
-            newKnockoutResult);
+            dueMatches.Count);
 
-        // Only burn a second API call if we actually got a knockout result that may
-        // have unlocked the next round's fixtures.
-        if (newKnockoutResult && HasUndeterminedKnockoutMatches(schedule))
-        {
-            if (await BudgetAllowsCallAsync(dbContext, DateTime.UtcNow, ct))
-            {
-                await LogApiCallAsync(dbContext, "/matches?status=scheduled", DateTime.UtcNow, ct);
-                await dbContext.SaveChangesAsync(ct);
-                await CheckForFixtureUpdatesAsync(ct);
-            }
-            else
-            {
-                logger.LogWarning("Skipping fixture update — daily API budget exhausted.");
-            }
-        }
+        // The new results may have completed a knockout fixture's feeders: the final group game
+        // finalises the round-of-32 bracket, a round-of-32 result finalises a round-of-16 tie,
+        // and so on. Pull in any teams that just became known. (existingResults already includes
+        // the results added above.)
+        await TryResolveFixturesAsync(dbContext, existingResults, DateTime.UtcNow, ct);
 
         // Recompute outstanding (some may have been resolved) for next-sleep calc.
         var stillOutstanding = outstanding
@@ -298,17 +296,24 @@ public sealed class ResultFetcherService(
             })
             .ToList();
 
-        return ComputeSleep(stillOutstanding, DateTime.UtcNow);
+        return ComputeSleep(stillOutstanding, DateTime.UtcNow, NextFixturePollWake(existingResults));
     }
 
     private static TimeSpan ComputeSleep(
         IReadOnlyList<(MatchEntry Match, DateTime NextPollAt, PendingMatchFetch? Pending)> outstanding,
-        DateTime now)
+        DateTime now,
+        DateTime? fixturePollWake = null)
     {
-        if (outstanding.Count == 0) return MaxSleep;
+        DateTime? nextWake = outstanding.Count > 0 ? outstanding.Min(x => x.NextPollAt) : null;
 
-        var nextWake = outstanding.Min(x => x.NextPollAt);
-        var delta = nextWake - now;
+        if (fixturePollWake is { } fixtureWake)
+        {
+            nextWake = nextWake is { } existing && existing < fixtureWake ? existing : fixtureWake;
+        }
+
+        if (nextWake is null) return MaxSleep;
+
+        var delta = nextWake.Value - now;
         return delta <= TimeSpan.Zero ? MinSleep : delta;
     }
 
@@ -320,11 +325,103 @@ public sealed class ResultFetcherService(
         _ => KnockoutBuffer
     };
 
-    private static bool HasUndeterminedKnockoutMatches(MatchSchedule schedule) =>
-        schedule.GetAllMatches().Any(m =>
-            m.AreTeamsUndetermined
-            && !m.ManualOverride
-            && !IsGroupStage(m.Stage));
+    /// <summary>
+    /// Polls the upstream "scheduled" feed and writes any now-known knockout teams into
+    /// matches.json — but only when at least one undetermined knockout fixture has had all of its
+    /// feeder matches played (so the upstream bracket should be populated), and never more often
+    /// than <see cref="FixturePollRetryInterval"/>. The bracket can lag the final feeder result,
+    /// so we retry on a backoff until every fixture is resolved.
+    /// </summary>
+    private async Task TryResolveFixturesAsync(
+        AppDbContext dbContext,
+        IReadOnlySet<int> completedMatchIds,
+        DateTime now,
+        CancellationToken ct)
+    {
+        var resolvable = GetResolvableUndeterminedKnockout(scheduleProvider.Current, completedMatchIds);
+        if (resolvable.Count == 0) return;
+        if (now < _nextFixturePollAtUtc) return;
+
+        // Back off regardless of outcome so a slow-to-publish bracket or an exhausted budget
+        // cannot turn into a tight poll loop.
+        _nextFixturePollAtUtc = now + FixturePollRetryInterval;
+
+        if (!await BudgetAllowsCallAsync(dbContext, now, ct))
+        {
+            logger.LogWarning(
+                "Skipping fixture-resolution poll — daily API budget exhausted. {Count} knockout fixture(s) awaiting teams.",
+                resolvable.Count);
+            return;
+        }
+
+        logger.LogInformation(
+            "Feeders complete for {Count} undetermined knockout fixture(s) — polling upstream for resolved teams.",
+            resolvable.Count);
+
+        await LogApiCallAsync(dbContext, "/matches?status=scheduled", now, ct);
+        await CheckForFixtureUpdatesAsync(ct);
+    }
+
+    /// <summary>
+    /// The undetermined, non-overridden knockout fixtures whose feeder matches have all been
+    /// played — i.e. the ones the upstream bracket should now be able to fill in.
+    /// </summary>
+    private static List<MatchEntry> GetResolvableUndeterminedKnockout(
+        MatchSchedule schedule,
+        IReadOnlySet<int> completedMatchIds)
+    {
+        var resolvable = new List<MatchEntry>();
+        foreach (var match in schedule.GetAllMatches())
+        {
+            if (IsGroupStage(match.Stage)) continue;
+            if (!match.AreTeamsUndetermined) continue;
+            if (match.ManualOverride) continue;
+            if (GetFeederMatchIds(match, schedule).All(completedMatchIds.Contains))
+            {
+                resolvable.Add(match);
+            }
+        }
+        return resolvable;
+    }
+
+    /// <summary>
+    /// The match Ids a knockout fixture feeds from. Later rounds name specific games
+    /// ("Vinner kamp 73"); the round of 32 instead names group positions ("2. plass gruppe B",
+    /// "3. plass gruppe A/B/C/D/F") whose final ordering — including the best-third allocation —
+    /// is only settled once every group match has been played.
+    /// </summary>
+    private static IReadOnlyCollection<int> GetFeederMatchIds(MatchEntry match, MatchSchedule schedule)
+    {
+        var referenced = ExtractFeederMatchIds(match.HomePlaceholder)
+            .Concat(ExtractFeederMatchIds(match.AwayPlaceholder))
+            .ToHashSet();
+
+        if (referenced.Count > 0) return referenced;
+
+        return schedule.GetAllMatches()
+            .Where(m => IsGroupStage(m.Stage))
+            .Select(m => m.Id)
+            .ToHashSet();
+    }
+
+    private static IEnumerable<int> ExtractFeederMatchIds(string? placeholder)
+    {
+        if (string.IsNullOrWhiteSpace(placeholder)) yield break;
+
+        foreach (Match m in FeederMatchPattern.Matches(placeholder))
+        {
+            if (int.TryParse(m.Groups[1].Value, out var id))
+            {
+                yield return id;
+            }
+        }
+    }
+
+    /// <summary>Next wake-up for the fixture re-poll, or null when nothing is awaiting teams.</summary>
+    private DateTime? NextFixturePollWake(IReadOnlySet<int> completedMatchIds) =>
+        GetResolvableUndeterminedKnockout(scheduleProvider.Current, completedMatchIds).Count > 0
+            ? _nextFixturePollAtUtc
+            : null;
 
     private static async Task<bool> BudgetAllowsCallAsync(AppDbContext dbContext, DateTime now, CancellationToken ct)
     {

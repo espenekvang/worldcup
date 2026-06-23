@@ -495,6 +495,97 @@ public class ResultFetcherServiceTests : IDisposable
         // But a known match number still resolves the correct one of the pair.
         apiClient.MapToLocalMatchId(matchNumber: 72, kickoff, schedule).Should().Be(72);
     }
+
+    private static IReadOnlyList<MatchEntry> InvokeResolvable(MatchSchedule schedule, IReadOnlySet<int> completed)
+    {
+        var method = typeof(ResultFetcherService).GetMethod(
+            "GetResolvableUndeterminedKnockout",
+            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+        return (List<MatchEntry>)method!.Invoke(null, [schedule, completed])!;
+    }
+
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_RoundOf32_ResolvesOnlyWhenEveryGroupMatchComplete()
+    {
+        // Round-of-32 placeholders name group positions ("2. plass gruppe A"). The bracket — and
+        // the best-third allocation — is only fixed once *every* group match has been played.
+        var groupMatches = Enumerable.Range(1, 3).Select(i => new MatchEntry
+        {
+            Id = i,
+            Date = new DateTime(2026, 6, 27, 23, 30, 0, DateTimeKind.Utc),
+            Stage = "group-3",
+            HomeTeam = "BRA",
+            AwayTeam = "GER",
+            VenueId = "venue",
+        }).ToList();
+
+        var roundOf32 = new MatchEntry
+        {
+            Id = 73,
+            Date = new DateTime(2026, 6, 28, 19, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-32",
+            HomePlaceholder = "2. plass gruppe A",
+            AwayPlaceholder = "2. plass gruppe B",
+            VenueId = "venue",
+        };
+
+        var schedule = new MatchSchedule(groupMatches.Append(roundOf32).ToList());
+
+        InvokeResolvable(schedule, new HashSet<int> { 1, 2 }).Should().BeEmpty(
+            "the round-of-32 bracket is not settled until every group match is played");
+
+        InvokeResolvable(schedule, new HashSet<int> { 1, 2, 3 })
+            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(73);
+    }
+
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_LaterRound_ResolvesOnReferencedMatches()
+    {
+        // Later rounds name specific feeder games ("Vinner kamp 74").
+        var roundOf16 = new MatchEntry
+        {
+            Id = 89,
+            Date = new DateTime(2026, 7, 1, 19, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-16",
+            HomePlaceholder = "Vinner kamp 74",
+            AwayPlaceholder = "Vinner kamp 77",
+            VenueId = "venue",
+        };
+        var schedule = new MatchSchedule([roundOf16]);
+
+        InvokeResolvable(schedule, new HashSet<int> { 74 }).Should().BeEmpty();
+        InvokeResolvable(schedule, new HashSet<int> { 74, 77 })
+            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(89);
+    }
+
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_SkipsManualOverrideAndDeterminedFixtures()
+    {
+        var determined = new MatchEntry
+        {
+            Id = 90,
+            Stage = "round-of-16",
+            HomeTeam = "BRA",
+            AwayTeam = "GER",
+            HomePlaceholder = "Vinner kamp 73",
+            AwayPlaceholder = "Vinner kamp 75",
+            VenueId = "venue",
+        };
+        var overridden = new MatchEntry
+        {
+            Id = 91,
+            Stage = "round-of-16",
+            HomePlaceholder = "Vinner kamp 76",
+            AwayPlaceholder = "Vinner kamp 78",
+            ManualOverride = true,
+            VenueId = "venue",
+        };
+        var schedule = new MatchSchedule([determined, overridden]);
+
+        InvokeResolvable(schedule, new HashSet<int> { 73, 75, 76, 78 }).Should().BeEmpty(
+            "determined fixtures need no resolution and manual overrides must never be touched");
+    }
 }
 
 internal sealed class FakeHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler
