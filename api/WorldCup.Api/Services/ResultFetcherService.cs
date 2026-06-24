@@ -35,6 +35,11 @@ public sealed class ResultFetcherService(
     private static readonly Regex FeederMatchPattern =
         new(@"kamp\s+(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+    // Matches the "gruppe X" (or "gruppe A/B/C/D/F") reference inside a round-of-32 placeholder
+    // so we can tell which groups a fixture's slots depend on.
+    private static readonly Regex GroupRefPattern =
+        new(@"gruppe\s+([A-L](?:\s*/\s*[A-L])*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     // Safety caps. We always wake at least this often, even if no match is due,
     // so config changes / schedule reloads are picked up. And we never sleep less
     // than the minimum to avoid tight loops on edge cases.
@@ -386,22 +391,61 @@ public sealed class ResultFetcherService(
 
     /// <summary>
     /// The match Ids a knockout fixture feeds from. Later rounds name specific games
-    /// ("Vinner kamp 73"); the round of 32 instead names group positions ("2. plass gruppe B",
-    /// "3. plass gruppe A/B/C/D/F") whose final ordering — including the best-third allocation —
-    /// is only settled once every group match has been played.
+    /// ("Vinner kamp 73"). The round of 32 instead names group positions: a single-group slot
+    /// ("Vinner gruppe E", "2. plass gruppe C") is fixed as soon as that group finishes — so e.g.
+    /// "2. plass gruppe A vs 2. plass gruppe B" can be filled in once groups A and B are done,
+    /// without waiting for the rest of the group stage. A best-third slot instead lists several
+    /// groups ("3. plass gruppe A/B/C/D/F") and can only be filled once the third-place ranking
+    /// across every group is known, so it depends on all group matches.
     /// </summary>
     private static IReadOnlyCollection<int> GetFeederMatchIds(MatchEntry match, MatchSchedule schedule)
     {
-        var referenced = ExtractFeederMatchIds(match.HomePlaceholder)
+        var referencedMatches = ExtractFeederMatchIds(match.HomePlaceholder)
             .Concat(ExtractFeederMatchIds(match.AwayPlaceholder))
             .ToHashSet();
 
-        if (referenced.Count > 0) return referenced;
+        if (referencedMatches.Count > 0) return referencedMatches;
 
-        return schedule.GetAllMatches()
-            .Where(m => IsGroupStage(m.Stage))
+        var feederGroups = GetFeederGroups(match);
+
+        var groupMatchIds = schedule.GetAllMatches()
+            .Where(m => IsGroupStage(m.Stage)
+                && (feederGroups is null || (m.Group is { } group && feederGroups.Contains(group))))
             .Select(m => m.Id)
             .ToHashSet();
+
+        // Defensive: never treat a fixture as resolvable off an empty feeder set (which All()
+        // would vacuously satisfy). Fall back to depending on the whole group stage.
+        return groupMatchIds.Count > 0
+            ? groupMatchIds
+            : schedule.GetAllMatches().Where(m => IsGroupStage(m.Stage)).Select(m => m.Id).ToHashSet();
+    }
+
+    /// <summary>
+    /// The group letters a round-of-32 fixture depends on, or <c>null</c> when it contains a
+    /// best-third slot (which needs the full cross-group third-place ranking, i.e. every group).
+    /// </summary>
+    private static HashSet<string>? GetFeederGroups(MatchEntry match)
+    {
+        var groups = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var placeholder in new[] { match.HomePlaceholder, match.AwayPlaceholder })
+        {
+            if (string.IsNullOrWhiteSpace(placeholder)) continue;
+
+            foreach (Match m in GroupRefPattern.Matches(placeholder))
+            {
+                var letters = m.Groups[1].Value
+                    .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                // A slot naming several groups is the best-third wildcard → depends on all groups.
+                if (letters.Length > 1) return null;
+
+                groups.Add(letters[0]);
+            }
+        }
+
+        return groups.Count > 0 ? groups : null;
     }
 
     private static IEnumerable<int> ExtractFeederMatchIds(string? placeholder)

@@ -505,21 +505,22 @@ public class ResultFetcherServiceTests : IDisposable
         return (List<MatchEntry>)method!.Invoke(null, [schedule, completed])!;
     }
 
-    [Fact]
-    public void GetResolvableUndeterminedKnockout_RoundOf32_ResolvesOnlyWhenEveryGroupMatchComplete()
-    {
-        // Round-of-32 placeholders name group positions ("2. plass gruppe A"). The bracket — and
-        // the best-third allocation — is only fixed once *every* group match has been played.
-        var groupMatches = Enumerable.Range(1, 3).Select(i => new MatchEntry
-        {
-            Id = i,
-            Date = new DateTime(2026, 6, 27, 23, 30, 0, DateTimeKind.Utc),
-            Stage = "group-3",
-            HomeTeam = "BRA",
-            AwayTeam = "GER",
-            VenueId = "venue",
-        }).ToList();
+    // Two group-stage matches per group across three letters (A, B, C), ids 1..6.
+    private static List<MatchEntry> ThreeGroupSchedule() =>
+    [
+        new() { Id = 1, Stage = "group-1", Group = "A", HomeTeam = "T1", AwayTeam = "T2", VenueId = "v" },
+        new() { Id = 2, Stage = "group-3", Group = "A", HomeTeam = "T3", AwayTeam = "T4", VenueId = "v" },
+        new() { Id = 3, Stage = "group-1", Group = "B", HomeTeam = "T5", AwayTeam = "T6", VenueId = "v" },
+        new() { Id = 4, Stage = "group-3", Group = "B", HomeTeam = "T7", AwayTeam = "T8", VenueId = "v" },
+        new() { Id = 5, Stage = "group-1", Group = "C", HomeTeam = "T9", AwayTeam = "T10", VenueId = "v" },
+        new() { Id = 6, Stage = "group-3", Group = "C", HomeTeam = "T11", AwayTeam = "T12", VenueId = "v" },
+    ];
 
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_SimpleSlots_ResolveAsSoonAsTheirOwnGroupsFinish()
+    {
+        // "2. plass gruppe A vs 2. plass gruppe B" depends only on groups A and B — it must
+        // resolve once those finish, without waiting for group C (or the rest of the stage).
         var roundOf32 = new MatchEntry
         {
             Id = 73,
@@ -530,13 +531,38 @@ public class ResultFetcherServiceTests : IDisposable
             VenueId = "venue",
         };
 
-        var schedule = new MatchSchedule(groupMatches.Append(roundOf32).ToList());
+        var schedule = new MatchSchedule(ThreeGroupSchedule().Append(roundOf32).ToList());
 
         InvokeResolvable(schedule, new HashSet<int> { 1, 2 }).Should().BeEmpty(
-            "the round-of-32 bracket is not settled until every group match is played");
+            "group B (matches 3 and 4) is not finished yet");
 
-        InvokeResolvable(schedule, new HashSet<int> { 1, 2, 3 })
-            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(73);
+        InvokeResolvable(schedule, new HashSet<int> { 1, 2, 3, 4 })
+            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(73,
+            "groups A and B are complete, so the fixture is fixed even though group C is not");
+    }
+
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_BestThirdSlot_WaitsForEveryGroup()
+    {
+        // A best-third slot ("3. plass gruppe A/B/C") needs the cross-group third-place ranking,
+        // so it depends on every group finishing — not just the winner's group.
+        var roundOf32 = new MatchEntry
+        {
+            Id = 74,
+            Date = new DateTime(2026, 6, 28, 19, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-32",
+            HomePlaceholder = "Vinner gruppe A",
+            AwayPlaceholder = "3. plass gruppe A/B/C",
+            VenueId = "venue",
+        };
+
+        var schedule = new MatchSchedule(ThreeGroupSchedule().Append(roundOf32).ToList());
+
+        InvokeResolvable(schedule, new HashSet<int> { 1, 2, 3, 4 }).Should().BeEmpty(
+            "group C is unfinished, so the best-third allocation is not yet known");
+
+        InvokeResolvable(schedule, new HashSet<int> { 1, 2, 3, 4, 5, 6 })
+            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(74);
     }
 
     [Fact]
