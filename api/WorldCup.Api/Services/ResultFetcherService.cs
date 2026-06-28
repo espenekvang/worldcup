@@ -130,7 +130,18 @@ public sealed class ResultFetcherService(
         foreach (var match in allMatches)
         {
             if (existingResults.Contains(match.Id)) continue;
-            if (match.AreTeamsUndetermined) continue; // can't fetch until fixture is locked
+
+            // For group-stage matches we always know the teams, so AreTeamsUndetermined
+            // is a genuine data problem and we skip. For knockout matches we skip only
+            // while the buffer window has not yet elapsed — once the game should be
+            // finished the completed-matches feed will carry the teams, and we can fill
+            // them in and store the result in the same cycle (see below).
+            if (match.AreTeamsUndetermined && IsGroupStage(match.Stage)) continue;
+            if (match.AreTeamsUndetermined)
+            {
+                var wouldBeReady = match.Date + GetBufferForStage(match.Stage);
+                if (now < wouldBeReady) continue;
+            }
 
             pendingFetches.TryGetValue(match.Id, out var pending);
 
@@ -178,6 +189,11 @@ public sealed class ResultFetcherService(
         var foundMatchIds = new HashSet<int>();
         var newResults = 0;
 
+        // Knockout fixtures whose teams were null but are now known from the completed feed.
+        // Written to matches.json after we finish processing results so the schedule stays
+        // consistent for the rest of this cycle.
+        var teamFillsFromCompleted = new Dictionary<int, MatchEntry>();
+
         foreach (var dto in completedMatches)
         {
             if (dto.HomeScore is not { } homeScore || dto.AwayScore is not { } awayScore)
@@ -199,6 +215,39 @@ public sealed class ResultFetcherService(
                     homeScore,
                     awayScore);
                 continue;
+            }
+
+            // If the local knockout fixture still has null teams, fill them in from the
+            // completed-match DTO. This self-heals the case where the scheduled feed was
+            // never polled in time (rate-limit, restart, upstream delay) — by the time
+            // results are available the completed feed carries both teams and the score.
+            var localMatch = schedule.GetMatch(matchId.Value);
+            if (localMatch is not null && localMatch.AreTeamsUndetermined && !IsGroupStage(localMatch.Stage))
+            {
+                var homeCode = ResolveTeamCode(dto.HomeCode, dto.Home);
+                var awayCode = ResolveTeamCode(dto.AwayCode, dto.Away);
+                if (homeCode is not null || awayCode is not null)
+                {
+                    teamFillsFromCompleted[matchId.Value] = new MatchEntry
+                    {
+                        Id = localMatch.Id,
+                        Date = localMatch.Date,
+                        Stage = localMatch.Stage,
+                        HomeTeam = homeCode ?? localMatch.HomeTeam,
+                        AwayTeam = awayCode ?? localMatch.AwayTeam,
+                        HomePlaceholder = localMatch.HomePlaceholder,
+                        AwayPlaceholder = localMatch.AwayPlaceholder,
+                        Group = localMatch.Group,
+                        VenueId = localMatch.VenueId,
+                        ManualOverride = localMatch.ManualOverride
+                    };
+                    logger.LogInformation(
+                        "Filling in teams for knockout fixture {MatchId} ({Stage}) from completed-matches feed: {Home} vs {Away}.",
+                        matchId.Value,
+                        localMatch.Stage,
+                        homeCode ?? "(unchanged)",
+                        awayCode ?? "(unchanged)");
+                }
             }
 
             if (existingResults.Contains(matchId.Value)) continue;
@@ -237,6 +286,19 @@ public sealed class ResultFetcherService(
             existingResults.Add(matchId.Value);
             foundMatchIds.Add(matchId.Value);
             newResults++;
+        }
+
+        // Persist any team fills extracted from the completed-matches feed.
+        if (teamFillsFromCompleted.Count > 0)
+        {
+            var currentScheduleMatches = scheduleProvider.Current.GetAllMatches();
+            var patchedMatches = currentScheduleMatches
+                .Select(m => teamFillsFromCompleted.TryGetValue(m.Id, out var filled) ? filled : m)
+                .ToList();
+            await matchFileWriter.WriteAsync(patchedMatches, ct);
+            logger.LogInformation(
+                "Wrote team fills for {Count} completed knockout fixture(s) to matches.json.",
+                teamFillsFromCompleted.Count);
         }
 
         // For matches that were due but did NOT show up in this response, schedule a retry.

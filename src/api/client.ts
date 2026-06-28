@@ -492,3 +492,42 @@ export async function getHeadToHead(teamA: string, teamB: string): Promise<HeadT
     throw err
   }
 }
+
+export interface DiagnosticsApiBudget {
+  usedInLast24h: number
+  dailyBudget: number
+  remaining: number
+}
+
+export interface DiagnosticsMissingResult {
+  matchId: number
+  stage: string
+  kickoffAt: string
+  homeTeam: string | null
+  awayTeam: string | null
+  expectedReadyAt: string
+  pendingAttempts: number
+  exhausted: boolean
+  nextAttemptAt: string | null
+}
+
+export interface DiagnosticsUnresolvedFixture {
+  matchId: number
+  stage: string
+  kickoffAt: string
+  homePlaceholder: string | null
+  awayPlaceholder: string | null
+  status: 'resolvable' | 'waiting_for_feeders'
+  waitingForMatchIds: number[]
+}
+
+export interface DiagnosticsResponse {
+  asOf: string
+  apiCallBudget: DiagnosticsApiBudget
+  missingResults: DiagnosticsMissingResult[]
+  unresolvedFixtures: DiagnosticsUnresolvedFixture[]
+}
+
+export function getDiagnostics(): Promise<DiagnosticsResponse> {
+  return request<DiagnosticsResponse>('/api/admin/diagnostics/missing-results')
+}
