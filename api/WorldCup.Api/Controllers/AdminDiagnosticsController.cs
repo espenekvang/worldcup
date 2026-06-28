@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorldCup.Api.Data;
+using WorldCup.Api.Models;
 using WorldCup.Api.Services;
 
 namespace WorldCup.Api.Controllers;
@@ -11,7 +12,11 @@ namespace WorldCup.Api.Controllers;
 [Authorize(Roles = "Admin")]
 public class AdminDiagnosticsController(
     AppDbContext dbContext,
-    MatchScheduleProvider scheduleProvider) : ControllerBase
+    MatchScheduleProvider scheduleProvider,
+    Wc2026ApiClient apiClient,
+    TeamCodeMapper teamCodeMapper,
+    MatchFileWriter matchFileWriter,
+    ScoringService scoringService) : ControllerBase
 {
     private const int MaxFetchAttempts = 5;
     private const int DailyCallBudget = 90;
@@ -27,9 +32,8 @@ public class AdminDiagnosticsController(
 
     /// <summary>
     /// Returns a snapshot of the result-fetcher's health: which matches are overdue without a
-    /// stored result, and which knockout fixtures still have null teams together with what they're
-    /// waiting for. Intended for admin-only use when the automatic fetcher appears to have missed
-    /// results — the response makes it easy to target manual overrides.
+    /// stored result, and which knockout fixtures still have null teams. Use this to decide
+    /// whether a manual force-fetch or team override is needed.
     /// </summary>
     [HttpGet("/api/admin/diagnostics/missing-results")]
     public async Task<ActionResult<DiagnosticsResponse>> GetMissingResults(CancellationToken ct)
@@ -55,12 +59,13 @@ public class AdminDiagnosticsController(
             DailyBudget: DailyCallBudget,
             Remaining: Math.Max(0, DailyCallBudget - callsInWindow));
 
-        // Matches that are due (teams known, buffer elapsed) but have no result yet.
+        // Matches past their expected-ready time with no stored result.
+        // Includes null-team knockout matches (the fixed fetcher now handles them too).
         var missingResults = new List<MissingResultInfo>();
         foreach (var match in allMatches.OrderBy(m => m.Date))
         {
             if (existingResultMatchIds.Contains(match.Id)) continue;
-            if (match.AreTeamsUndetermined) continue;
+            if (match.AreTeamsUndetermined && IsGroupStage(match.Stage)) continue;
 
             var buffer = GetBufferForStage(match.Stage);
             var expectedReadyAt = match.Date + buffer;
@@ -76,6 +81,7 @@ public class AdminDiagnosticsController(
                 KickoffAt: match.Date,
                 HomeTeam: match.HomeTeam,
                 AwayTeam: match.AwayTeam,
+                TeamsUnknown: match.AreTeamsUndetermined,
                 ExpectedReadyAt: expectedReadyAt,
                 PendingAttempts: attempts,
                 Exhausted: exhausted,
@@ -113,6 +119,182 @@ public class AdminDiagnosticsController(
             ApiCallBudget: budget,
             MissingResults: missingResults,
             UnresolvedFixtures: unresolvedFixtures));
+    }
+
+    /// <summary>
+    /// Immediately fetches results and resolves fixture teams from the upstream API,
+    /// bypassing the in-app daily budget gate. Use when the automatic background service
+    /// is stuck due to budget exhaustion. Still logs calls to ApiCallLogs so the
+    /// rolling budget window stays accurate; the upstream provider enforces its own limit.
+    /// </summary>
+    [HttpPost("/api/admin/diagnostics/force-fetch")]
+    public async Task<ActionResult<ForceFetchResult>> ForceFetch(CancellationToken ct)
+    {
+        var now = DateTime.UtcNow;
+        var schedule = scheduleProvider.Current;
+        var allMatches = schedule.GetAllMatches();
+
+        var existingResultIds = (await dbContext.MatchResults
+                .Select(r => r.MatchId)
+                .ToListAsync(ct))
+            .ToHashSet();
+
+        // ── Step 1: completed-matches feed → results + null-team fills ──────────
+        await LogApiCallAsync("/matches?status=completed", now, ct);
+        var completedDtos = await apiClient.GetCompletedMatchesAsync(ct);
+
+        var newResults = 0;
+        var teamFills = new Dictionary<int, MatchEntry>();
+
+        foreach (var dto in completedDtos)
+        {
+            if (dto.HomeScore is not { } homeScore || dto.AwayScore is not { } awayScore) continue;
+
+            var matchId = apiClient.MapToLocalMatchId(dto.MatchNumber, dto.KickoffAt, schedule);
+            if (matchId is null) continue;
+
+            var localMatch = schedule.GetMatch(matchId.Value);
+            if (localMatch is not null && localMatch.AreTeamsUndetermined && !IsGroupStage(localMatch.Stage))
+            {
+                var homeCode = ResolveTeamCode(dto.HomeCode, dto.Home);
+                var awayCode = ResolveTeamCode(dto.AwayCode, dto.Away);
+                if (homeCode is not null || awayCode is not null)
+                {
+                    teamFills[matchId.Value] = new MatchEntry
+                    {
+                        Id = localMatch.Id,
+                        Date = localMatch.Date,
+                        Stage = localMatch.Stage,
+                        HomeTeam = homeCode ?? localMatch.HomeTeam,
+                        AwayTeam = awayCode ?? localMatch.AwayTeam,
+                        HomePlaceholder = localMatch.HomePlaceholder,
+                        AwayPlaceholder = localMatch.AwayPlaceholder,
+                        Group = localMatch.Group,
+                        VenueId = localMatch.VenueId,
+                        ManualOverride = localMatch.ManualOverride
+                    };
+                }
+            }
+
+            if (existingResultIds.Contains(matchId.Value)) continue;
+
+            dbContext.MatchResults.Add(new MatchResult
+            {
+                Id = Guid.NewGuid(),
+                MatchId = matchId.Value,
+                HomeScore = homeScore,
+                AwayScore = awayScore,
+                FetchedAt = DateTime.UtcNow,
+                Referee = string.IsNullOrWhiteSpace(dto.Referee) ? null : dto.Referee.Trim()
+            });
+
+            var predictions = await dbContext.Predictions
+                .Where(p => p.MatchId == matchId.Value)
+                .ToListAsync(ct);
+
+            foreach (var prediction in predictions)
+            {
+                prediction.Points = scoringService.CalculatePoints(
+                    prediction.HomeScore, prediction.AwayScore, homeScore, awayScore);
+            }
+
+            var pending = await dbContext.PendingMatchFetches
+                .FirstOrDefaultAsync(p => p.MatchId == matchId.Value, ct);
+            if (pending is not null) dbContext.PendingMatchFetches.Remove(pending);
+
+            existingResultIds.Add(matchId.Value);
+            newResults++;
+        }
+
+        if (teamFills.Count > 0)
+        {
+            var patched = allMatches
+                .Select(m => teamFills.TryGetValue(m.Id, out var f) ? f : m)
+                .ToList();
+            await matchFileWriter.WriteAsync(patched, ct);
+            schedule = scheduleProvider.Current;
+            allMatches = schedule.GetAllMatches();
+        }
+
+        await dbContext.SaveChangesAsync(ct);
+
+        // ── Step 2: scheduled-matches feed → undetermined fixture teams ──────────
+        var undetermined = allMatches
+            .Where(m => !IsGroupStage(m.Stage) && m.AreTeamsUndetermined && !m.ManualOverride)
+            .ToDictionary(m => m.Id);
+
+        var fixtureTeamFills = 0;
+
+        if (undetermined.Count > 0)
+        {
+            await LogApiCallAsync("/matches?status=scheduled", DateTime.UtcNow, ct);
+            var scheduledDtos = await apiClient.GetScheduledMatchesAsync(ct);
+
+            var fixtureUpdates = new Dictionary<int, MatchEntry>();
+            foreach (var dto in scheduledDtos)
+            {
+                var matchId = apiClient.MapToLocalMatchIdByMatchNumber(dto.MatchNumber, schedule);
+                if (matchId is null || !undetermined.TryGetValue(matchId.Value, out var local)) continue;
+
+                var homeCode = ResolveTeamCode(dto.HomeCode, dto.Home);
+                var awayCode = ResolveTeamCode(dto.AwayCode, dto.Away);
+                if (homeCode is null && awayCode is null) continue;
+
+                var newHome = homeCode ?? local.HomeTeam;
+                var newAway = awayCode ?? local.AwayTeam;
+                if (newHome == local.HomeTeam && newAway == local.AwayTeam) continue;
+
+                fixtureUpdates[local.Id] = new MatchEntry
+                {
+                    Id = local.Id,
+                    Date = local.Date,
+                    Stage = local.Stage,
+                    HomeTeam = newHome,
+                    AwayTeam = newAway,
+                    HomePlaceholder = local.HomePlaceholder,
+                    AwayPlaceholder = local.AwayPlaceholder,
+                    Group = local.Group,
+                    VenueId = local.VenueId,
+                    ManualOverride = local.ManualOverride
+                };
+            }
+
+            if (fixtureUpdates.Count > 0)
+            {
+                var currentMatches = scheduleProvider.Current.GetAllMatches();
+                var patchedMatches = currentMatches
+                    .Select(m => fixtureUpdates.TryGetValue(m.Id, out var u) ? u : m)
+                    .ToList();
+                await matchFileWriter.WriteAsync(patchedMatches, ct);
+                fixtureTeamFills = fixtureUpdates.Count;
+            }
+
+            await dbContext.SaveChangesAsync(ct);
+        }
+
+        return Ok(new ForceFetchResult(
+            NewResults: newResults,
+            TeamFillsFromCompleted: teamFills.Count,
+            FixtureTeamFills: fixtureTeamFills,
+            CompletedDtosReceived: completedDtos.Count,
+            RemainingUndetermined: undetermined.Count - fixtureTeamFills));
+    }
+
+    private string? ResolveTeamCode(string? code, string? name)
+    {
+        if (!string.IsNullOrWhiteSpace(code)) return code.Trim();
+        return string.IsNullOrWhiteSpace(name) ? null : teamCodeMapper.GetCode(name);
+    }
+
+    private async Task LogApiCallAsync(string endpoint, DateTime calledAt, CancellationToken ct)
+    {
+        dbContext.ApiCallLogs.Add(new ApiCallLog
+        {
+            Id = Guid.NewGuid(),
+            CalledAt = calledAt,
+            Endpoint = endpoint
+        });
+        await dbContext.SaveChangesAsync(ct);
     }
 
     private static bool IsGroupStage(string? stage) =>
@@ -199,6 +381,7 @@ public sealed record MissingResultInfo(
     DateTime KickoffAt,
     string? HomeTeam,
     string? AwayTeam,
+    bool TeamsUnknown,
     DateTime ExpectedReadyAt,
     int PendingAttempts,
     bool Exhausted,
@@ -212,3 +395,10 @@ public sealed record UnresolvedFixtureInfo(
     string? AwayPlaceholder,
     string Status,
     IReadOnlyList<int> WaitingForMatchIds);
+
+public sealed record ForceFetchResult(
+    int NewResults,
+    int TeamFillsFromCompleted,
+    int FixtureTeamFills,
+    int CompletedDtosReceived,
+    int RemainingUndetermined);

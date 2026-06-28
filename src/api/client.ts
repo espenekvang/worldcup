@@ -505,6 +505,7 @@ export interface DiagnosticsMissingResult {
   kickoffAt: string
   homeTeam: string | null
   awayTeam: string | null
+  teamsUnknown: boolean
   expectedReadyAt: string
   pendingAttempts: number
   exhausted: boolean
@@ -530,4 +531,16 @@ export interface DiagnosticsResponse {
 
 export function getDiagnostics(): Promise<DiagnosticsResponse> {
   return request<DiagnosticsResponse>('/api/admin/diagnostics/missing-results')
+}
+
+export interface ForceFetchResult {
+  newResults: number
+  teamFillsFromCompleted: number
+  fixtureTeamFills: number
+  completedDtosReceived: number
+  remainingUndetermined: number
+}
+
+export function forceFetch(): Promise<ForceFetchResult> {
+  return request<ForceFetchResult>('/api/admin/diagnostics/force-fetch', { method: 'POST' })
 }
