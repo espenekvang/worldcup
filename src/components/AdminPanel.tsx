@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { InvitationResponse, InviteLinkResponse } from '../api/client'
+import type { InvitationResponse, InviteLinkResponse, DiagnosticsResponse } from '../api/client'
 import {
   getInvitations, createInvitation, deleteInvitation,
   getInviteLinks, createInviteLink, revokeInviteLink,
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
-  setMemberPaid, broadcastMessage, setBossNameDisplay,
+  setMemberPaid, broadcastMessage, setBossNameDisplay, getDiagnostics,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
@@ -88,6 +88,11 @@ export default function AdminPanel() {
   const [broadcastLoading, setBroadcastLoading] = useState(false)
   const [broadcastError, setBroadcastError] = useState<string | null>(null)
   const [broadcastSuccess, setBroadcastSuccess] = useState<string | null>(null)
+
+  // Diagnostics state
+  const [diagnostics, setDiagnostics] = useState<DiagnosticsResponse | null>(null)
+  const [diagnosticsLoading, setDiagnosticsLoading] = useState(false)
+  const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null)
 
   const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
   const matchesWithoutResult = matches.filter((m) => !results.has(m.id))
@@ -475,6 +480,19 @@ export default function AdminPanel() {
       setResultError(err instanceof Error ? err.message : 'Kunne ikke sette resultat')
     } finally {
       setResultLoading(false)
+    }
+  }
+
+  async function handleLoadDiagnostics() {
+    setDiagnosticsLoading(true)
+    setDiagnosticsError(null)
+    try {
+      const data = await getDiagnostics()
+      setDiagnostics(data)
+    } catch (err) {
+      setDiagnosticsError(err instanceof Error ? err.message : 'Kunne ikke laste diagnostikk')
+    } finally {
+      setDiagnosticsLoading(false)
     }
   }
 
@@ -1086,6 +1104,144 @@ export default function AdminPanel() {
 
       {isGlobalAdmin && (
       <>
+      {/* Diagnostics */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Diagnostikk</h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Manglende resultater og uløste sluttspilloppsett fra den automatiske henteren.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleLoadDiagnostics}
+            disabled={diagnosticsLoading}
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+          >
+            {diagnosticsLoading ? 'Laster...' : 'Hent status'}
+          </button>
+        </div>
+
+        {diagnosticsError && (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{diagnosticsError}</p>
+        )}
+
+        {diagnostics && (
+          <div className="mt-4 space-y-4">
+            {/* API budget */}
+            <div
+              className="rounded-lg border px-4 py-3 text-sm"
+              style={{ borderColor: 'var(--color-border-light)' }}
+            >
+              <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>API-budsjett siste 24t: </span>
+              <span style={{ color: diagnostics.apiCallBudget.remaining < 10 ? 'var(--color-danger)' : 'var(--color-text-secondary)' }}>
+                {diagnostics.apiCallBudget.usedInLast24h}/{diagnostics.apiCallBudget.dailyBudget} kall brukt
+                {' '}({diagnostics.apiCallBudget.remaining} igjen)
+              </span>
+              <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                per {new Date(diagnostics.asOf).toLocaleString('no-NO')}
+              </span>
+            </div>
+
+            {/* Missing results */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                Manglende resultater ({diagnostics.missingResults.length})
+              </h3>
+              {diagnostics.missingResults.length === 0 ? (
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Ingen manglende resultater.</p>
+              ) : (
+                <ul className="space-y-1">
+                  {diagnostics.missingResults.map((r) => (
+                    <li
+                      key={r.matchId}
+                      className="rounded-lg border px-3 py-2 text-xs"
+                      style={{
+                        borderColor: r.exhausted ? 'var(--color-danger)' : 'var(--color-border-light)',
+                        backgroundColor: r.exhausted ? 'var(--color-danger-light, #fee2e2)' : undefined,
+                      }}
+                    >
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                        Kamp {r.matchId}
+                      </span>
+                      {' '}
+                      <span style={{ color: 'var(--color-text-muted)' }}>({stageNames[r.stage] ?? r.stage})</span>
+                      {' · '}
+                      <span style={{ color: 'var(--color-text-secondary)' }}>
+                        {r.homeTeam ?? '?'} vs {r.awayTeam ?? '?'}
+                      </span>
+                      {' · sparkoff: '}
+                      <span style={{ color: 'var(--color-text-secondary)' }}>
+                        {new Date(r.kickoffAt).toLocaleString('no-NO')}
+                      </span>
+                      {' · '}
+                      {r.exhausted ? (
+                        <span style={{ color: 'var(--color-danger)' }}>
+                          Gitt opp etter {r.pendingAttempts} forsøk — krever manuell intervensjon
+                        </span>
+                      ) : r.pendingAttempts > 0 ? (
+                        <span style={{ color: 'var(--color-text-muted)' }}>
+                          Forsøk {r.pendingAttempts}/{5} · neste: {r.nextAttemptAt ? new Date(r.nextAttemptAt).toLocaleString('no-NO') : '?'}
+                        </span>
+                      ) : (
+                        <span style={{ color: 'var(--color-text-muted)' }}>Venter på første forsøk</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Unresolved fixtures */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                Uløste sluttspilloppsett ({diagnostics.unresolvedFixtures.length})
+              </h3>
+              {diagnostics.unresolvedFixtures.length === 0 ? (
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Alle sluttspillkamper har kjente lag.</p>
+              ) : (
+                <ul className="space-y-1">
+                  {diagnostics.unresolvedFixtures.map((f) => (
+                    <li
+                      key={f.matchId}
+                      className="rounded-lg border px-3 py-2 text-xs"
+                      style={{
+                        borderColor: f.status === 'resolvable' ? 'var(--color-warning, #f59e0b)' : 'var(--color-border-light)',
+                      }}
+                    >
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                        Kamp {f.matchId}
+                      </span>
+                      {' '}
+                      <span style={{ color: 'var(--color-text-muted)' }}>({stageNames[f.stage] ?? f.stage})</span>
+                      {' · '}
+                      <span style={{ color: 'var(--color-text-secondary)' }}>
+                        {f.homePlaceholder ?? '?'} vs {f.awayPlaceholder ?? '?'}
+                      </span>
+                      {' · '}
+                      {f.status === 'resolvable' ? (
+                        <span style={{ color: 'var(--color-warning, #b45309)' }}>
+                          Klar til oppløsning — venter på neste poll (maks 20 min)
+                        </span>
+                      ) : (
+                        <span style={{ color: 'var(--color-text-muted)' }}>
+                          Venter på kamp {f.waitingForMatchIds.join(', ')}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Match Override */}
       <div
         className="rounded-xl border p-4 sm:p-6 mt-6"
