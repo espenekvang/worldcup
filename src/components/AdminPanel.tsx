@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { InvitationResponse, InviteLinkResponse, DiagnosticsResponse } from '../api/client'
+import type { InvitationResponse, InviteLinkResponse, DiagnosticsResponse, ForceFetchResult } from '../api/client'
 import {
   getInvitations, createInvitation, deleteInvitation,
   getInviteLinks, createInviteLink, revokeInviteLink,
   updateMatchTeams, setMatchResult,
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
-  setMemberPaid, broadcastMessage, setBossNameDisplay, getDiagnostics,
+  setMemberPaid, broadcastMessage, setBossNameDisplay, getDiagnostics, forceFetch,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
@@ -93,6 +93,9 @@ export default function AdminPanel() {
   const [diagnostics, setDiagnostics] = useState<DiagnosticsResponse | null>(null)
   const [diagnosticsLoading, setDiagnosticsLoading] = useState(false)
   const [diagnosticsError, setDiagnosticsError] = useState<string | null>(null)
+  const [forceFetchResult, setForceFetchResult] = useState<ForceFetchResult | null>(null)
+  const [forceFetchLoading, setForceFetchLoading] = useState(false)
+  const [forceFetchError, setForceFetchError] = useState<string | null>(null)
 
   const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
   const matchesWithoutResult = matches.filter((m) => !results.has(m.id))
@@ -493,6 +496,23 @@ export default function AdminPanel() {
       setDiagnosticsError(err instanceof Error ? err.message : 'Kunne ikke laste diagnostikk')
     } finally {
       setDiagnosticsLoading(false)
+    }
+  }
+
+  async function handleForceFetch() {
+    setForceFetchLoading(true)
+    setForceFetchError(null)
+    setForceFetchResult(null)
+    try {
+      const result = await forceFetch()
+      setForceFetchResult(result)
+      // Refresh diagnostics so the updated state is visible
+      const updated = await getDiagnostics()
+      setDiagnostics(updated)
+    } catch (err) {
+      setForceFetchError(err instanceof Error ? err.message : 'Tving-henting feilet')
+    } finally {
+      setForceFetchLoading(false)
     }
   }
 
@@ -1109,23 +1129,53 @@ export default function AdminPanel() {
         className="rounded-xl border p-4 sm:p-6 mt-6"
         style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Diagnostikk</h2>
             <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Manglende resultater og uløste sluttspilloppsett fra den automatiske henteren.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handleLoadDiagnostics}
-            disabled={diagnosticsLoading}
-            className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
-            style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
-          >
-            {diagnosticsLoading ? 'Laster...' : 'Hent status'}
-          </button>
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleLoadDiagnostics}
+              disabled={diagnosticsLoading || forceFetchLoading}
+              className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+            >
+              {diagnosticsLoading ? 'Laster...' : 'Hent status'}
+            </button>
+            <button
+              type="button"
+              onClick={handleForceFetch}
+              disabled={forceFetchLoading || diagnosticsLoading}
+              className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-danger, #dc2626)', color: '#fff' }}
+            >
+              {forceFetchLoading ? 'Henter...' : 'Tving henting'}
+            </button>
+          </div>
         </div>
+
+        {forceFetchError && (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{forceFetchError}</p>
+        )}
+
+        {forceFetchResult && (
+          <div
+            className="mt-3 rounded-lg border px-4 py-3 text-sm"
+            style={{ borderColor: 'var(--color-success, #16a34a)', backgroundColor: 'var(--color-success-light)' }}
+          >
+            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Tving-henting fullført: </span>
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+              {forceFetchResult.newResults} nye resultater
+              {forceFetchResult.teamFillsFromCompleted > 0 && `, ${forceFetchResult.teamFillsFromCompleted} lag fylt fra resultater`}
+              {forceFetchResult.fixtureTeamFills > 0 && `, ${forceFetchResult.fixtureTeamFills} oppsett oppdatert`}
+              {forceFetchResult.remainingUndetermined > 0 && ` · ${forceFetchResult.remainingUndetermined} oppsett fremdeles ubestemt`}
+            </span>
+          </div>
+        )}
 
         {diagnosticsError && (
           <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{diagnosticsError}</p>

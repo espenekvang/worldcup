@@ -82,7 +82,6 @@ builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
 builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
-builder.Services.AddHostedService<ResultFetcherService>();
 
 // Værvarsel (Open-Meteo). MemoryCache holder svar i ~3t per stadion+dato slik at
 // klienten kan kalle endepunktet fritt uten å belaste tredjepart.
@@ -158,7 +157,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// DatabaseMigrationService must be registered first: the host calls StartAsync in
+// registration order and awaits each one, so migrations complete before
+// ResultFetcherService.StartAsync fires its background ExecuteAsync task.
 builder.Services.AddHostedService<DatabaseMigrationService>();
+builder.Services.AddHostedService<ResultFetcherService>();
 
 var app = builder.Build();
 
