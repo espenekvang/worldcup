@@ -64,6 +64,8 @@ public sealed class ResultFetcherService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await ResetExhaustedKnockoutFetchesAsync(stoppingToken);
+
         while (!stoppingToken.IsCancellationRequested)
         {
             TimeSpan sleepFor = MaxSleep;
@@ -98,6 +100,56 @@ public sealed class ResultFetcherService(
             {
                 break;
             }
+        }
+    }
+
+    /// <summary>
+    /// On startup, resets any <see cref="PendingMatchFetch"/> rows that exhausted their
+    /// retries for knockout matches with no stored result. These rows were written by a
+    /// previous service version that required teams to be known before polling — but a
+    /// deployed fix now fills in teams from the completed-matches feed, so the old "give up"
+    /// state is stale. Resetting gives those matches a clean retry in the first cycle.
+    /// </summary>
+    private async Task ResetExhaustedKnockoutFetchesAsync(CancellationToken ct)
+    {
+        try
+        {
+            using var scope = scopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var existingResultIds = (await dbContext.MatchResults
+                    .Select(r => r.MatchId)
+                    .ToListAsync(ct))
+                .ToHashSet();
+
+            var knockoutMatchIds = scheduleProvider.Current
+                .GetAllMatches()
+                .Where(m => !IsGroupStage(m.Stage))
+                .Select(m => m.Id)
+                .ToHashSet();
+
+            var stale = await dbContext.PendingMatchFetches
+                .Where(p => p.AttemptCount >= MaxFetchAttempts
+                    && knockoutMatchIds.Contains(p.MatchId)
+                    && !existingResultIds.Contains(p.MatchId))
+                .ToListAsync(ct);
+
+            if (stale.Count == 0) return;
+
+            foreach (var p in stale)
+            {
+                p.AttemptCount = 0;
+                p.NextAttemptAt = DateTime.UtcNow;
+            }
+
+            await dbContext.SaveChangesAsync(ct);
+            logger.LogInformation(
+                "Startup: reset {Count} exhausted PendingMatchFetch row(s) for knockout matches with no result — they will be retried this cycle.",
+                stale.Count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Startup: could not reset exhausted knockout pending fetches — will proceed normally.");
         }
     }
 
