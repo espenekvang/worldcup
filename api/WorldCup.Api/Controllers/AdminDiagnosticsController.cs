@@ -233,7 +233,7 @@ public class AdminDiagnosticsController(
             var fixtureUpdates = new Dictionary<int, MatchEntry>();
             foreach (var dto in scheduledDtos)
             {
-                var matchId = apiClient.MapToLocalMatchIdByMatchNumber(dto.MatchNumber, schedule);
+                var matchId = apiClient.MapToLocalMatchIdByMatchNumber(dto.MatchNumber, dto.KickoffAt, schedule);
                 if (matchId is null || !undetermined.TryGetValue(matchId.Value, out var local)) continue;
 
                 var homeCode = ResolveTeamCode(dto.HomeCode, dto.Home);

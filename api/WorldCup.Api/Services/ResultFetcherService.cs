@@ -642,7 +642,7 @@ public sealed class ResultFetcherService(
 
         foreach (var dto in scheduledMatches)
         {
-            var matchId = apiClient.MapToLocalMatchIdByMatchNumber(dto.MatchNumber, currentSchedule);
+            var matchId = apiClient.MapToLocalMatchIdByMatchNumber(dto.MatchNumber, dto.KickoffAt, currentSchedule);
             if (matchId is null || !undeterminedMatchesById.TryGetValue(matchId.Value, out var localMatch) || !localMatch.AreTeamsUndetermined)
             {
                 continue;

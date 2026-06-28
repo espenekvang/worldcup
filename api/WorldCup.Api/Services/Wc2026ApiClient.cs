@@ -157,24 +157,62 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
     /// <summary>
     /// Resolves a completed-match DTO to a local fixture Id.
     /// <para>
-    /// The primary key is the FIFA <paramref name="matchNumber"/>, which equals the local
-    /// <see cref="MatchEntry.Id"/>. This is exact and completely immune to clock/timezone
-    /// differences between matches.json and the upstream payload.
+    /// The primary lookup is by <paramref name="matchNumber"/> against the local schedule. When
+    /// a match is found, the kickoff time is cross-validated: if it falls outside the tolerance
+    /// window the number match is discarded and the time-based fallback is used instead. This
+    /// guards against the API's match_number diverging from our local IDs in the knockout rounds
+    /// (confirmed: the API's knockout match_numbers do not align 1:1 with our local IDs 73–104).
     /// </para>
     /// <para>
-    /// Only when the match number is unknown do we fall back to kickoff time, comparing both
-    /// sides normalized to UTC (a plain <see cref="DateTime"/> subtraction ignores
-    /// <see cref="DateTimeKind"/>, so an offset/local kickoff would otherwise look hours away
-    /// from the UTC value in matches.json and never match). The fallback resolves only when
-    /// exactly one local fixture is in range — simultaneous kickoffs (e.g. final-round group
-    /// games) must never be guessed by time alone.
+    /// The time-based fallback normalises both sides to UTC and resolves only when exactly one
+    /// local fixture is within range — simultaneous kickoffs (final-round group games) must never
+    /// be guessed by time alone.
     /// </para>
     /// </summary>
     public int? MapToLocalMatchId(int matchNumber, DateTime kickoffAt, MatchSchedule schedule)
     {
+        var kickoffUtc = ToUtc(kickoffAt);
+
         if (schedule.GetMatch(matchNumber) is { } byNumber)
         {
-            return byNumber.Id;
+            var delta = Math.Abs((ToUtc(byNumber.Date) - kickoffUtc).TotalMinutes);
+            if (delta <= KickoffMatchToleranceMinutes)
+            {
+                return byNumber.Id;
+            }
+
+            // Match number resolves a local fixture but the kickoff doesn't align — the API's
+            // numbering has diverged from ours for this stage. Fall through to the time lookup.
+            logger.LogWarning(
+                "match_number {MatchNumber} resolves to local fixture {LocalId} (kickoff {LocalKickoff:o}) " +
+                "but API kickoff {ApiKickoff:o} is {DeltaMin:F0} min away — treating as numbering mismatch, falling back to kickoff lookup.",
+                matchNumber, byNumber.Id, byNumber.Date, kickoffAt, delta);
+        }
+
+        var candidates = schedule.GetAllMatches()
+            .Where(m => Math.Abs((ToUtc(m.Date) - kickoffUtc).TotalMinutes) <= KickoffMatchToleranceMinutes)
+            .ToList();
+
+        return candidates.Count == 1 ? candidates[0].Id : null;
+    }
+
+    /// <summary>
+    /// Resolves a scheduled-match DTO to a local fixture Id by match number, cross-validating
+    /// with kickoff time to guard against knockout-stage numbering mismatches.
+    /// </summary>
+    public int? MapToLocalMatchIdByMatchNumber(int matchNumber, DateTime kickoffAt, MatchSchedule schedule)
+    {
+        if (schedule.GetMatch(matchNumber) is { } byNumber)
+        {
+            var delta = Math.Abs((ToUtc(byNumber.Date) - ToUtc(kickoffAt)).TotalMinutes);
+            if (delta <= KickoffMatchToleranceMinutes)
+            {
+                return byNumber.Id;
+            }
+
+            logger.LogWarning(
+                "match_number {MatchNumber} resolves to local fixture {LocalId} but kickoff delta is {DeltaMin:F0} min — using kickoff fallback.",
+                matchNumber, byNumber.Id, delta);
         }
 
         var kickoffUtc = ToUtc(kickoffAt);
@@ -184,9 +222,6 @@ public sealed class Wc2026ApiClient(HttpClient httpClient, IConfiguration config
 
         return candidates.Count == 1 ? candidates[0].Id : null;
     }
-
-    public int? MapToLocalMatchIdByMatchNumber(int matchNumber, MatchSchedule schedule) =>
-        schedule.GetMatch(matchNumber)?.Id;
 
     /// <summary>
     /// Normalizes a <see cref="DateTime"/> to UTC for instant-comparison. An offset in the
