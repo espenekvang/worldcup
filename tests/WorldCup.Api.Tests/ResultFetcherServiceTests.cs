@@ -326,6 +326,102 @@ public class ResultFetcherServiceTests : IDisposable
         updated.AwayTeam.Should().Be("GER");
     }
 
+    [Fact]
+    public async Task BackfillCompletedKnockoutTeams_PlayedFixtureWithNullTeams_WritesResolvedTeams()
+    {
+        // The case the durable fix targets: a knockout fixture that has already been played
+        // (its result has landed) but whose teams are still null. The scheduled feed can't see
+        // it anymore, so the completed-feed backfill must resolve its teams.
+        var playedButUnresolved = new MatchEntry
+        {
+            Id = 90,
+            Date = new DateTime(2026, 7, 3, 19, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-16",
+            HomeTeam = null,
+            AwayTeam = null,
+            HomePlaceholder = "Vinner kamp 73",
+            AwayPlaceholder = "Vinner kamp 75",
+            VenueId = "venue-r16",
+            ManualOverride = false,
+        };
+
+        WriteMatches([playedButUnresolved]);
+        _scheduleProvider.Reload([playedButUnresolved]);
+
+        // The completed feed still carries both teams (and the score) for the played fixture.
+        var apiDto = new[]
+        {
+            new { match_number = 90, home_team = "Brasil", away_team = "Tyskland", home_team_code = "BRA", away_team_code = "GER", kickoff_utc = playedButUnresolved.Date, home_score = 2, away_score = 1, status = "completed" }
+        };
+        var apiJson = JsonSerializer.Serialize(apiDto);
+
+        var handler = new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(apiJson, Encoding.UTF8, "application/json")
+            });
+
+        var apiClient = BuildApiClient(handler);
+
+        var teamsJson = """
+            {
+              "BRA": { "code": "BRA", "name": "Brasil", "flag": "🇧🇷" },
+              "GER": { "code": "GER", "name": "Tyskland", "flag": "🇩🇪" }
+            }
+            """;
+        var tempTeamsPath = Path.Combine(_tempDir, "teams_backfill_test.json");
+        File.WriteAllText(tempTeamsPath, teamsJson);
+        var teamMapper = BuildTeamCodeMapper(tempTeamsPath);
+
+        var service = new ResultFetcherService(
+            Substitute.For<IServiceScopeFactory>(), _scheduleProvider, apiClient, teamMapper, _matchFileWriter,
+            Substitute.For<ILogger<ResultFetcherService>>());
+
+        var method = typeof(ResultFetcherService).GetMethod(
+            "BackfillCompletedKnockoutTeamsAsync",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        var task = (Task<int>)method!.Invoke(service, [CancellationToken.None])!;
+        var count = await task;
+
+        count.Should().Be(1);
+
+        var written = JsonSerializer.Deserialize<List<MatchEntry>>(
+            File.ReadAllText(_jsonPath),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        written.Should().NotBeNull();
+        var updated = written!.Single(m => m.Id == 90);
+        updated.HomeTeam.Should().Be("BRA");
+        updated.AwayTeam.Should().Be("GER");
+    }
+
+    [Fact]
+    public void GetResolvableUndeterminedKnockout_SkipsAlreadyPlayedFixtures()
+    {
+        // A fixture that has itself already been played (its id is in the completed set) but still
+        // has null teams must NOT be chased via the scheduled feed — it has left that feed. The
+        // completed-feed backfill is responsible for it instead. A not-yet-played fixture with the
+        // same feeders is still resolvable via the scheduled feed.
+        var fixture = new MatchEntry
+        {
+            Id = 89,
+            Stage = "round-of-16",
+            HomePlaceholder = "Vinner kamp 74",
+            AwayPlaceholder = "Vinner kamp 77",
+            VenueId = "venue",
+        };
+        var schedule = new MatchSchedule([fixture]);
+
+        InvokeResolvable(schedule, new HashSet<int> { 74, 77, 89 }).Should().BeEmpty(
+            "fixture 89 has already been played, so the scheduled-feed resolver must skip it");
+
+        InvokeResolvable(schedule, new HashSet<int> { 74, 77 })
+            .Select(m => m.Id).Should().ContainSingle().Which.Should().Be(89,
+            "feeders are complete and the fixture has not been played, so it resolves via the scheduled feed");
+    }
+
     private static MatchSchedule ScheduleWith(params MatchEntry[] matches) => new(matches);
 
     [Fact]

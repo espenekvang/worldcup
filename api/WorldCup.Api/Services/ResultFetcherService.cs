@@ -30,6 +30,13 @@ public sealed class ResultFetcherService(
     private static readonly TimeSpan FixturePollRetryInterval = TimeSpan.FromMinutes(20);
     private DateTime _nextFixturePollAtUtc = DateTime.MinValue;
 
+    // Cadence for re-polling the upstream "completed" feed to backfill teams for knockout
+    // fixtures that already have a stored result but whose teams are still null. The scheduled
+    // feed cannot help here (a played game has left it), so this is the only path that can
+    // un-freeze such a fixture from its placeholder. In-memory; resets on restart.
+    private static readonly TimeSpan CompletedBackfillRetryInterval = TimeSpan.FromMinutes(20);
+    private DateTime _nextCompletedBackfillAtUtc = DateTime.MinValue;
+
     // Matches the "kamp NN" reference inside a knockout placeholder ("Vinner kamp 73",
     // "Taper kamp 101") so we can tell which earlier games a fixture feeds from.
     private static readonly Regex FeederMatchPattern =
@@ -218,9 +225,12 @@ public sealed class ResultFetcherService(
         {
             // No match results are due, but knockout fixtures may have become resolvable in an
             // earlier cycle (e.g. the final group game's result has already landed). Try to pull
-            // in the teams, then sleep until the next result *or* fixture re-poll is due.
+            // in the teams from the scheduled feed (for not-yet-played fixtures) and from the
+            // completed feed (for already-played fixtures that are still missing their teams),
+            // then sleep until the next result *or* re-poll is due.
             await TryResolveFixturesAsync(dbContext, existingResults, now, ct);
-            return ComputeSleep(outstanding, DateTime.UtcNow, NextFixturePollWake(existingResults));
+            await TryBackfillPlayedKnockoutTeamsAsync(dbContext, existingResults, now, ct);
+            return ComputeSleep(outstanding, DateTime.UtcNow, NextResolutionWake(existingResults));
         }
 
         // ---- Budget gate ----
@@ -415,7 +425,7 @@ public sealed class ResultFetcherService(
             })
             .ToList();
 
-        return ComputeSleep(stillOutstanding, DateTime.UtcNow, NextFixturePollWake(existingResults));
+        return ComputeSleep(stillOutstanding, DateTime.UtcNow, NextResolutionWake(existingResults));
     }
 
     private static TimeSpan ComputeSleep(
@@ -495,6 +505,10 @@ public sealed class ResultFetcherService(
             if (IsGroupStage(match.Stage)) continue;
             if (!match.AreTeamsUndetermined) continue;
             if (match.ManualOverride) continue;
+            // A fixture that has itself already been played has left the scheduled feed, so the
+            // scheduled-feed resolver can no longer see it. The completed-feed backfill
+            // (TryBackfillPlayedKnockoutTeamsAsync) is responsible for those instead.
+            if (completedMatchIds.Contains(match.Id)) continue;
             if (GetFeederMatchIds(match, schedule).All(completedMatchIds.Contains))
             {
                 resolvable.Add(match);
@@ -580,6 +594,144 @@ public sealed class ResultFetcherService(
         GetResolvableUndeterminedKnockout(scheduleProvider.Current, completedMatchIds).Count > 0
             ? _nextFixturePollAtUtc
             : null;
+
+    /// <summary>
+    /// Backfills teams for knockout fixtures whose result has already landed but whose teams are
+    /// still null. Such a fixture is invisible to <see cref="TryResolveFixturesAsync"/> (it has
+    /// left the scheduled feed by being played) and is no longer "due" for a result, so without
+    /// this it stays frozen on its placeholder ("Vinner kamp 89") forever in the UI. We poll the
+    /// completed feed — which still carries both teams — on a backoff, guarded by the daily
+    /// budget, and write any resolved teams to matches.json.
+    /// </summary>
+    private async Task TryBackfillPlayedKnockoutTeamsAsync(
+        AppDbContext dbContext,
+        IReadOnlySet<int> completedMatchIds,
+        DateTime now,
+        CancellationToken ct)
+    {
+        if (!HasPlayedUndeterminedKnockout(completedMatchIds)) return;
+        if (now < _nextCompletedBackfillAtUtc) return;
+
+        // Back off regardless of outcome so a feed that never carries the teams (or an exhausted
+        // budget) cannot turn into a tight poll loop.
+        _nextCompletedBackfillAtUtc = now + CompletedBackfillRetryInterval;
+
+        if (!await BudgetAllowsCallAsync(dbContext, now, ct))
+        {
+            logger.LogWarning(
+                "Skipping completed-feed team backfill — daily API budget exhausted. Played knockout fixture(s) still missing teams.");
+            return;
+        }
+
+        logger.LogInformation(
+            "Played knockout fixture(s) have a result but no teams — polling completed feed to backfill names.");
+
+        await LogApiCallAsync(dbContext, "/matches?status=completed", now, ct);
+        await BackfillCompletedKnockoutTeamsAsync(ct);
+    }
+
+    /// <summary>
+    /// Polls the completed-matches feed and writes any now-known teams into matches.json for
+    /// knockout fixtures that are still undetermined. Mirrors <see cref="CheckForFixtureUpdatesAsync"/>
+    /// but reads the *completed* feed, so it resolves fixtures whose game has already been played.
+    /// Returns the number of fixtures updated. Kept internal-accessible so reflection-based tests
+    /// can exercise it directly.
+    /// </summary>
+    private async Task<int> BackfillCompletedKnockoutTeamsAsync(CancellationToken ct)
+    {
+        var currentSchedule = scheduleProvider.Current;
+        var currentMatches = currentSchedule.GetAllMatches();
+        var undeterminedById = currentMatches
+            .Where(match =>
+                match.AreTeamsUndetermined
+                && !match.ManualOverride
+                && !IsGroupStage(match.Stage))
+            .ToDictionary(match => match.Id);
+
+        if (undeterminedById.Count == 0) return 0;
+
+        var completedMatches = await apiClient.GetCompletedMatchesAsync(ct);
+        var updatesById = new Dictionary<int, MatchEntry>();
+
+        foreach (var dto in completedMatches)
+        {
+            var matchId = apiClient.MapToLocalMatchId(dto.MatchNumber, dto.KickoffAt, currentSchedule);
+            if (matchId is null || !undeterminedById.TryGetValue(matchId.Value, out var localMatch))
+            {
+                continue;
+            }
+
+            var homeTeamCode = ResolveTeamCode(dto.HomeCode, dto.Home);
+            var awayTeamCode = ResolveTeamCode(dto.AwayCode, dto.Away);
+            if (homeTeamCode is null && awayTeamCode is null)
+            {
+                continue;
+            }
+
+            var updatedHomeTeam = homeTeamCode ?? localMatch.HomeTeam;
+            var updatedAwayTeam = awayTeamCode ?? localMatch.AwayTeam;
+            if (updatedHomeTeam == localMatch.HomeTeam && updatedAwayTeam == localMatch.AwayTeam)
+            {
+                continue;
+            }
+
+            updatesById[localMatch.Id] = new MatchEntry
+            {
+                Id = localMatch.Id,
+                Date = localMatch.Date,
+                Stage = localMatch.Stage,
+                HomeTeam = updatedHomeTeam,
+                AwayTeam = updatedAwayTeam,
+                HomePlaceholder = localMatch.HomePlaceholder,
+                AwayPlaceholder = localMatch.AwayPlaceholder,
+                Group = localMatch.Group,
+                VenueId = localMatch.VenueId,
+                ManualOverride = localMatch.ManualOverride
+            };
+        }
+
+        if (updatesById.Count == 0)
+        {
+            logger.LogWarning("Completed-feed team backfill found no resolvable teams for the played knockout fixture(s).");
+            return 0;
+        }
+
+        var updatedMatches = currentMatches
+            .Select(match => updatesById.TryGetValue(match.Id, out var updatedMatch) ? updatedMatch : match)
+            .ToList();
+
+        await matchFileWriter.WriteAsync(updatedMatches, ct);
+        logger.LogInformation(
+            "Completed-feed backfill resolved teams for {Count} played knockout fixture(s).",
+            updatesById.Count);
+        return updatesById.Count;
+    }
+
+    /// <summary>True when a knockout fixture has a stored result but still no teams.</summary>
+    private bool HasPlayedUndeterminedKnockout(IReadOnlySet<int> completedMatchIds) =>
+        scheduleProvider.Current.GetAllMatches().Any(m =>
+            !IsGroupStage(m.Stage)
+            && m.AreTeamsUndetermined
+            && !m.ManualOverride
+            && completedMatchIds.Contains(m.Id));
+
+    /// <summary>Next wake-up for the completed-feed backfill, or null when nothing needs it.</summary>
+    private DateTime? NextBackfillWake(IReadOnlySet<int> completedMatchIds) =>
+        HasPlayedUndeterminedKnockout(completedMatchIds) ? _nextCompletedBackfillAtUtc : null;
+
+    /// <summary>
+    /// Earliest pending team-resolution wake-up across both paths (scheduled-feed fixture poll
+    /// and completed-feed backfill), or null when neither is pending.
+    /// </summary>
+    private DateTime? NextResolutionWake(IReadOnlySet<int> completedMatchIds)
+    {
+        var fixtureWake = NextFixturePollWake(completedMatchIds);
+        var backfillWake = NextBackfillWake(completedMatchIds);
+
+        if (fixtureWake is null) return backfillWake;
+        if (backfillWake is null) return fixtureWake;
+        return fixtureWake < backfillWake ? fixtureWake : backfillWake;
+    }
 
     private static async Task<bool> BudgetAllowsCallAsync(AppDbContext dbContext, DateTime now, CancellationToken ct)
     {
