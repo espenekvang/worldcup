@@ -16,7 +16,8 @@ public class AdminDiagnosticsController(
     Wc2026ApiClient apiClient,
     TeamCodeMapper teamCodeMapper,
     MatchFileWriter matchFileWriter,
-    ScoringService scoringService) : ControllerBase
+    ScoringService scoringService,
+    ILogger<AdminDiagnosticsController> logger) : ControllerBase
 {
     private const int MaxFetchAttempts = 5;
     private const int DailyCallBudget = 90;
@@ -160,19 +161,32 @@ public class AdminDiagnosticsController(
                 var awayCode = ResolveTeamCode(dto.AwayCode, dto.Away);
                 if (homeCode is not null || awayCode is not null)
                 {
-                    teamFills[matchId.Value] = new MatchEntry
+                    var filledHome = homeCode ?? localMatch.HomeTeam;
+                    var filledAway = awayCode ?? localMatch.AwayTeam;
+
+                    if (MatchEntry.WouldDuplicateTeam(filledHome, filledAway))
                     {
-                        Id = localMatch.Id,
-                        Date = localMatch.Date,
-                        Stage = localMatch.Stage,
-                        HomeTeam = homeCode ?? localMatch.HomeTeam,
-                        AwayTeam = awayCode ?? localMatch.AwayTeam,
-                        HomePlaceholder = localMatch.HomePlaceholder,
-                        AwayPlaceholder = localMatch.AwayPlaceholder,
-                        Group = localMatch.Group,
-                        VenueId = localMatch.VenueId,
-                        ManualOverride = localMatch.ManualOverride
-                    };
+                        logger.LogWarning(
+                            "force-fetch: refusing to fill knockout fixture {MatchId} ({Stage}) from completed feed — " +
+                            "both sides resolve to {Team}. Likely a mapping error; leaving teams unresolved.",
+                            matchId.Value, localMatch.Stage, filledHome);
+                    }
+                    else
+                    {
+                        teamFills[matchId.Value] = new MatchEntry
+                        {
+                            Id = localMatch.Id,
+                            Date = localMatch.Date,
+                            Stage = localMatch.Stage,
+                            HomeTeam = filledHome,
+                            AwayTeam = filledAway,
+                            HomePlaceholder = localMatch.HomePlaceholder,
+                            AwayPlaceholder = localMatch.AwayPlaceholder,
+                            Group = localMatch.Group,
+                            VenueId = localMatch.VenueId,
+                            ManualOverride = localMatch.ManualOverride
+                        };
+                    }
                 }
             }
 
@@ -243,6 +257,15 @@ public class AdminDiagnosticsController(
                 var newHome = homeCode ?? local.HomeTeam;
                 var newAway = awayCode ?? local.AwayTeam;
                 if (newHome == local.HomeTeam && newAway == local.AwayTeam) continue;
+
+                if (MatchEntry.WouldDuplicateTeam(newHome, newAway))
+                {
+                    logger.LogWarning(
+                        "force-fetch: refusing to update knockout fixture {MatchId} ({Stage}) from scheduled feed — " +
+                        "both sides resolve to {Team}. Likely a mapping error; leaving teams unresolved.",
+                        local.Id, local.Stage, newHome);
+                    continue;
+                }
 
                 fixtureUpdates[local.Id] = new MatchEntry
                 {
