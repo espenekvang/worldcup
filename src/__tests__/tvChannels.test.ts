@@ -30,7 +30,21 @@ describe('tvChannels-data', () => {
     expect(getTvChannel(2)).toBe('NRK')
   })
 
-  it('returnerer undefined for kamper uten kanal (sluttspill)', () => {
-    expect(getTvChannel(104)).toBeUndefined()
+  it('dekker round-of-32-kampene', () => {
+    for (const match of matches) {
+      if (match.stage === 'round-of-32') {
+        expect(getTvChannel(match.id)).toBeDefined()
+      }
+    }
+  })
+
+  it('kanalsetter finalen (NRK)', () => {
+    expect(getTvChannel(104)).toBe('NRK')
+  })
+
+  it('returnerer undefined for runder uten fastsatt kanal (8-dels/kvartfinaler)', () => {
+    // NRK/TV2 har ikke fordelt 8-dels- og kvartfinalene ennå.
+    expect(getTvChannel(89)).toBeUndefined()
+    expect(getTvChannel(97)).toBeUndefined()
   })
 })
