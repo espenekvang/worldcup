@@ -326,6 +326,83 @@ public class ResultFetcherServiceTests : IDisposable
         updated.AwayTeam.Should().Be("GER");
     }
 
+    [Fact]
+    public async Task CheckForFixtureUpdates_SameTeamOnBothSides_DoesNotWriteFile()
+    {
+        // Regression ("Paraguay vs Paraguay"): a mis-mapped/duplicated upstream record can resolve
+        // both slots of a knockout fixture to the same team. The fill must refuse such an
+        // impossible result and leave the fixture unresolved rather than persist it.
+        var undeterminedMatch = new MatchEntry
+        {
+            Id = 90,
+            Date = new DateTime(2026, 7, 4, 17, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-16",
+            HomeTeam = null,
+            AwayTeam = null,
+            HomePlaceholder = "Vinner kamp 73",
+            AwayPlaceholder = "Vinner kamp 75",
+            VenueId = "nrg",
+            ManualOverride = false,
+        };
+
+        WriteMatches([undeterminedMatch]);
+        _scheduleProvider.Reload([undeterminedMatch]);
+
+        var apiDto = new[]
+        {
+            new { match_number = 90, home_team = "Paraguay", away_team = "Paraguay", home_team_code = "PAR", away_team_code = "PAR", kickoff_utc = undeterminedMatch.Date }
+        };
+        var apiJson = JsonSerializer.Serialize(apiDto);
+
+        var handler = new FakeHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(apiJson, Encoding.UTF8, "application/json")
+            });
+
+        var apiClient = BuildApiClient(handler);
+
+        var teamsJson = """
+            {
+              "PAR": { "code": "PAR", "name": "Paraguay", "flag": "🇵🇾" }
+            }
+            """;
+        var tempTeamsPath = Path.Combine(_tempDir, "teams_dup_test.json");
+        File.WriteAllText(tempTeamsPath, teamsJson);
+        var teamMapper = BuildTeamCodeMapper(tempTeamsPath);
+
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+
+        var service = new ResultFetcherService(
+            scopeFactory, _scheduleProvider, apiClient, teamMapper, _matchFileWriter,
+            Substitute.For<ILogger<ResultFetcherService>>());
+
+        var originalJson = File.ReadAllText(_jsonPath);
+
+        var method = typeof(ResultFetcherService).GetMethod(
+            "CheckForFixtureUpdatesAsync",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+
+        var task = (Task)method!.Invoke(service, [CancellationToken.None])!;
+        await task;
+
+        File.ReadAllText(_jsonPath).Should().Be(originalJson,
+            "a knockout fixture must never be filled with the same team on both sides");
+    }
+
+    [Theory]
+    [InlineData("PAR", "PAR", true)]
+    [InlineData("par", "PAR", true)]
+    [InlineData("PAR", "BRA", false)]
+    [InlineData(null, null, false)]
+    [InlineData("PAR", null, false)]
+    [InlineData(null, "PAR", false)]
+    public void WouldDuplicateTeam_DetectsOnlyIdenticalKnownCodes(string? home, string? away, bool expected)
+    {
+        MatchEntry.WouldDuplicateTeam(home, away).Should().Be(expected);
+    }
+
     private static MatchSchedule ScheduleWith(params MatchEntry[] matches) => new(matches);
 
     [Fact]
@@ -426,7 +503,7 @@ public class ResultFetcherServiceTests : IDisposable
             }));
 
     [Fact]
-    public void MapToLocalMatchId_ResolvesByMatchNumber_RegardlessOfKickoffTime()
+    public void MapToLocalMatchId_ResolvesByMatchNumber_WhenKickoffWithinTolerance()
     {
         var schedule = ScheduleWith(new MatchEntry
         {
@@ -440,13 +517,41 @@ public class ResultFetcherServiceTests : IDisposable
 
         var apiClient = BuildApiClientNoHttp();
 
-        // Kickoff time is hours off, but the match number is authoritative.
+        // Match number hits a local fixture and the kickoff is within the ±60 min tolerance,
+        // so the number match is trusted (a small clock/timezone skew must not break it).
         var matchId = apiClient.MapToLocalMatchId(
             matchNumber: 42,
-            kickoffAt: new DateTime(2026, 6, 20, 9, 0, 0, DateTimeKind.Utc),
+            kickoffAt: new DateTime(2026, 6, 20, 16, 30, 0, DateTimeKind.Utc),
             schedule);
 
         matchId.Should().Be(42);
+    }
+
+    [Fact]
+    public void MapToLocalMatchId_DiscardsNumberMatch_WhenKickoffOutsideTolerance()
+    {
+        // Cross-validation (#122): the API's knockout match_numbers don't align 1:1 with local
+        // IDs 73–104. When the number hits a fixture but the kickoff is far off, the number match
+        // is discarded and we fall back to a kickoff lookup — here that lookup finds no candidate,
+        // so the result is null rather than the wrong (number-matched) fixture.
+        var schedule = ScheduleWith(new MatchEntry
+        {
+            Id = 90,
+            Date = new DateTime(2026, 7, 4, 17, 0, 0, DateTimeKind.Utc),
+            Stage = "round-of-16",
+            HomePlaceholder = "Vinner kamp 73",
+            AwayPlaceholder = "Vinner kamp 75",
+            VenueId = "nrg",
+        });
+
+        var apiClient = BuildApiClientNoHttp();
+
+        var matchId = apiClient.MapToLocalMatchId(
+            matchNumber: 90,
+            kickoffAt: new DateTime(2026, 6, 30, 17, 0, 0, DateTimeKind.Utc),
+            schedule);
+
+        matchId.Should().BeNull();
     }
 
     [Fact]

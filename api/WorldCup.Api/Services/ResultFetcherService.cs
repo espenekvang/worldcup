@@ -280,25 +280,39 @@ public sealed class ResultFetcherService(
                 var awayCode = ResolveTeamCode(dto.AwayCode, dto.Away);
                 if (homeCode is not null || awayCode is not null)
                 {
-                    teamFillsFromCompleted[matchId.Value] = new MatchEntry
+                    var filledHome = homeCode ?? localMatch.HomeTeam;
+                    var filledAway = awayCode ?? localMatch.AwayTeam;
+
+                    if (MatchEntry.WouldDuplicateTeam(filledHome, filledAway))
                     {
-                        Id = localMatch.Id,
-                        Date = localMatch.Date,
-                        Stage = localMatch.Stage,
-                        HomeTeam = homeCode ?? localMatch.HomeTeam,
-                        AwayTeam = awayCode ?? localMatch.AwayTeam,
-                        HomePlaceholder = localMatch.HomePlaceholder,
-                        AwayPlaceholder = localMatch.AwayPlaceholder,
-                        Group = localMatch.Group,
-                        VenueId = localMatch.VenueId,
-                        ManualOverride = localMatch.ManualOverride
-                    };
-                    logger.LogInformation(
-                        "Filling in teams for knockout fixture {MatchId} ({Stage}) from completed-matches feed: {Home} vs {Away}.",
-                        matchId.Value,
-                        localMatch.Stage,
-                        homeCode ?? "(unchanged)",
-                        awayCode ?? "(unchanged)");
+                        logger.LogWarning(
+                            "Refusing to fill knockout fixture {MatchId} ({Stage}) from completed-matches feed: " +
+                            "both sides resolve to {Team}, which is impossible — likely a match-number/kickoff mapping error. " +
+                            "Leaving teams unresolved.",
+                            matchId.Value, localMatch.Stage, filledHome);
+                    }
+                    else
+                    {
+                        teamFillsFromCompleted[matchId.Value] = new MatchEntry
+                        {
+                            Id = localMatch.Id,
+                            Date = localMatch.Date,
+                            Stage = localMatch.Stage,
+                            HomeTeam = filledHome,
+                            AwayTeam = filledAway,
+                            HomePlaceholder = localMatch.HomePlaceholder,
+                            AwayPlaceholder = localMatch.AwayPlaceholder,
+                            Group = localMatch.Group,
+                            VenueId = localMatch.VenueId,
+                            ManualOverride = localMatch.ManualOverride
+                        };
+                        logger.LogInformation(
+                            "Filling in teams for knockout fixture {MatchId} ({Stage}) from completed-matches feed: {Home} vs {Away}.",
+                            matchId.Value,
+                            localMatch.Stage,
+                            homeCode ?? "(unchanged)",
+                            awayCode ?? "(unchanged)");
+                    }
                 }
             }
 
@@ -663,6 +677,16 @@ public sealed class ResultFetcherService(
 
             if (updatedHomeTeam == localMatch.HomeTeam && updatedAwayTeam == localMatch.AwayTeam)
             {
+                continue;
+            }
+
+            if (MatchEntry.WouldDuplicateTeam(updatedHomeTeam, updatedAwayTeam))
+            {
+                logger.LogWarning(
+                    "Refusing to update knockout fixture {MatchId} ({Stage}) from scheduled feed: " +
+                    "both sides resolve to {Team}, which is impossible — likely a match-number/kickoff mapping error. " +
+                    "Leaving teams unresolved.",
+                    localMatch.Id, localMatch.Stage, updatedHomeTeam);
                 continue;
             }
 

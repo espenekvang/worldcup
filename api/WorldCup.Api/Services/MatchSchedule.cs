@@ -69,4 +69,16 @@ public sealed class MatchEntry
     public bool ManualOverride { get; init; }
 
     public bool AreTeamsUndetermined => HomeTeam is null || AwayTeam is null;
+
+    /// <summary>
+    /// True when both proposed team codes are known and identical — an impossible fixture, since
+    /// a team can never play itself. Auto-fill of knockout teams maps an upstream record to a
+    /// local fixture heuristically (by match number with a kickoff-time fallback) and writes the
+    /// home/away slots independently, so a mis-mapped or duplicated upstream record can otherwise
+    /// land the same team on both sides (e.g. "Paraguay vs Paraguay"). Fill sites use this to
+    /// reject such writes and leave the fixture unresolved for the next poll.
+    /// </summary>
+    public static bool WouldDuplicateTeam(string? home, string? away) =>
+        !string.IsNullOrWhiteSpace(home)
+        && string.Equals(home, away, StringComparison.OrdinalIgnoreCase);
 }
