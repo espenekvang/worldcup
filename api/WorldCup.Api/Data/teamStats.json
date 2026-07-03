@@ -15,7 +15,7 @@
     },
     "ARG": {
       "teamCode": "ARG",
-      "fifaRank": 3,
+      "fifaRank": 1,
       "manager": "Lionel Scaloni",
       "starPlayer": "Lionel Messi",
       "preferredFormation": "4-3-3",
@@ -67,7 +67,7 @@
     },
     "BIH": {
       "teamCode": "BIH",
-      "fifaRank": 65,
+      "fifaRank": 64,
       "manager": "Sergej Barbarez",
       "starPlayer": "Edin Džeko",
       "preferredFormation": "4-2-3-1",
@@ -106,7 +106,7 @@
     },
     "CIV": {
       "teamCode": "CIV",
-      "fifaRank": 39,
+      "fifaRank": 33,
       "manager": "Emerse Faé",
       "starPlayer": "Sébastien Haller",
       "preferredFormation": "4-2-3-1",
@@ -119,7 +119,7 @@
     },
     "COD": {
       "teamCode": "COD",
-      "fifaRank": 56,
+      "fifaRank": 46,
       "manager": "Sébastien Desabre",
       "starPlayer": "Cédric Bakambu",
       "preferredFormation": "4-3-3",
@@ -145,7 +145,7 @@
     },
     "CPV": {
       "teamCode": "CPV",
-      "fifaRank": 70,
+      "fifaRank": 67,
       "manager": "Bubista",
       "starPlayer": "Ryan Mendes",
       "preferredFormation": "4-3-3",
@@ -184,7 +184,7 @@
     },
     "CZE": {
       "teamCode": "CZE",
-      "fifaRank": 38,
+      "fifaRank": 40,
       "manager": "Ivan Hašek",
       "starPlayer": "Patrik Schick",
       "preferredFormation": "4-2-3-1",
@@ -249,7 +249,7 @@
     },
     "FRA": {
       "teamCode": "FRA",
-      "fifaRank": 1,
+      "fifaRank": 3,
       "manager": "Didier Deschamps",
       "starPlayer": "Kylian Mbappé",
       "preferredFormation": "4-2-3-1",
@@ -275,7 +275,7 @@
     },
     "GHA": {
       "teamCode": "GHA",
-      "fifaRank": 74,
+      "fifaRank": 73,
       "manager": "Otto Addo",
       "starPlayer": "Mohammed Kudus",
       "preferredFormation": "4-3-3",
@@ -301,7 +301,7 @@
     },
     "IRN": {
       "teamCode": "IRN",
-      "fifaRank": 18,
+      "fifaRank": 20,
       "manager": "Amir Ghalenoei",
       "starPlayer": "Alireza Jahanbakhsh",
       "preferredFormation": "3-5-2",
@@ -353,7 +353,7 @@
     },
     "KOR": {
       "teamCode": "KOR",
-      "fifaRank": 22,
+      "fifaRank": 25,
       "manager": "Hong Myung-bo",
       "starPlayer": "Son Heung-min",
       "preferredFormation": "4-2-3-1",
@@ -379,7 +379,7 @@
     },
     "MAR": {
       "teamCode": "MAR",
-      "fifaRank": 8,
+      "fifaRank": 7,
       "manager": "Mohamed Ouahbi",
       "starPlayer": "Achraf Hakimi",
       "preferredFormation": "4-3-3",
@@ -392,7 +392,7 @@
     },
     "MEX": {
       "teamCode": "MEX",
-      "fifaRank": 15,
+      "fifaRank": 14,
       "manager": "Javier Aguirre",
       "starPlayer": "Edson Álvarez",
       "preferredFormation": "4-3-3",
@@ -405,7 +405,7 @@
     },
     "NED": {
       "teamCode": "NED",
-      "fifaRank": 7,
+      "fifaRank": 8,
       "manager": "Ronald Koeman",
       "starPlayer": "Virgil van Dijk",
       "preferredFormation": "4-3-3",
@@ -431,7 +431,7 @@
     },
     "NZL": {
       "teamCode": "NZL",
-      "fifaRank": 88,
+      "fifaRank": 85,
       "manager": "Darren Bazeley",
       "starPlayer": "Chris Wood",
       "preferredFormation": "4-4-2",
@@ -444,7 +444,7 @@
     },
     "PAN": {
       "teamCode": "PAN",
-      "fifaRank": 33,
+      "fifaRank": 34,
       "manager": "Thomas Christiansen",
       "starPlayer": "Aníbal Godoy",
       "preferredFormation": "4-2-3-1",
@@ -457,7 +457,7 @@
     },
     "PAR": {
       "teamCode": "PAR",
-      "fifaRank": 40,
+      "fifaRank": 41,
       "manager": "Gustavo Alfaro",
       "starPlayer": "Miguel Almirón",
       "preferredFormation": "4-3-3",
@@ -483,7 +483,7 @@
     },
     "QAT": {
       "teamCode": "QAT",
-      "fifaRank": 55,
+      "fifaRank": 56,
       "manager": "Bartolomé Márquez",
       "starPlayer": "Akram Afif",
       "preferredFormation": "4-3-3",
@@ -509,7 +509,7 @@
     },
     "SCO": {
       "teamCode": "SCO",
-      "fifaRank": 43,
+      "fifaRank": 42,
       "manager": "Steve Clarke",
       "starPlayer": "Scott McTominay",
       "preferredFormation": "3-4-2-1",
@@ -522,7 +522,7 @@
     },
     "SEN": {
       "teamCode": "SEN",
-      "fifaRank": 14,
+      "fifaRank": 15,
       "manager": "Pape Thiaw",
       "starPlayer": "Sadio Mané",
       "preferredFormation": "4-3-3",
@@ -561,7 +561,7 @@
     },
     "TUN": {
       "teamCode": "TUN",
-      "fifaRank": 44,
+      "fifaRank": 45,
       "manager": "Sami Trabelsi",
       "starPlayer": "Hannibal Mejbri",
       "preferredFormation": "4-3-3",
@@ -574,7 +574,7 @@
     },
     "TUR": {
       "teamCode": "TUR",
-      "fifaRank": 26,
+      "fifaRank": 22,
       "manager": "Vincenzo Montella",
       "starPlayer": "Arda Güler",
       "preferredFormation": "4-2-3-1",
@@ -587,7 +587,7 @@
     },
     "URU": {
       "teamCode": "URU",
-      "fifaRank": 17,
+      "fifaRank": 16,
       "manager": "Marcelo Bielsa",
       "starPlayer": "Federico Valverde",
       "preferredFormation": "4-3-3",
@@ -600,7 +600,7 @@
     },
     "USA": {
       "teamCode": "USA",
-      "fifaRank": 16,
+      "fifaRank": 17,
       "manager": "Mauricio Pochettino",
       "starPlayer": "Christian Pulisic",
       "preferredFormation": "4-3-3",

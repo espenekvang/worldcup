@@ -32,7 +32,7 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SEED_PATH = REPO_ROOT / "api" / "WorldCup.Api" / "data" / "teamStats.json"
+SEED_PATH = REPO_ROOT / "api" / "WorldCup.Api" / "Data" / "teamStats.json"
 
 USER_AGENT = "WorldCupTippeApp/1.0 (refresh-team-stats; contact: hobby)"
 
