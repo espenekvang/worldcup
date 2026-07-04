@@ -38,13 +38,26 @@ describe('tvChannels-data', () => {
     }
   })
 
+  it('dekker round-of-16-kampene', () => {
+    for (const match of matches) {
+      if (match.stage === 'round-of-16') {
+        expect(getTvChannel(match.id)).toBeDefined()
+      }
+    }
+  })
+
   it('kanalsetter finalen (NRK)', () => {
     expect(getTvChannel(104)).toBe('NRK')
   })
 
-  it('returnerer undefined for runder uten fastsatt kanal (8-dels/kvartfinaler)', () => {
-    // NRK/TV2 har ikke fordelt 8-dels- og kvartfinalene ennå.
-    expect(getTvChannel(89)).toBeUndefined()
+  it('slår opp åttedelsfinale-kamper riktig', () => {
+    // Kamp 89: Paraguay–Frankrike på TV2, kamp 90: Canada–Marokko på NRK
+    expect(getTvChannel(89)).toBe('TV2')
+    expect(getTvChannel(90)).toBe('NRK')
+  })
+
+  it('returnerer undefined for runder uten fastsatt kanal (kvartfinaler)', () => {
+    // NRK/TV2 har ikke fordelt kvartfinalene per kamp ennå.
     expect(getTvChannel(97)).toBeUndefined()
   })
 })
