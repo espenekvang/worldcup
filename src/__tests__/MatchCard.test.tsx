@@ -60,9 +60,10 @@ describe('MatchCard', () => {
     expect(screen.getByText('TV 2')).toBeInTheDocument()
   })
 
-  it('viser ingen TV-kanal-logo for en kamp uten fastsatt kanal (kvartfinale)', () => {
-    // NRK/TV2 har ikke fordelt kvartfinalene per kamp ennå, så ingen logo skal vises.
-    const match: Match = { id: 97, date: '2026-07-09T20:00:00Z', homeTeam: null, awayTeam: null, homePlaceholder: 'Vinner kamp 89', awayPlaceholder: 'Vinner kamp 90', stage: 'quarter-final', venueId: 'metlife' }
+  it('viser ingen TV-kanal-logo for en kamp uten fastsatt kanal', () => {
+    // Alle ekte kamper (1-104) er nå kanalsatt; bruker en kamp-id som ikke finnes
+    // i tvChannels-dataen for å teste at MatchCard takler manglende kanal.
+    const match: Match = { id: 9999, date: '2026-07-09T20:00:00Z', homeTeam: null, awayTeam: null, homePlaceholder: 'Vinner kamp 89', awayPlaceholder: 'Vinner kamp 90', stage: 'quarter-final', venueId: 'metlife' }
 
     render(<MatchCard match={match} teams={mockTeams} venues={mockVenues} locked={false} onTipClick={onTipClick} onViewOthers={onViewOthers} />, { wrapper: Wrapper })
 

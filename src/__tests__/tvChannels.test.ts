@@ -46,6 +46,14 @@ describe('tvChannels-data', () => {
     }
   })
 
+  it('dekker quarter-final-kampene', () => {
+    for (const match of matches) {
+      if (match.stage === 'quarter-final') {
+        expect(getTvChannel(match.id)).toBeDefined()
+      }
+    }
+  })
+
   it('kanalsetter finalen (NRK)', () => {
     expect(getTvChannel(104)).toBe('NRK')
   })
@@ -56,8 +64,11 @@ describe('tvChannels-data', () => {
     expect(getTvChannel(90)).toBe('NRK')
   })
 
-  it('returnerer undefined for runder uten fastsatt kanal (kvartfinaler)', () => {
-    // NRK/TV2 har ikke fordelt kvartfinalene per kamp ennå.
-    expect(getTvChannel(97)).toBeUndefined()
+  it('slår opp kvartfinale-kamper riktig', () => {
+    // Kamp 97 og 100 på NRK, kamp 98 og 99 på TV2
+    expect(getTvChannel(97)).toBe('NRK')
+    expect(getTvChannel(98)).toBe('TV2')
+    expect(getTvChannel(99)).toBe('TV2')
+    expect(getTvChannel(100)).toBe('NRK')
   })
 })
