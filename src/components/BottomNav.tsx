@@ -56,17 +56,17 @@ export default function BottomNav({ mobileView, onSelectView }: BottomNavProps) 
         onClick={() => handleHome('leaderboard')}
       />
       <NavButton
-        label="Statistikk"
-        icon="📊"
-        active={statsActive}
-        onClick={() => handleHome('stats')}
-      />
-      <NavButton
         label="Chat"
         icon="💬"
         active={onChat}
         badge={unreadCount}
         onClick={() => navigate('/chat')}
+      />
+      <NavButton
+        label="Statistikk"
+        icon="📊"
+        active={statsActive}
+        onClick={() => handleHome('stats')}
       />
     </nav>
   )
