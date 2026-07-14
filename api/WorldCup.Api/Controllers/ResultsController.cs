@@ -13,7 +13,8 @@ namespace WorldCup.Api.Controllers;
 public class ResultsController(
     AppDbContext dbContext,
     ScoringService scoringService,
-    MatchScheduleProvider scheduleProvider) : ControllerBase
+    MatchScheduleProvider scheduleProvider,
+    LeagueStatsCalculator statsCalculator) : ControllerBase
 {
     [HttpPut("/api/admin/results/{matchId:int}")]
     [Authorize(Roles = "Admin")]
@@ -297,6 +298,50 @@ public class ResultsController(
             .ToList();
 
         return Ok(globalLeaderboard);
+    }
+
+    [HttpGet("stats")]
+    [Authorize]
+    public async Task<ActionResult<LeagueStatsResponse>> GetLeagueStats(CancellationToken ct)
+    {
+        var (groupId, isValid) = await ValidateGroupMembership();
+        if (!isValid) return BadRequest("Ugyldig eller manglende X-Group-Id header.");
+
+        var memberRows = await dbContext.BettingGroupMembers
+            .Where(m => m.BettingGroupId == groupId)
+            .Select(m => new { m.UserId, m.User.Name, m.User.Picture })
+            .AsNoTracking()
+            .ToListAsync(ct);
+        var members = memberRows
+            .Select(m => new StatMember(m.UserId, m.Name, m.Picture))
+            .ToList();
+
+        var memberIds = members.Select(m => m.UserId).ToList();
+
+        var predictionRows = await dbContext.Predictions
+            .Where(p => memberIds.Contains(p.UserId))
+            .Select(p => new { p.UserId, p.MatchId, p.HomeScore, p.AwayScore })
+            .AsNoTracking()
+            .ToListAsync(ct);
+        var predictions = predictionRows
+            .Select(p => new StatPrediction(p.UserId, p.MatchId, p.HomeScore, p.AwayScore))
+            .ToList();
+
+        var resultRows = await dbContext.MatchResults
+            .Select(r => new { r.MatchId, r.HomeScore, r.AwayScore, r.FetchedAt })
+            .AsNoTracking()
+            .ToListAsync(ct);
+        var results = resultRows
+            .Select(r => new StatResult(r.MatchId, r.HomeScore, r.AwayScore, r.FetchedAt))
+            .ToList();
+
+        var schedule = scheduleProvider.Current;
+        var matchInfos = schedule.GetAllMatches()
+            .Select(m => new StatMatchInfo(m.Id, m.Stage, m.Date, schedule.IsMatchLocked(m.Id)))
+            .ToList();
+
+        var stats = statsCalculator.Calculate(members, predictions, results, matchInfos);
+        return Ok(stats);
     }
 
     private Guid? GetAuthenticatedUserId()

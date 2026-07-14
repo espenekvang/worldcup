@@ -81,6 +81,7 @@ builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
     Options.Create(new MatchFileWriterOptions { JsonPath = matchesJsonPath }));
 builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
+builder.Services.AddScoped<LeagueStatsCalculator>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
 
 // Værvarsel (Open-Meteo). MemoryCache holder svar i ~3t per stadion+dato slik at

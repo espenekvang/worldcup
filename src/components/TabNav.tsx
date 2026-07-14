@@ -9,6 +9,7 @@ const TABS: { section: Section; label: string }[] = [
   { section: 'group', label: 'Gruppespill' },
   { section: 'knockout', label: 'Sluttspill' },
   { section: 'leaderboard', label: 'The Boss' },
+  { section: 'stats', label: 'Statistikk' },
 ]
 
 /**
