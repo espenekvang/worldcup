@@ -11,6 +11,9 @@ public sealed record StatPrediction(Guid UserId, int MatchId, int HomeScore, int
 /// <summary>Ett kampresultat (input).</summary>
 public sealed record StatResult(int MatchId, int HomeScore, int AwayScore, DateTime FetchedAt);
 
+/// <summary>Kampmetadata fra kampskjemaet: fase, avspark og om kampen har startet (låst).</summary>
+public sealed record StatMatchInfo(int MatchId, string Stage, DateTime Kickoff, bool IsLocked);
+
 /// <summary>
 /// Regner ut «VM-oppsummeringen» for én liga fra rene lister. Holdt fri for EF/DbContext slik at
 /// den kan enhetstestes uten database (på samme måte som <see cref="ScoringService"/>).
@@ -24,8 +27,14 @@ public sealed class LeagueStatsCalculator(ScoringService scoringService)
         IReadOnlyList<StatMember> members,
         IReadOnlyList<StatPrediction> predictions,
         IReadOnlyList<StatResult> results,
-        IReadOnlyDictionary<int, string> matchStages)
+        IReadOnlyList<StatMatchInfo> matchInfos)
     {
+        var matchStages = new Dictionary<int, string>();
+        foreach (var mi in matchInfos)
+        {
+            matchStages[mi.MatchId] = mi.Stage;
+        }
+
         var response = new LeagueStatsResponse
         {
             ScoredMatchCount = results.Count,
@@ -71,6 +80,7 @@ public sealed class LeagueStatsCalculator(ScoringService scoringService)
         response.MatchFacts = BuildMatchFacts(scored, memberPredictions);
         response.Aggregate = BuildAggregate(scored, results, matchStages);
         response.Drama = BuildDrama(members, scored, chronologicalMatchIds);
+        response.Participation = BuildParticipation(memberPredictions, matchInfos);
 
         return response;
     }
@@ -265,6 +275,26 @@ public sealed class LeagueStatsCalculator(ScoringService scoringService)
         }
 
         return facts;
+    }
+
+    private static List<ParticipationPoint> BuildParticipation(
+        List<StatPrediction> memberPredictions,
+        IReadOnlyList<StatMatchInfo> matchInfos)
+    {
+        var countByMatch = memberPredictions
+            .GroupBy(p => p.MatchId)
+            .ToDictionary(g => g.Key, g => g.Select(p => p.UserId).Distinct().Count());
+
+        return matchInfos
+            .Where(mi => mi.IsLocked)
+            .OrderBy(mi => mi.Kickoff)
+            .ThenBy(mi => mi.MatchId)
+            .Select(mi => new ParticipationPoint
+            {
+                MatchId = mi.MatchId,
+                Count = countByMatch.GetValueOrDefault(mi.MatchId, 0),
+            })
+            .ToList();
     }
 
     private static AggregateStats BuildAggregate(

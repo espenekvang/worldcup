@@ -335,10 +335,12 @@ public class ResultsController(
             .Select(r => new StatResult(r.MatchId, r.HomeScore, r.AwayScore, r.FetchedAt))
             .ToList();
 
-        var matchStages = scheduleProvider.Current.GetAllMatches()
-            .ToDictionary(m => m.Id, m => m.Stage);
+        var schedule = scheduleProvider.Current;
+        var matchInfos = schedule.GetAllMatches()
+            .Select(m => new StatMatchInfo(m.Id, m.Stage, m.Date, schedule.IsMatchLocked(m.Id)))
+            .ToList();
 
-        var stats = statsCalculator.Calculate(members, predictions, results, matchStages);
+        var stats = statsCalculator.Calculate(members, predictions, results, matchInfos);
         return Ok(stats);
     }
 

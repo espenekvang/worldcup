@@ -297,6 +297,11 @@ export interface DramaStats {
   biggestFall: RankMovement | null
 }
 
+export interface ParticipationPoint {
+  matchId: number
+  count: number
+}
+
 export interface LeagueStats {
   scoredMatchCount: number
   memberCount: number
@@ -304,6 +309,8 @@ export interface LeagueStats {
   matchFacts: MatchFacts
   aggregate: AggregateStats
   drama: DramaStats
+  /** Antall medlemmer som tippet på hver spilte kamp, i kronologisk rekkefølge. */
+  participation: ParticipationPoint[]
 }
 
 export function getLeagueStats(): Promise<LeagueStats> {

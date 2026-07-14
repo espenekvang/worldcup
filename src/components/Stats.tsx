@@ -5,6 +5,7 @@ import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
 import { teams } from '../data'
 import { displayName } from '../utils/nameUtils'
+import ParticipationChart, { type ParticipationChartPoint } from './ParticipationChart'
 
 /**
  * «VM-oppsummering» per liga: personlige priser, kampfakta, aggregerte tall og
@@ -73,6 +74,17 @@ export default function Stats() {
     return { title: `${homeName} – ${awayName}`, score }
   }, [matches, results])
 
+  const participationPoints = useMemo<ParticipationChartPoint[]>(() => {
+    if (!stats) return []
+    return stats.participation.map(p => {
+      const match = matches.find(m => m.id === p.matchId)
+      const dateLabel = match
+        ? new Date(match.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })
+        : `Kamp ${p.matchId}`
+      return { count: p.count, label: matchLabel(p.matchId).title, dateLabel }
+    })
+  }, [stats, matches, matchLabel])
+
   if (isLoading) {
     return <p className="py-8 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Laster statistikk …</p>
   }
@@ -101,6 +113,19 @@ export default function Stats() {
           {stats.memberCount} deltakere · {stats.scoredMatchCount} spilte kamper
         </p>
       </header>
+
+      {/* Deltakelse over tid */}
+      {participationPoints.length >= 2 && (
+        <section>
+          <SectionTitle>📉 Deltakelse per kamp</SectionTitle>
+          <CardShell>
+            <p className="mb-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              Antall som har tippet på hver spilte kamp – viser når folk falt fra.
+            </p>
+            <ParticipationChart points={participationPoints} memberCount={stats.memberCount} />
+          </CardShell>
+        </section>
+      )}
 
       {/* Personlige priser */}
       <section>

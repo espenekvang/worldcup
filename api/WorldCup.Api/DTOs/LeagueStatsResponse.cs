@@ -21,6 +21,21 @@ public class LeagueStatsResponse
     public AggregateStats Aggregate { get; set; } = new();
 
     public DramaStats Drama { get; set; } = new();
+
+    /// <summary>
+    /// Antall medlemmer som tippet på hver spilte kamp, i kronologisk rekkefølge.
+    /// Viser engasjement/frafall gjennom turneringen. Kun kamper som har startet
+    /// (låst) tas med, slik at tallet per kamp er endelig.
+    /// </summary>
+    public List<ParticipationPoint> Participation { get; set; } = [];
+}
+
+public class ParticipationPoint
+{
+    public int MatchId { get; set; }
+
+    /// <summary>Antall medlemmer som har et tips på denne kampen.</summary>
+    public int Count { get; set; }
 }
 
 /// <summary>

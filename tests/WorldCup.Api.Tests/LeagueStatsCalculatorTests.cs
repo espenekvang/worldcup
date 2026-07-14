@@ -11,11 +11,11 @@ public class LeagueStatsCalculatorTests
 
     private readonly LeagueStatsCalculator _calculator = new(new ScoringService());
 
-    private static readonly IReadOnlyDictionary<int, string> Stages = new Dictionary<int, string>
+    private static readonly IReadOnlyList<StatMatchInfo> MatchInfos = new List<StatMatchInfo>
     {
-        [1] = "group-1",
-        [2] = "group-1",
-        [3] = "round-of-32",
+        new(1, "group-1", new DateTime(2026, 6, 11, 18, 0, 0, DateTimeKind.Utc), true),
+        new(2, "group-1", new DateTime(2026, 6, 11, 21, 0, 0, DateTimeKind.Utc), true),
+        new(3, "round-of-32", new DateTime(2026, 7, 1, 18, 0, 0, DateTimeKind.Utc), true),
     };
 
     /// <summary>
@@ -66,7 +66,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         stats.MemberCount.Should().Be(3);
         stats.ScoredMatchCount.Should().Be(3);
@@ -77,7 +77,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         var award = Award(stats, "nostradamus");
         award.WinnerName.Should().Be("Carol");
@@ -89,7 +89,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         var award = Award(stats, "utfallsekspert");
         award.WinnerName.Should().Be("Alice");
@@ -101,7 +101,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         var award = Award(stats, "lengste_rekke");
         award.WinnerName.Should().Be("Alice");
@@ -113,7 +113,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         var award = Award(stats, "brannfakkel");
         // Bob (kamp 3) og Carol (kamp 1) bommer begge med severity 4; laveste MatchId vinner.
@@ -127,7 +127,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         var award = Award(stats, "presisjon");
         award.WinnerName.Should().Be("Carol");
@@ -139,7 +139,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         Award(stats, "optimist").WinnerName.Should().Be("Bob");
 
@@ -153,7 +153,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         stats.MatchFacts.HardestMatch!.MatchId.Should().Be(1);
         stats.MatchFacts.EasiestMatch!.MatchId.Should().Be(2);
@@ -166,7 +166,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         stats.Aggregate.AvgActualGoalsPerMatch.Should().BeApproximately(2.0, 0.0001);
         stats.Aggregate.AvgPredictedGoalsPerMatch.Should().BeApproximately(20.0 / 9.0, 0.0001);
@@ -179,7 +179,7 @@ public class LeagueStatsCalculatorTests
     {
         var (members, predictions, results) = BuildScenario();
 
-        var stats = _calculator.Calculate(members, predictions, results, Stages);
+        var stats = _calculator.Calculate(members, predictions, results, MatchInfos);
 
         stats.Drama.BiggestClimb!.Name.Should().Be("Carol");
         stats.Drama.BiggestClimb.Positions.Should().Be(2);
@@ -204,9 +204,13 @@ public class LeagueStatsCalculatorTests
             new(aaron, 1, 0, 1), // bom -> 0
             new(aaron, 2, 1, 0), // blinkskudd -> 4
         };
-        var stages = new Dictionary<int, string> { [1] = "group-1", [2] = "group-1" };
+        var matchInfos = new List<StatMatchInfo>
+        {
+            new(1, "group-1", t0, true),
+            new(2, "group-1", t0.AddHours(3), true),
+        };
 
-        var stats = _calculator.Calculate(members, predictions, results, stages);
+        var stats = _calculator.Calculate(members, predictions, results, matchInfos);
 
         stats.Drama.LeadChanges.Should().Be(1);
     }
@@ -225,7 +229,7 @@ public class LeagueStatsCalculatorTests
             new(a, 2, 0, 0),
         };
 
-        var stats = _calculator.Calculate(members, predictions, results, new Dictionary<int, string>());
+        var stats = _calculator.Calculate(members, predictions, results, new List<StatMatchInfo>());
 
         stats.MatchFacts.PopularScoreline!.HomeScore.Should().Be(2);
         stats.MatchFacts.PopularScoreline.AwayScore.Should().Be(1);
@@ -235,7 +239,7 @@ public class LeagueStatsCalculatorTests
     [Fact]
     public void Calculate_WithNoData_ReturnsEmptyResultWithoutThrowing()
     {
-        var stats = _calculator.Calculate([], [], [], new Dictionary<int, string>());
+        var stats = _calculator.Calculate([], [], [], new List<StatMatchInfo>());
 
         stats.MemberCount.Should().Be(0);
         stats.ScoredMatchCount.Should().Be(0);
@@ -243,5 +247,37 @@ public class LeagueStatsCalculatorTests
         stats.MatchFacts.HardestMatch.Should().BeNull();
         stats.MatchFacts.PopularScoreline.Should().BeNull();
         stats.Drama.BiggestClimb.Should().BeNull();
+    }
+
+    [Fact]
+    public void Participation_CountsMembersPerLockedMatchInChronologicalOrder()
+    {
+        var a = Guid.NewGuid();
+        var b = Guid.NewGuid();
+        var c = Guid.NewGuid();
+        var members = new List<StatMember> { new(a, "A", null), new(b, "B", null), new(c, "C", null) };
+        var t0 = new DateTime(2026, 6, 11, 18, 0, 0, DateTimeKind.Utc);
+        var results = new List<StatResult> { new(1, 1, 0, t0), new(2, 1, 0, t0.AddHours(3)) };
+        var predictions = new List<StatPrediction>
+        {
+            // Kamp 1: alle tre tipper. Kamp 2: C har falt fra. Kamp 3 (ulåst): kun A – skal ikke telle.
+            new(a, 1, 1, 0), new(b, 1, 1, 0), new(c, 1, 0, 1),
+            new(a, 2, 1, 0), new(b, 2, 1, 0),
+            new(a, 3, 2, 2),
+        };
+        var matchInfos = new List<StatMatchInfo>
+        {
+            new(1, "group-1", t0, true),
+            new(2, "group-1", t0.AddHours(3), true),
+            new(3, "group-2", t0.AddDays(5), false), // ikke startet ennå
+        };
+
+        var stats = _calculator.Calculate(members, predictions, results, matchInfos);
+
+        stats.Participation.Should().HaveCount(2);
+        stats.Participation[0].MatchId.Should().Be(1);
+        stats.Participation[0].Count.Should().Be(3);
+        stats.Participation[1].MatchId.Should().Be(2);
+        stats.Participation[1].Count.Should().Be(2);
     }
 }
