@@ -244,6 +244,72 @@ export function getGlobalLeaderboard(): Promise<GlobalLeaderboardEntry[]> {
   return request<GlobalLeaderboardEntry[]>('/api/results/leaderboard/global')
 }
 
+/** En personlig pris i VM-oppsummeringen. `winnerName` er null når prisen ikke kan kåres. */
+export interface AwardEntry {
+  key: string
+  winnerName: string | null
+  winnerPicture: string | null
+  value: number
+  /** Satt for priser knyttet til én bestemt kamp (f.eks. brannfakkel). */
+  matchId: number | null
+}
+
+export interface MatchStat {
+  matchId: number
+  value: number
+}
+
+export interface PopularScoreline {
+  homeScore: number
+  awayScore: number
+  count: number
+}
+
+export interface MatchFacts {
+  hardestMatch: MatchStat | null
+  easiestMatch: MatchStat | null
+  biggestShock: MatchStat | null
+  popularScoreline: PopularScoreline | null
+}
+
+export interface StageAccuracy {
+  predictionCount: number
+  avgPoints: number
+  outcomeHitRate: number
+}
+
+export interface AggregateStats {
+  avgPredictedGoalsPerMatch: number
+  avgActualGoalsPerMatch: number
+  groupStage: StageAccuracy
+  knockout: StageAccuracy
+}
+
+export interface RankMovement {
+  name: string | null
+  picture: string | null
+  positions: number
+}
+
+export interface DramaStats {
+  leadChanges: number
+  biggestClimb: RankMovement | null
+  biggestFall: RankMovement | null
+}
+
+export interface LeagueStats {
+  scoredMatchCount: number
+  memberCount: number
+  personalAwards: AwardEntry[]
+  matchFacts: MatchFacts
+  aggregate: AggregateStats
+  drama: DramaStats
+}
+
+export function getLeagueStats(): Promise<LeagueStats> {
+  return request<LeagueStats>('/api/results/stats')
+}
+
 export function getMatches(): Promise<Match[]> {
   return request<Match[]>('/api/matches')
 }

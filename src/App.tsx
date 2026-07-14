@@ -10,6 +10,7 @@ import RoundPills from './components/RoundPills'
 import BottomNav from './components/BottomNav'
 import MatchList from './components/MatchList'
 import Leaderboard from './components/Leaderboard'
+import Stats from './components/Stats'
 import PredictionModal from './components/PredictionModal'
 import OtherPredictionsModal from './components/OtherPredictionsModal'
 import AdminPanel from './components/AdminPanel'
@@ -20,7 +21,7 @@ import { useMatches } from './context/MatchesContext'
 import { useResults } from './context/ResultsContext'
 import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage, getDefaultStage } from './utils/dateUtils'
 
-type MatchesSection = Exclude<Section, 'leaderboard' | 'admin'>
+type MatchesSection = Exclude<Section, 'leaderboard' | 'admin' | 'stats'>
 
 /**
  * Husker hvilken seksjon/runde brukeren sist så på, slik at vi kan gjenopprette
@@ -73,7 +74,7 @@ function nextBettingStage(matches: Match[]): { section: MatchesSection; stage: S
   const next = getNextBettingDeadline(matches)
   if (!next) return null
   const section = getSectionForStage(next.stage)
-  if (section === 'leaderboard' || section === 'admin') return null
+  if (section === 'leaderboard' || section === 'admin' || section === 'stats') return null
   return { section, stage: next.stage }
 }
 
@@ -89,7 +90,7 @@ function defaultMatchesStage(
   const stage = getDefaultStage(matches, hasResult)
   if (!stage) return null
   const section = getSectionForStage(stage)
-  if (section === 'leaderboard' || section === 'admin') return null
+  if (section === 'leaderboard' || section === 'admin' || section === 'stats') return null
   return { section, stage }
 }
 
@@ -160,7 +161,7 @@ function AppContent() {
 
   // Husk siste seksjon (utenom leaderboard/admin) og siste stage per seksjon.
   useEffect(() => {
-    if (activeSection !== 'leaderboard' && activeSection !== 'admin') {
+    if (activeSection !== 'leaderboard' && activeSection !== 'admin' && activeSection !== 'stats') {
       setLastMatchesSection(activeSection)
     }
     if (activeSection === 'group') setLastGroupStage(activeStage)
@@ -181,9 +182,12 @@ function AppContent() {
 
   // Reager på navigasjons-state (f.eks. fra BottomNav på ChatPage).
   useEffect(() => {
-    const view = (location.state as { mobileView?: 'matches' | 'leaderboard' | 'admin' } | null)?.mobileView
+    const view = (location.state as { mobileView?: 'matches' | 'leaderboard' | 'stats' | 'admin' } | null)?.mobileView
     if (view === 'leaderboard') {
       setActiveSection('leaderboard')
+      navigate(location.pathname, { replace: true, state: null })
+    } else if (view === 'stats') {
+      setActiveSection('stats')
       navigate(location.pathname, { replace: true, state: null })
     } else if (view === 'admin') {
       setActiveSection('admin')
@@ -205,16 +209,18 @@ function AppContent() {
     }
   }
 
-  function handleMobileViewChange(view: 'matches' | 'leaderboard') {
+  function handleMobileViewChange(view: 'matches' | 'leaderboard' | 'stats') {
     if (view === 'leaderboard') {
       setActiveSection('leaderboard')
+    } else if (view === 'stats') {
+      setActiveSection('stats')
     } else {
       handleSectionChange(lastMatchesSection)
     }
   }
 
-  const mobileView: 'matches' | 'leaderboard' =
-    activeSection === 'leaderboard' ? 'leaderboard' : 'matches'
+  const mobileView: 'matches' | 'leaderboard' | 'stats' =
+    activeSection === 'leaderboard' ? 'leaderboard' : activeSection === 'stats' ? 'stats' : 'matches'
 
   return (
     <div
@@ -231,6 +237,8 @@ function AppContent() {
               <AdminPanel />
             ) : activeSection === 'leaderboard' ? (
               <Leaderboard />
+            ) : activeSection === 'stats' ? (
+              <Stats />
             ) : (
               <>
                 <MobileStageNav

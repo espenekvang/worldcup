@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useChat } from '../context/ChatContext'
 
-type MobileView = 'matches' | 'leaderboard'
+type MobileView = 'matches' | 'leaderboard' | 'stats'
 
 interface BottomNavProps {
   /** Currently active mobile view, when on the home (`/`) route. */
@@ -23,6 +23,7 @@ export default function BottomNav({ mobileView, onSelectView }: BottomNavProps) 
   const onHome = location.pathname === '/'
   const matchesActive = onHome && mobileView === 'matches'
   const bossActive = onHome && mobileView === 'leaderboard'
+  const statsActive = onHome && mobileView === 'stats'
 
   function handleHome(view: MobileView) {
     if (onHome) {
@@ -53,6 +54,12 @@ export default function BottomNav({ mobileView, onSelectView }: BottomNavProps) 
         icon="🏆"
         active={bossActive}
         onClick={() => handleHome('leaderboard')}
+      />
+      <NavButton
+        label="Statistikk"
+        icon="📊"
+        active={statsActive}
+        onClick={() => handleHome('stats')}
       />
       <NavButton
         label="Chat"

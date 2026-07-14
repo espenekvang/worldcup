@@ -10,8 +10,8 @@ export type Stage =
   | "final"
   | "leaderboard"
 
-/** Top-level UI grouping: gruppespill, sluttspill eller The Boss. */
-export type Section = "group" | "knockout" | "leaderboard" | "admin"
+/** Top-level UI grouping: gruppespill, sluttspill, The Boss, statistikk eller admin. */
+export type Section = "group" | "knockout" | "leaderboard" | "stats" | "admin"
 
 /** Norsk TV-kanal som sender en kamp. NRK og TV2 deler VM-rettighetene. */
 export type TvChannel = "NRK" | "TV2"
