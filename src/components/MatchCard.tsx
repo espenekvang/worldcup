@@ -31,6 +31,14 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
+// Bronsefinale og finale spilles i samme "Finale"-runde. Gi dem tydelig
+// forskjellige farger og ikoner slik at kortene er lette å skille fra
+// hverandre ved første øyekast.
+const SPECIAL_STAGE_BADGES: Record<string, { backgroundColor: string; color: string; icon: string }> = {
+  'third-place': { backgroundColor: '#f4dcc6', color: '#8a4b1e', icon: '🥉' },
+  'final': { backgroundColor: '#fbeec2', color: '#856512', icon: '🏆' },
+}
+
 export default function MatchCard({ match, teams, venues, locked, isNext, isLive, onTipClick, onViewOthers }: MatchCardProps) {
   const navigate = useNavigate()
   const { predictions } = usePredictions()
@@ -64,6 +72,7 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
   }
 
   const stageLabel = isGroupStage ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage
+  const specialBadge = SPECIAL_STAGE_BADGES[match.stage]
 
   function goToDetails() {
     navigate(`/match/${match.id}`)
@@ -105,9 +114,14 @@ export default function MatchCard({ match, teams, venues, locked, isNext, isLive
           <span className="flex-1 text-left font-medium sm:flex-none sm:text-center">{formatMatchTime(match.date)}</span>
           <span className="flex flex-col items-center gap-0.5">
             <span
-              className="whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
-              style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
+              className="inline-flex items-center gap-0.5 whitespace-nowrap rounded-full px-1.5 py-px text-[10px] font-medium"
+              style={
+                specialBadge
+                  ? { backgroundColor: specialBadge.backgroundColor, color: specialBadge.color }
+                  : { backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }
+              }
             >
+              {specialBadge && <span aria-hidden="true">{specialBadge.icon}</span>}
               {stageLabel}
             </span>
             {isLive && (
