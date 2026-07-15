@@ -69,9 +69,11 @@ export default function Stats() {
     const match = matches.find(m => m.id === matchId)
     if (!match) return { title: `Kamp ${matchId}`, score }
     // Lagene er ennå ikke bestemt (uoppløst sluttspillkamp, homeTeam/awayTeam = null):
-    // vis rundenavnet i stedet for «Vinner kamp N»-placeholderen.
+    // vis rundenavn + kampnummer i stedet for «Vinner kamp N»-placeholderen, slik at
+    // admin lett finner igjen hvilken kamp som må oppdateres manuelt.
     if (areTeamsUndetermined(match)) {
-      return { title: STAGE_LABELS[match.stage] ?? `Kamp ${matchId}`, score }
+      const round = STAGE_LABELS[match.stage] ?? 'Sluttspill'
+      return { title: `${round} (kamp ${matchId})`, score }
     }
     // Lagene er bestemt. Slå opp i teams-tabellen, men fall tilbake på selve
     // lagverdien slik resten av appen (MatchCard) gjør – IKKE på gruppe-/
