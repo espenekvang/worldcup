@@ -9,7 +9,8 @@ namespace WorldCup.Api.Controllers;
 public class MatchesController(
     MatchScheduleProvider scheduleProvider,
     TeamCodeMapper teamCodeMapper,
-    MatchFileWriter matchFileWriter) : ControllerBase
+    MatchFileWriter matchFileWriter,
+    KnockoutResolutionService knockoutResolution) : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
@@ -78,6 +79,12 @@ public class MatchesController(
             .ToList();
 
         await matchFileWriter.WriteAsync(updatedMatches, ct);
+
+        // Å overstyre hvem som spiller kan låse opp etterfølgende sluttspillkamper: hvis den
+        // overstyrte kampen allerede har et resultat, kan vi nå avgjøre «Vinner/Taper kamp N»
+        // nedover i bracket-en. Kjør oppløsningen slik at semifinale/finale ikke blir stående
+        // som placeholder etter en manuell oppsett-overstyring.
+        await knockoutResolution.ResolveAndPersistAsync(ct);
 
         return Ok(new MatchResponse(
             updatedMatch.Id,

@@ -15,8 +15,7 @@ public class ResultsController(
     ScoringService scoringService,
     MatchScheduleProvider scheduleProvider,
     LeagueStatsCalculator statsCalculator,
-    KnockoutBracketResolver bracketResolver,
-    MatchFileWriter matchFileWriter) : ControllerBase
+    KnockoutResolutionService knockoutResolution) : ControllerBase
 {
     [HttpPut("/api/admin/results/{matchId:int}")]
     [Authorize(Roles = "Admin")]
@@ -84,7 +83,7 @@ public class ResultsController(
         // begge kvartfinaler er avgjort). Uten dette avanserer bare den automatiske
         // oppstrøms-hentingen bracket-en, så et manuelt registrert resultat ville latt
         // «Vinner kamp N» stå uoppløst nedover i bracket-en.
-        await ResolveKnockoutBracketAsync(ct);
+        await knockoutResolution.ResolveAndPersistAsync(ct);
 
         return Ok(new ResultResponse
         {
@@ -93,28 +92,6 @@ public class ResultsController(
             AwayScore = request.AwayScore,
             FetchedAt = DateTime.UtcNow
         });
-    }
-
-    private async Task ResolveKnockoutBracketAsync(CancellationToken ct)
-    {
-        var resultRows = await dbContext.MatchResults
-            .Select(r => new { r.MatchId, r.HomeScore, r.AwayScore })
-            .AsNoTracking()
-            .ToListAsync(ct);
-        var scores = resultRows.ToDictionary(r => r.MatchId, r => new MatchScore(r.HomeScore, r.AwayScore));
-
-        var current = scheduleProvider.Current.GetAllMatches();
-        var resolved = bracketResolver.Resolve(current, scores);
-
-        var currentById = current.ToDictionary(m => m.Id);
-        var changed = resolved.Any(r =>
-            currentById.TryGetValue(r.Id, out var before)
-            && (r.HomeTeam != before.HomeTeam || r.AwayTeam != before.AwayTeam));
-
-        if (changed)
-        {
-            await matchFileWriter.WriteAsync(resolved, ct);
-        }
     }
 
     [HttpGet]
