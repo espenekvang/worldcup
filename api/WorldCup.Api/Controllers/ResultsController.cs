@@ -14,7 +14,8 @@ public class ResultsController(
     AppDbContext dbContext,
     ScoringService scoringService,
     MatchScheduleProvider scheduleProvider,
-    LeagueStatsCalculator statsCalculator) : ControllerBase
+    LeagueStatsCalculator statsCalculator,
+    KnockoutResolutionService knockoutResolution) : ControllerBase
 {
     [HttpPut("/api/admin/results/{matchId:int}")]
     [Authorize(Roles = "Admin")]
@@ -77,6 +78,12 @@ public class ResultsController(
         }
 
         await dbContext.SaveChangesAsync(ct);
+
+        // Forsøk å løse opp etterfølgende sluttspillkamper lokalt (f.eks. semifinalen når
+        // begge kvartfinaler er avgjort). Uten dette avanserer bare den automatiske
+        // oppstrøms-hentingen bracket-en, så et manuelt registrert resultat ville latt
+        // «Vinner kamp N» stå uoppløst nedover i bracket-en.
+        await knockoutResolution.ResolveAndPersistAsync(ct);
 
         return Ok(new ResultResponse
         {
