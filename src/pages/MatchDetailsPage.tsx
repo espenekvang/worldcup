@@ -31,6 +31,13 @@ const STAGE_LABELS: Record<string, string> = {
   'final': 'Finale',
 }
 
+// Bronsefinale og finale hører til samme runde – tydelige farger og ikoner
+// gjør det enkelt å se hvilken kamp man ser på.
+const SPECIAL_STAGE_BADGES: Record<string, { backgroundColor: string; color: string; icon: string }> = {
+  'third-place': { backgroundColor: '#f4dcc6', color: '#8a4b1e', icon: '🥉' },
+  'final': { backgroundColor: '#fbeec2', color: '#856512', icon: '🏆' },
+}
+
 /**
  * Detaljside for én kamp (URL /match/:matchId). Samler all info som kan
  * hjelpe en tipper: kickoff, venue, vær, ditt tips, andres tips, lagform,
@@ -82,6 +89,7 @@ export default function MatchDetailsPage() {
   const homeDisplay = homeTeam?.name ?? match.homePlaceholder ?? 'Ikke avgjort'
   const awayDisplay = awayTeam?.name ?? match.awayPlaceholder ?? 'Ikke avgjort'
   const stageLabel = isGroupStage(match.stage) ? `Gruppe ${match.group}` : STAGE_LABELS[match.stage] ?? match.stage
+  const specialBadge = SPECIAL_STAGE_BADGES[match.stage]
 
   const prediction = predictions.get(match.id)
   const result = results.get(match.id)
@@ -109,9 +117,14 @@ export default function MatchDetailsPage() {
         >
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
             <span
-              className="rounded-full px-2 py-0.5 font-medium"
-              style={{ backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }}
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium"
+              style={
+                specialBadge
+                  ? { backgroundColor: specialBadge.backgroundColor, color: specialBadge.color }
+                  : { backgroundColor: 'var(--color-badge-bg)', color: 'var(--color-badge-text)' }
+              }
             >
+              {specialBadge && <span aria-hidden="true">{specialBadge.icon}</span>}
               {stageLabel}
             </span>
             <span>{formatMatchDate(match.date)}</span>
