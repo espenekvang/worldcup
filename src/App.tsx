@@ -19,7 +19,7 @@ import RulesModal from './components/RulesModal'
 import { useAuth } from './context/AuthContext'
 import { useMatches } from './context/MatchesContext'
 import { useResults } from './context/ResultsContext'
-import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage, getDefaultStage } from './utils/dateUtils'
+import { isMatchLocked, GROUP_ROUNDS, getNextBettingDeadline, getSectionForStage, getDefaultStage, stageToRoundPill } from './utils/dateUtils'
 
 type MatchesSection = Exclude<Section, 'leaderboard' | 'admin' | 'stats'>
 
@@ -73,9 +73,10 @@ function defaultStageFor(section: MatchesSection, matches: Match[]): Stage {
 function nextBettingStage(matches: Match[]): { section: MatchesSection; stage: Stage } | null {
   const next = getNextBettingDeadline(matches)
   if (!next) return null
-  const section = getSectionForStage(next.stage)
+  const stage = stageToRoundPill(next.stage)
+  const section = getSectionForStage(stage)
   if (section === 'leaderboard' || section === 'admin' || section === 'stats') return null
-  return { section, stage: next.stage }
+  return { section, stage }
 }
 
 /**
@@ -87,8 +88,9 @@ function defaultMatchesStage(
   matches: Match[],
   hasResult: (matchId: number) => boolean,
 ): { section: MatchesSection; stage: Stage } | null {
-  const stage = getDefaultStage(matches, hasResult)
-  if (!stage) return null
+  const rawStage = getDefaultStage(matches, hasResult)
+  if (!rawStage) return null
+  const stage = stageToRoundPill(rawStage)
   const section = getSectionForStage(stage)
   if (section === 'leaderboard' || section === 'admin' || section === 'stats') return null
   return { section, stage }
