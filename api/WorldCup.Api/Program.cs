@@ -82,6 +82,7 @@ builder.Services.AddSingleton<IOptions<MatchFileWriterOptions>>(
 builder.Services.AddSingleton<MatchFileWriter>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddScoped<LeagueStatsCalculator>();
+builder.Services.AddSingleton<KnockoutBracketResolver>();
 builder.Services.AddHttpClient<Wc2026ApiClient>();
 
 // Værvarsel (Open-Meteo). MemoryCache holder svar i ~3t per stadion+dato slik at
