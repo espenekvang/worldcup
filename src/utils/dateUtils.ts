@@ -177,3 +177,13 @@ export function getSectionForStage(stage: Stage): Section {
 /** Stages som vises som "runder" innenfor en seksjon (ekskl. leaderboard og third-place). */
 export const GROUP_ROUNDS: Stage[] = ['group-1', 'group-2', 'group-3']
 export const KNOCKOUT_ROUNDS: Stage[] = ['round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'final']
+
+/**
+ * Bronsefinalen (`third-place`) har ingen egen pill – den deler «Finale»-fanen
+ * med finalen. Når vi utleder hvilken runde appen skal åpne på, må vi derfor
+ * mappe `third-place` til `final`, ellers havner vi på en fane uten aktiv pill
+ * der bare bronsefinalen vises.
+ */
+export function stageToRoundPill(stage: Stage): Stage {
+  return stage === 'third-place' ? 'final' : stage
+}

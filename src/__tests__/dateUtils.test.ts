@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { formatMatchDate, formatMatchTime, getTimeUntil, getNextMatch, isBeforeTournament, isMatchInProgress, getDefaultStage } from '../utils/dateUtils'
+import { formatMatchDate, formatMatchTime, getTimeUntil, getNextMatch, isBeforeTournament, isMatchInProgress, getDefaultStage, stageToRoundPill } from '../utils/dateUtils'
 import type { Match } from '../types'
 
 describe('dateUtils', () => {
@@ -111,6 +111,18 @@ describe('dateUtils', () => {
       const now = new Date('2026-07-01T00:00:00Z').getTime()
       const finished = () => true
       expect(getDefaultStage(matches, finished, now)).toBeNull()
+    })
+  })
+
+  describe('stageToRoundPill', () => {
+    it('maps third-place to the final pill', () => {
+      expect(stageToRoundPill('third-place')).toBe('final')
+    })
+
+    it('leaves other stages unchanged', () => {
+      expect(stageToRoundPill('final')).toBe('final')
+      expect(stageToRoundPill('semi-final')).toBe('semi-final')
+      expect(stageToRoundPill('group-1')).toBe('group-1')
     })
   })
 })
