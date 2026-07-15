@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, Team, Venue, Stage } from '../types'
-import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined, isMatchInProgress, isToday } from '../utils/dateUtils'
+import { formatMatchDate, getLocalDateKey, isMatchLocked, areTeamsUndetermined, isMatchInProgress, isToday, getNextMatch } from '../utils/dateUtils'
 import { useResults } from '../context/ResultsContext'
 import MatchCard from './MatchCard'
 
@@ -40,11 +40,11 @@ export default function MatchList({ matches, teams, venues, activeStage, onTipCl
   const finishedMatches = sorted.filter(isFinished).reverse()
   const remainingMatches = sorted.filter(m => !isFinished(m))
 
-  // Find the globally next upcoming unlocked match (across all stages)
-  const now = new Date()
-  const globalNextMatch = [...matches]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .find(m => new Date(m.date) > now && !isLocked(m))
+  // Finn den kronologisk neste kommende kampen (på tvers av alle runder). Vi ser
+  // kun på avsparkstidspunkt, ikke om lagene er avgjort ennå: bronsefinalen spilles
+  // før finalen, så den skal festes som "Neste kamp" selv om motstanderne fortsatt
+  // fylles inn fra semifinalene. Kortet viser da "Ikke avgjort" på vanlig vis.
+  const globalNextMatch = getNextMatch(matches)
 
   // Only show "Neste kamp" if it belongs to the currently active stage
   const nextMatch = remainingMatches.find(m => m.id === globalNextMatch?.id) || null
