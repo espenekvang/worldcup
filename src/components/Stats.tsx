@@ -5,6 +5,7 @@ import { useMatches } from '../context/MatchesContext'
 import { useResults } from '../context/ResultsContext'
 import { teams } from '../data'
 import { displayName } from '../utils/nameUtils'
+import { STAGE_LABELS, areTeamsUndetermined } from '../utils/dateUtils'
 import ParticipationChart, { type ParticipationChartPoint } from './ParticipationChart'
 
 /**
@@ -63,14 +64,22 @@ export default function Stats() {
 
   /** Kort tekstetikett for en kamp, f.eks. «🇳🇴 Norge – Brasil 🇧🇷» med resultat. */
   const matchLabel = useMemo(() => (matchId: number): { title: string; score: string | null } => {
-    const match = matches.find(m => m.id === matchId)
-    if (!match) return { title: `Kamp ${matchId}`, score: null }
-    const home = match.homeTeam ? teams[match.homeTeam] : undefined
-    const away = match.awayTeam ? teams[match.awayTeam] : undefined
-    const homeName = home ? `${home.flag} ${home.name}` : match.homePlaceholder ?? '?'
-    const awayName = away ? `${away.name} ${away.flag}` : match.awayPlaceholder ?? '?'
     const result = results.get(matchId)
     const score = result ? `${result.homeScore}–${result.awayScore}` : null
+    const match = matches.find(m => m.id === matchId)
+    if (!match) return { title: `Kamp ${matchId}`, score }
+    // Lagene er ennå ikke bestemt (uoppløst sluttspillkamp, homeTeam/awayTeam = null):
+    // vis rundenavnet i stedet for «Vinner kamp N»-placeholderen.
+    if (areTeamsUndetermined(match)) {
+      return { title: STAGE_LABELS[match.stage] ?? `Kamp ${matchId}`, score }
+    }
+    // Lagene er bestemt. Slå opp i teams-tabellen, men fall tilbake på selve
+    // lagverdien slik resten av appen (MatchCard) gjør – IKKE på gruppe-/
+    // rundeplaceholderen – dersom koden ikke finnes i den statiske teams-tabellen.
+    const home = teams[match.homeTeam!]
+    const away = teams[match.awayTeam!]
+    const homeName = home ? `${home.flag} ${home.name}` : match.homeTeam!
+    const awayName = away ? `${away.name} ${away.flag}` : match.awayTeam!
     return { title: `${homeName} – ${awayName}`, score }
   }, [matches, results])
 
