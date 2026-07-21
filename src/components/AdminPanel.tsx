@@ -7,6 +7,7 @@ import {
   getAllGroups, getMyGroups, createGroup, updateGroup, deleteGroup,
   getGroupMembers, addGroupMember, removeGroupMember, toggleGroupAdmin,
   setMemberPaid, broadcastMessage, setBossNameDisplay, getDiagnostics, forceFetch,
+  downloadBackupOverview,
 } from '../api/client'
 import type { BettingGroup, BettingGroupMember } from '../types'
 import { useMatches } from '../context/MatchesContext'
@@ -96,6 +97,11 @@ export default function AdminPanel() {
   const [forceFetchResult, setForceFetchResult] = useState<ForceFetchResult | null>(null)
   const [forceFetchLoading, setForceFetchLoading] = useState(false)
   const [forceFetchError, setForceFetchError] = useState<string | null>(null)
+
+  // Backup state
+  const [backupLoading, setBackupLoading] = useState(false)
+  const [backupError, setBackupError] = useState<string | null>(null)
+  const [backupSuccess, setBackupSuccess] = useState(false)
 
   const knockoutMatches = matches.filter((m) => !m.stage.startsWith('group'))
   const matchesWithoutResult = matches.filter((m) => !results.has(m.id))
@@ -513,6 +519,28 @@ export default function AdminPanel() {
       setForceFetchError(err instanceof Error ? err.message : 'Tving-henting feilet')
     } finally {
       setForceFetchLoading(false)
+    }
+  }
+
+  async function handleDownloadBackup() {
+    setBackupLoading(true)
+    setBackupError(null)
+    setBackupSuccess(false)
+    try {
+      const { blob, fileName } = await downloadBackupOverview()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+      setBackupSuccess(true)
+    } catch (err) {
+      setBackupError(err instanceof Error ? err.message : 'Kunne ikke laste ned backup')
+    } finally {
+      setBackupLoading(false)
     }
   }
 
@@ -1124,6 +1152,38 @@ export default function AdminPanel() {
 
       {isGlobalAdmin && (
       <>
+      {/* Backup / eksport */}
+      <div
+        className="rounded-xl border p-4 sm:p-6 mt-6"
+        style={{ backgroundColor: 'var(--color-surface-card)', borderColor: 'var(--color-border)' }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Backup av sluttoppgjør</h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Last ned en selvstendig HTML-fil med poeng per spiller i hver liga. Filen kan lagres og
+              åpnes i en nettleser uten app eller database – nyttig før løsningen tas ned.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadBackup}
+            disabled={backupLoading}
+            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50"
+            style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+          >
+            {backupLoading ? 'Lager...' : 'Last ned backup'}
+          </button>
+        </div>
+
+        {backupError && (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{backupError}</p>
+        )}
+        {backupSuccess && (
+          <p className="mt-3 text-sm" style={{ color: 'var(--color-success)' }}>Backup lastet ned.</p>
+        )}
+      </div>
+
       {/* Diagnostics */}
       <div
         className="rounded-xl border p-4 sm:p-6 mt-6"

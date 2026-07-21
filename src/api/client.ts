@@ -617,3 +617,29 @@ export interface ForceFetchResult {
 export function forceFetch(): Promise<ForceFetchResult> {
   return request<ForceFetchResult>('/api/admin/diagnostics/force-fetch', { method: 'POST' })
 }
+
+/**
+ * Laster ned en selvstendig HTML-backup av sluttoppgjøret (poeng per spiller per liga).
+ * Endepunktet er JWT-beskyttet, så vi henter med Authorization-header og returnerer en
+ * Blob + foreslått filnavn som kalleren kan lagre lokalt.
+ */
+export async function downloadBackupOverview(): Promise<{ blob: Blob; fileName: string }> {
+  const token = getToken()
+  const headers: Record<string, string> = {}
+  if (token) headers['Authorization'] = `Bearer ${token}`
+
+  const response = await fetch(`${API_BASE}/api/admin/backup/overview`, { headers })
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Unknown error')
+    throw new Error(`API error ${response.status}: ${errorText}`)
+  }
+
+  const blob = await response.blob()
+
+  // Filnavn fra Content-Disposition om det finnes, ellers et fornuftig standardnavn.
+  const disposition = response.headers.get('Content-Disposition') ?? ''
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition)
+  const fileName = match ? decodeURIComponent(match[1]) : `vm-2026-backup-${new Date().toISOString().slice(0, 10)}.html`
+
+  return { blob, fileName }
+}
